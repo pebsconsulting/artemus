@@ -1,0 +1,121 @@
+=pod
+
+=head1 NAME
+
+artemus - Text substitution tool and much more
+
+=head1 SYNOPSIS
+
+ # substitutes text
+ artemus -i|--input={input file} -o|--output={output file}
+	[-c|--conf={config file}]
+	[-p|--paragraph={paragraph_separator}]
+	[-m|--msdos] [-a|--append]
+
+ # send via ftp
+ artemus -f|--ftp {files to ftp...}
+
+ # creates a template makefile for html projects
+ artemus -k|--makefile > Makefile
+
+ # builds a site map page
+ artemus -s|--site-map {Directories} > sitemap/index.artemus
+
+=head1 DESCRIPTION
+
+B<artemus> is a text substitution tool (thought mainly for preprocessing HTML).
+Macros are defined in the file F<artemus.conf>, in the form B<key=value>,
+being B<value> the destination text, that can have parameters. The macro is
+included in the source file between the B<{-> and B<}> marks. The (possible)
+parameters are delimited by the B<|> symbol.
+
+Examples:
+
+In F<artemus.conf> file:
+
+ # some simple definitions
+ Perl=<a href="http://www.perl.com">Perl</a>
+ LWN=<a href="http://www.lwn.net">Linux Weekly News</a>
+ separator=<br><hr><br>
+ head=<html><body bgcolor=ffffff>
+
+ # definitions with parameters
+ # generic link
+ link=<a href="http://$1">$0</a>
+ # generic meta
+ meta=<meta name="$1" content="$0">
+ # link using the link macro
+ CPAN={-link|CPAN|www.cpan.org}
+
+In a source file F<index.artemus>:
+
+ {-head}
+ {-meta|links, free software|keywords}
+ <h1>Links</h1>
+ <ul>
+ <li>{-Perl}
+ <li>{-LWN}
+ <li>{-CPAN}
+ <li>{-link|kernel.org|www.kernel.org}
+ </ul>
+ {-separator}
+
+By running
+
+ artemus -i index.artemus -o index.html
+
+you obtain the file F<index.html>:
+
+ <html><body bgcolor=ffffff>
+ <meta name="keywords" content="links, free software">
+ <h1>Links</h1>
+ <ul>
+ <li><a href="http://www.perl.com">Perl</a>
+ <li><a href="http://www.lwn.net">Linux Weekly News</a>
+ <li><a href="http://www.cpan.org">CPAN</a>
+ <li><a href="http://www.kernel.org">kernel.org</a>
+ </ul>
+ <br><hr><br>
+
+The I<--paragraph> argument let us define a string to substitute the empty
+lines in the document. If defined as <p>, you can create HTML documents
+separating the paragraphs with only a blank line, as B<artemus> will fill
+them with <p>.
+
+The I<--msdos> argument creates the typical MSDOS end of line, CR+LF.
+
+The I<--append> argument appends the output to destination file, instead
+of overwriting it.
+
+The I<--makefile> argument creates a typical makefile for artemus-based
+HTML projects (including building and ftp-uploading rules). You must
+modify it to suit your needs.
+
+The I<--site-map> argument walks the directories sent as arguments searching
+for HTML files and sends to standard output the map of the site. As header
+and footer it creates the special B<artemus> tags B<site-map-head> and
+B<site-map-foot>, that must be defined in F<artemus.conf>. A typical
+definition could be
+
+ site-map-head={-head|Site Map}
+ site-map-foot={-foot}
+
+=head1 FTP
+
+B<artemus> includes, since version 2.04, ftp capabilities to send the files
+specified as arguments to a server defined in F<artemus.conf>. The entries
+in this file must be:
+
+ ftp.host=<host>
+ ftp.user=<user>
+ ftp.passwd=<passwd>
+ ftp.dir=<destination directory (optional)>
+
+Note that including this information in F<artemus.conf> makes it
+security-sensible.
+
+=head1 AUTHOR
+
+(C) Angel Ortega <angel@triptico.com> 2000/2002
+
+=cut
