@@ -332,9 +332,12 @@ sub new
 	$ah{'vars'}->{'\VERSION'}=$Artemus::VERSION;
 
 	# special functions
-	$ah{'funcs'}->{"localtime"}=sub { scalar(localtime) };
-	$ah{'funcs'}->{"if"}=sub { $_[0] ? return($_[1]) : return("") };
-	$ah{'funcs'}->{"ifelse"}=sub { $_[0] ? return($_[1]) : return($_[2]) };
+	$ah{'funcs'}->{"localtime"} = sub { scalar(localtime) };
+	$ah{'funcs'}->{"if"} = sub { $_[0] ? return($_[1]) : return("") };
+	$ah{'funcs'}->{"ifelse"} = sub { $_[0] ? return($_[1]) : return($_[2]) };
+	$ah{'funcs'}->{"ifeq"} = sub { $_[0] eq $_[1] ? return($_[2]) : return("") };
+	$ah{'funcs'}->{"ifneq"} = sub { $_[0] ne $_[1] ? return($_[2]) : return("") };
+	$ah{'funcs'}->{"ifeqelse"} = sub { $_[0] eq $_[1] ? return($_[2]) : return($_[3]) };
 
 	bless(\%ah,$class);
 	return(\%ah);
