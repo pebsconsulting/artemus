@@ -1,0 +1,8 @@
+Artemus TODO
+============
+
+Improvements
+------------
+
+ - Add a new clear_cache() function to delete cache entries older
+   than a specified number of days.
