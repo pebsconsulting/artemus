@@ -472,6 +472,7 @@ sub _process_do
 		{
 			$cache_time=$1;
 
+			# convert strange chars to :
 			$template_name =~ s/[^\w\d_]/:/g;
 
 			my ($f)="$ah->{'cache-path'}/$template_name";
@@ -595,7 +596,8 @@ sub _process_do
 		}
 
 		# do the recursivity
-#		$text=$ah->_process_do($text,$key);
+		# if params are not to be cached,
+		# use $key instead of $found
 		$text=$ah->_process_do($text,$found);
 
 		# make the substitution
