@@ -26,7 +26,7 @@ use locale;
 
 package Artemus;
 
-$VERSION='4.0.3';
+$VERSION='4.0.4m';
 
 =pod
 
@@ -198,7 +198,7 @@ I<text_unless_true> otherwise.
 
  {-\CACHE|time}
 
-Marks a template as cacheable and sets its cache time. See below.
+Marks a template as cacheable and sets its cache time. See above.
 
 =item B<\VERSION>
 
@@ -503,7 +503,7 @@ sub _process_do
 	# strips HTML comments
 	if($ah->{'strip-html-comments'})
 	{
-		$data=~s/\<\!\-\-.*\-\-\>//gs;
+		$data=~s/<!--.*?-->//gs;
 	}
 
 	# if defined, substitute the paragraphs

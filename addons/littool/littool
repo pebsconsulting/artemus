@@ -1,0 +1,61 @@
+#!/bin/sh
+
+#
+#	littool
+#
+#	Bash + artemus version
+#
+#	Copyright (C) 2000/2001 Angel Ortega <angel@triptico.com>
+#
+
+
+CONF_DIR=/usr/local/share/littool
+OPTS=
+TYPE=$1
+
+shift
+
+case $TYPE in
+rtf)
+	OUT_FILE=$1.rtf
+	CONF_FILE=littool-rtf.conf
+	OPTS=-m
+	;;
+html)
+	OUT_FILE=$1.html
+	CONF_FILE=littool-html.conf
+	;;
+troff)
+	OUT_FILE=$1.troff
+	CONF_FILE=littool-troff.conf
+	;;
+ps)
+	OUT_FILE=$1
+	shift
+	littool troff $OUT_FILE $*
+	groff -Tps -me $OUT_FILE.troff > $OUT_FILE.ps
+	exit 0
+	;;
+pdf)
+	OUT_FILE=$1
+	shift
+	littool ps $OUT_FILE $*
+	ps2pdf $OUT_FILE.ps
+	exit 0
+	;;
+*)
+	echo "Usage: littool {format} {output file} {input files...}"
+	echo "formats:"
+	echo "rtf, html, troff, ps, pdf"
+	exit 0
+	;;
+esac
+
+> $OUT_FILE
+
+shift
+
+for part in $* ; do
+	artemus -c $CONF_DIR/$CONF_FILE \
+		$OPTS -p '{-parr}' -a -o $OUT_FILE -i $part
+done
