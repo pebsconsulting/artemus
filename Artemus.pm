@@ -193,6 +193,27 @@ otherwise. A condition is true if is not zero or the empty string
 If I<condition> is true, this template returns I<text_if_true>, or
 I<text_unless_true> otherwise.
 
+=item B<ifeq>
+
+ {-ifeq|term1|term2|text}
+
+If I<term1> is equal to I<term2>, this template returns I<text>, or nothing
+otherwise.
+
+=item B<ifneq>
+
+ {-ifneq|term1|term2|text}
+
+If I<term1> is not equal to I<term2>, this template returns I<text>, or
+nothing otherwise.
+
+=item B<ifeqelse>
+
+ {-ifeqelse|term1|term2|text_if_true|text_unless_true}
+
+If I<term1> is equal to I<term2>, this template returns I<text_if_true>, or
+I<text_unless_true> otherwise.
+
 =item B<\CACHE>
 
  {-\CACHE|time}
