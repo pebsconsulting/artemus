@@ -107,9 +107,8 @@ you can insert the following call:
 
  {-link|http://www.triptico.com|Angel Ortega's Home Page}
 
-As you can see, you normally use the | character as a separator
-among the parameters and the template name itself. Any other
-non-alphanumeric character can be used as the separator.
+As you can see, you use the | character as a separator
+among the parameters and the template name itself.
 
 =head2 Perl functions as templates
 
@@ -526,7 +525,7 @@ sub _process_do
 		my ($found)=$1;
 		my ($key,@params,$text);
 
-		# take key and separator (usually |)
+		# take key and params
 		if(($key,$text)=($found =~ /^([-\\\w_ \.]+)\|(.*)$/s))
 		{
 			# now split the parameters
