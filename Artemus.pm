@@ -2,7 +2,7 @@
 #
 #   Artemus - Template Toolkit
 #
-#   Copyright (C) 2000/2002 Angel Ortega <angel@triptico.com>
+#   Copyright (C) 2000/2003 Angel Ortega <angel@triptico.com>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License
@@ -26,7 +26,7 @@ use locale;
 
 package Artemus;
 
-$VERSION='4.0.5m';
+$VERSION = '4.0.5';
 
 =pod
 
@@ -344,13 +344,13 @@ sent as the first argument.
 
 sub new
 {
-	my ($class,%ah)=@_;
+	my ($class,%ah) = @_;
 
 	# special variables
-	$ah{'vars'}->{'\n'}="\n";
-	$ah{'vars'}->{'\BEGIN'}||="";
-	$ah{'vars'}->{'\END'}||="";
-	$ah{'vars'}->{'\VERSION'}=$Artemus::VERSION;
+	$ah{'vars'}->{'\n'} = "\n";
+	$ah{'vars'}->{'\BEGIN'} ||= "";
+	$ah{'vars'}->{'\END'} ||= "";
+	$ah{'vars'}->{'\VERSION'} = $Artemus::VERSION;
 
 	# special functions
 	$ah{'funcs'}->{"localtime"} = sub { scalar(localtime) };
@@ -376,7 +376,7 @@ interpreted by the parser.
 
 sub armor
 {
-	my ($ah,$t)=@_;
+	my ($ah,$t) = @_;
 
 	$t =~ s/{/\&#123;/g;
 	$t =~ s/\|/\&#124;/g;
@@ -399,7 +399,7 @@ is the reverse operation of B<armor>.
 
 sub unarmor
 {
-	my ($ah,$t)=@_;
+	my ($ah,$t) = @_;
 
 	$t =~ s/\&#123;/{/g;
 	$t =~ s/\&#124;/\|/g;
@@ -421,7 +421,7 @@ Strips all Artemus markup from the string.
 
 sub strip
 {
-	my ($ah,$t)=@_;
+	my ($ah,$t) = @_;
 
 	$t =~ s/{-([-\\\w_ \.]+)[^{}]*}/$1/g;
 
@@ -440,7 +440,7 @@ the equivalent element from @params.
 
 sub params
 {
-	my ($ah,$t,@params)=@_;
+	my ($ah,$t,@params) = @_;
 
 	for(my $n=0;$t =~ /\$$n/;$n++)
 	{
@@ -463,19 +463,19 @@ I<unresolved> list are reset on each call to this method.
 
 sub process
 {
-	my ($ah,$data)=@_;
+	my ($ah,$data) = @_;
 
 	# not aborted by now
-	$$ah->{'abort-flag'}=0 if ref($ah->{'abort-flag'});
+	$$ah->{'abort-flag'} = 0 if ref($ah->{'abort-flag'});
 
 	# no unresolved templates by now
-	@{$ah->{'unresolved'}}=() if ref($ah->{'unresolved'});
+	@{$ah->{'unresolved'}} = () if ref($ah->{'unresolved'});
 
 	# surround with \BEGIN and \END
-	$data=$ah->{'vars'}->{'\BEGIN'} . $data . $ah->{'vars'}->{'\END'};
+	$data = $ah->{'vars'}->{'\BEGIN'} . $data . $ah->{'vars'}->{'\END'};
 
 	# really do it, recursively
-	$data=$ah->_process_do($data);
+	$data = $ah->_process_do($data);
 
 	# finally, convert end of lines if necessary
 	$data =~ s/\n/\r\n/g if $ah->{'use-cr-lf'};
@@ -486,7 +486,7 @@ sub process
 
 sub _process_do
 {
-	my ($ah,$data,$template_name)=@_;
+	my ($ah,$data,$template_name) = @_;
 	my ($cache_time);
 
 	# test if the template includes cache info
@@ -494,18 +494,18 @@ sub _process_do
 	{
 		if($template_name and $ah->{'cache-path'})
 		{
-			$cache_time=$1;
+			$cache_time = $1;
 
 			# convert strange chars to :
 			$template_name =~ s/[^\w\d_]/:/g;
 
-			my ($f)="$ah->{'cache-path'}/$template_name";
+			my ($f) = "$ah->{'cache-path'}/$template_name";
 
 			if(-r $f and -M $f < $cache_time)
 			{
 				open F, $f;
 				flock F, 1;
-				$data=join("",<F>);
+				$data = join("",<F>);
 				close F;
 
 				return($data);
@@ -523,13 +523,13 @@ sub _process_do
 			push(@d, $_) unless(/^=/ .. /^=cut/);
 		}
 
-		$data=join("\n",@d);
+		$data = join("\n",@d);
 	}
 
 	# strips HTML comments
 	if($ah->{'strip-html-comments'})
 	{
-		$data=~s/<!--.*?-->//gs;
+		$data =~ s/<!--.*?-->//gs;
 	}
 
 	# if defined, substitute the paragraphs
@@ -549,33 +549,33 @@ sub _process_do
 	# main function, variable and include substitutions
 	while($data =~ /{-([^}{]*)}/s)
 	{
-		my ($found)=$1;
+		my ($found) = $1;
 		my ($key,@params,$text);
 
 		# take key and params
-		if(($key,$text)=($found =~ /^([-\\\w_ \.]+)\|(.*)$/s))
+		if(($key,$text) = ($found =~ /^([-\\\w_ \.]+)\|(.*)$/s))
 		{
 			# now split the parameters
-			@params=split(/\|/,$text);
+			@params = split(/\|/,$text);
 		}
 		else
 		{
 			# no separator nor parameters; try key alone
-			unless(($key)=($found =~ /^([-\\\w_ \.]+)$/s))
+			unless(($key) = ($found =~ /^([-\\\w_ \.]+)$/s))
 			{
 				# invalid key; replace and try next
 				$data =~ s/{-\Q$found\E}/$found/;
 				next;
 			}
 
-			@params=();
+			@params = ();
 		}
 
 		# is it a variable?
 		if(defined $ah->{'vars'}->{$key})
 		{
-			$text=$ah->{'vars'}->{$key};
-			$text=$ah->params($text,@params);
+			$text = $ah->{'vars'}->{$key};
+			$text = $ah->params($text,@params);
 		}
 
 		# is it a function?
@@ -584,8 +584,8 @@ sub _process_do
 		{
 			my ($func);
 
-			$func=$ah->{'funcs'}->{$key};
-			$text=&$func(@params);
+			$func = $ah->{'funcs'}->{$key};
+			$text = &$func(@params);
 
 			# functions can abort further execution
 			last if ref($ah->{'abort-flag'}) and $$ah->{'abort-flag'};
@@ -598,10 +598,10 @@ sub _process_do
 			{
 				if(open(INC, "$p/$key"))
 				{
-					$text=join("",<INC>);
+					$text = join("",<INC>);
 					close INC;
 
-					$text=$ah->params($text,@params);
+					$text = $ah->params($text,@params);
 
 					last;
 				}
@@ -610,19 +610,19 @@ sub _process_do
 
 		unless(defined $text)
 		{
-			$text=$found;
+			$text = $found;
 
 			push(@{$ah->{'unresolved'}},$found)
 				if ref $ah->{'unresolved'};
 
-			$text=$ah->{'AUTOLOAD'}($found)
+			$text = $ah->{'AUTOLOAD'}($found)
 				if ref $ah->{'AUTOLOAD'};
 		}
 
 		# do the recursivity
 		# if params are not to be cached,
 		# use $key instead of $found
-		$text=$ah->_process_do($text,$found);
+		$text = $ah->_process_do($text,$found);
 
 		# make the substitution
 		$data =~ s/{-\Q$found\E}/$text/;

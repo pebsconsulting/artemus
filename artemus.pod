@@ -116,6 +116,6 @@ security-sensible.
 
 =head1 AUTHOR
 
-(C) Angel Ortega <angel@triptico.com> 2000/2002
+(C) Angel Ortega <angel@triptico.com> 2000/2003
 
 =cut
