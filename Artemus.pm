@@ -26,7 +26,7 @@ use locale;
 
 package Artemus;
 
-$VERSION='4.0.4';
+$VERSION='4.0.5m';
 
 =pod
 
@@ -472,6 +472,8 @@ sub _process_do
 		{
 			$cache_time=$1;
 
+			$template_name =~ s/[^\w\d_]/:/g;
+
 			my ($f)="$ah->{'cache-path'}/$template_name";
 
 			if(-r $f and -M $f < $cache_time)
@@ -593,7 +595,8 @@ sub _process_do
 		}
 
 		# do the recursivity
-		$text=$ah->_process_do($text,$key);
+#		$text=$ah->_process_do($text,$key);
+		$text=$ah->_process_do($text,$found);
 
 		# make the substitution
 		$data =~ s/{-\Q$found\E}/$text/;
