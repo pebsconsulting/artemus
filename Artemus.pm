@@ -26,7 +26,7 @@ use locale;
 
 package Artemus;
 
-$VERSION='4.0.1';
+$VERSION='4.0.3';
 
 =pod
 
@@ -231,7 +231,9 @@ prepended (\END) to the text being processed.
 	[ "unresolved" => \@unresolved_templates, ]
 	[ "use-cr-lf" => $boolean, ]
 	[ "contains-pod" => $boolean, ]
-	[ "paragraph-separator" => $separator ]
+	[ "paragraph-separator" => $separator, ]
+	[ "strip-html-comments" => $boolean, ]
+	[ "AUTOLOAD" => \&autoload_func ]
 	);
 
 Creates a new Artemus object. The following arguments (passed to it
@@ -282,7 +284,7 @@ can set it to any other non-zero value to stop template processing.
 
 =item I<unresolved>
 
-If you point this argument to an array reference, it will be filled
+If this argument points to an array reference, it will be filled
 with the name of any unresolved templates. Each time a template
 processing is started, the array is emptied.
 
@@ -302,6 +304,19 @@ See L<Documenting templates>.
 
 If this argument is set to some string, all empty lines will be
 substituted by it (can be another Artemus template).
+
+=item I<strip-html-comments>
+
+If this flag is set, HTML comments are stripped before any
+processing.
+
+=item I<AUTOLOAD>
+
+If this argument points to a sub reference, the subrutine will
+be executed when a template is unresolved and its return value used
+as the final substitution value. Similar to the AUTOLOAD function
+in Perl standard modules. The unresolved template name will be
+sent as the first argument.
 
 =back
 
@@ -485,6 +500,12 @@ sub _process_do
 		$data=join("\n",@d);
 	}
 
+	# strips HTML comments
+	if($ah->{'strip-html-comments'})
+	{
+		$data=~s/\<\!\-\-.*\-\-\>//gs;
+	}
+
 	# if defined, substitute the paragraphs
 	# with the paragraph separator
 	if($ah->{'paragraph-separator'})
@@ -563,10 +584,13 @@ sub _process_do
 
 		unless(defined $text)
 		{
+			$text=$found;
+
 			push(@{$ah->{'unresolved'}},$found)
 				if ref $ah->{'unresolved'};
 
-			$text=$found;
+			$text=$ah->{'AUTOLOAD'}($found)
+				if ref $ah->{'AUTOLOAD'};
 		}
 
 		# do the recursivity

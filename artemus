@@ -74,7 +74,7 @@ $include_path="";
 # include debugging info
 $debug=0;
 
-# list of unresolved symbols
+# unresolved templates
 @unresolved=();
 
 #####################################################################
@@ -149,15 +149,10 @@ open F, ($append?">":"").">$dst" or die "can't write '$dst'";
 print F $data;
 close F;
 
-# dump errors
-unless($quiet)
+foreach my $t (@unresolved)
 {
-	foreach my $e (@unresolved)
-	{
-		print STDERR "Unresolved: '$e'\n";
-	}
+	print STDERR "Artemus: unresolved '$t'\n";
 }
-
 
 exit(0);
 
