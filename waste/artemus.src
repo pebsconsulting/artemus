@@ -1,0 +1,436 @@
+#!/usr/bin/perl
+
+#
+#   artemus - HTML (and other things) Preprocessor
+#
+#   Copyright (C) 2000/2002 Angel Ortega <angel@triptico.com>
+#
+#   This program is free software; you can redistribute it and/or
+#   modify it under the terms of the GNU General Public License
+#   as published by the Free Software Foundation; either version 2
+#   of the License, or (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+#   http://www.triptico.com
+#
+
+use locale;
+use Getopt::Long;
+
+# id
+$VERSION="3.0beta1";
+$artemus_id="Artemus $VERSION";
+
+# substitution variables
+%vars=();
+
+# substitution functions
+%funcs=();
+
+# source and destination files
+$src="";
+$dst="";
+
+# config file
+$config_file="artemus.conf";
+
+# local configuration file
+$local_config_file="local-artemus.conf";
+
+# paragraph separator
+$para_sep="";
+
+# use cr/lf instead of lf
+$use_cr_lf=0;
+
+# append instead of overwrite output file
+$append=0;
+
+# send files using ftp
+$use_ftp=0;
+
+# build site map
+$site_map=0;
+
+# create makefile template
+$makefile_template=0;
+
+# quiet flag
+$quiet=0;
+
+# inverse substitutions
+$inverse_config_file="artemus-inv.conf";
+%inv_vars=();
+
+# include path
+$include_path="";
+
+# include debugging info
+$debug=0;
+
+# list of unresolved symbols
+@unresolved=();
+
+#####################################################################
+
+
+usage() if(!GetOptions( "i|input=s"	   => \$src,
+			"o|output=s"	   => \$dst,
+			"c|conf=s"	   => \$config_file,
+			"p|paragraph=s"    => \$para_sep,
+			"m|msdos"	   => \$use_cr_lf,
+			"a|append"	   => \$append,
+			"v|version-only"   => \$version_only,
+			"f|ftp" 	   => \$use_ftp,
+			"k|makefile"	   => \$makefile_template,
+			"s|site-map"	   => \$site_map,
+			"q|quiet"	   => \$quiet,
+			"l|include-path=s" => \$include_path,
+			"d|debug"	   => \$debug,
+			"h|help"	   => \$help) or $help);
+
+$dst=">-" if $dst eq "-";
+
+version_only() if $version_only;
+
+make_makefile() if $makefile_template;
+
+build_site_map(@ARGV) if $site_map;
+
+if(!$use_ftp)
+{
+	usage() unless $src;
+	usage() unless $dst;
+}
+
+# read the configuration files
+read_config($config_file) if -f $config_file;
+read_config($local_config_file) if -f $local_config_file;
+read_config($inverse_config_file,1) if -f $inverse_config_file;
+
+ftp_send() if $use_ftp;
+
+open F, $src or die "can't open '$src'";
+
+# get all the file
+#undef $/;
+$data=join("",<F>);
+close F;
+
+@artemus.pl@
+
+if($dst =~ /.html$/)
+{
+	$data="<meta name=\"generator\" content=\"$artemus_id\">\n".$data;
+	$data=sprintf("<!-- Date: %s -->\n",scalar(localtime)).$data;
+	$data="<!-- Built with $artemus_id Angel Ortega 2000/2002 -->\n".$data;
+}
+
+# special functions
+$funcs{"filesize"}=sub { -s $_[0] };
+$funcs{"shell"}=sub { $_=`$_[0]`; chop; return $_ };
+
+$data=artemus($data, "paragraph-separator"	=> $para_sep,
+		     "vars"			=> \%vars,
+		     "inv-vars" 		=> \%inv_vars,
+		     "funcs"			=> \%funcs,
+		     "include-path"		=> $include_path,
+		     "use-cr-lf"		=> $use_cr_lf,
+		     "debug"			=> $debug,
+		     "unresolved"		=> \@unresolved
+	      );
+
+# save file
+
+open F, ($append?">":"").">$dst" or die "can't write '$dst'";
+print F $data;
+close F;
+
+# dump errors
+unless($quiet)
+{
+	foreach my $e (@unresolved)
+	{
+		print STDERR "Unresolved: '$e'\n";
+	}
+}
+
+
+exit(0);
+
+# #####################################################################
+
+sub read_config
+{
+	my ($conf,$inverse)=@_;
+	local (*F);
+
+	# read config file
+	unless(open F, $conf)
+	{
+		if($quiet)
+		{ return }
+		else
+		{ die "'$conf' bad config file"; }
+	}
+
+	while(<F>)
+	{
+		my ($key,$val);
+
+		chomp($_);
+
+		unless(/^#/ or /^$/)
+		{
+			($key,$val)=split("=",$_,2);
+
+			if($val =~ s/^\|//)
+			{
+				$val=`$val`;
+				chop($val);
+			}
+			elsif($val eq "<<EOF")
+			{
+				# 'document here' construction
+				$val="";
+
+				while(<F>)
+				{
+					last if /^EOF/;
+
+					$val.=$_;
+				}
+			}
+			elsif($key eq "\\INCLUDE")
+			{
+				read_config($val);
+				next;
+			}
+
+			$vars{$key}=$val;
+			$inv_vars{$key}=$val if($inverse);
+		}
+	}
+
+	close F;
+}
+
+
+sub usage
+{
+	print("$artemus_id - HTML (and other things) Preprocessor\n");
+	print("Copyright (C) 2000/2002 Angel Ortega <angel\@triptico.com>\n\n");
+
+	print("Usage:\n");
+	print("  artemus -i|--input={input file} -o|--output={output file}\n");
+	print("        [-c|--conf={config file}]\n");
+	print("        [-l|--include-path={path to includes}]\n");
+	print("        [-p|--paragraph={paragraph_separator}]\n");
+	print("        [-q|--quiet]\n");
+	print("        [-m|--msdos] [-a|--append] [-d|--debug]\n\n");
+	print("    or\n\n");
+	print("  artemus -f|--ftp {files to ftp...}\n\n");
+	print("    or\n\n");
+	print("  artemus -k|--makefile\n");
+	print("    or\n\n");
+	print("  artemus -s|--site-map\n");
+
+	exit(1);
+}
+
+
+sub version_only
+{
+	print("$VERSION\n");
+	exit(0);
+}
+
+
+sub ftp_send
+# send files using ftp
+{
+	my ($ftp);
+
+	require Net::FTP;
+
+	if(scalar(@ARGV)==0)
+	{
+		print "Nothing to send.\n";
+		exit(0);
+	}
+
+	print "Connecting to $vars{'ftp.host'}...\n";
+	$ftp=Net::FTP->new($vars{'ftp.host'});
+	print "OK\n";
+
+	print "Logging in as $vars{'ftp.user'}...\n";
+	$ftp->login($vars{'ftp.user'},$vars{'ftp.passwd'})
+		or die "ftp login error";
+	print "OK\n";
+
+	if(defined($vars{'ftp.dir'}))
+	{
+		print "Chdir $vars{'ftp.dir'}...\n";
+		$ftp->cwd($vars{'ftp.dir'});
+		print "OK\n";
+	}
+
+	$ftp->binary();
+
+	foreach my $f (@ARGV)
+	{
+		print "Sending $f...\n";
+		$ftp->put($f,$f);
+		print "OK\n";
+	}
+
+	print "Done.\n";
+	$ftp->quit;
+
+	exit(0);
+}
+
+
+sub make_makefile
+# makes a makefile template
+{
+	print <<"EOF";
+#
+# Makefile template created by $artemus_id
+# for HTML projects (GNU Make)
+#
+# artemus (C) 2000/2002 Angel Ortega <angel\@triptico.com>
+#
+# Use:
+#	make		-- to build everything
+#	make file.html	-- to build just file.html from file.artemus
+#	make clean	-- to delete every rebuildable thing
+#	make ftp	-- to upload using ftp
+#
+
+# Fill DEST with a list of the .html files created by artemus
+# Use relative paths (e.g. misc/contact.html) if there are
+# subdirectories. This paths will be the same when uploading;
+# subdirs on ftp server must exist
+
+DEST=	index.html [MODIFY HERE]
+
+# Add \$(DEST) to INET plus any other file/directory than will
+# be uploaded but not built by this makefile.
+# e.g.: download/* or images/*
+
+INET=\$(DEST) images/* [MODIFY HERE]
+
+# directories for the site map
+DIRS= [MODIFY HERE]
+
+# default target
+.PHONY: all
+all: \$(DEST)
+
+# default rule. Artemus sources use the .artemus extension.
+# Change if you use another
+%.html: %.artemus
+	artemus -i \$< -o \$@
+
+# site map. File sitemap/index.artemus must be included
+# in DEST in order to be correctly remade.
+map:
+	artemus --site-map \$(DIRS) > sitemap/index.artemus
+	\$(MAKE)
+
+# The usual clean
+.PHONY: clean
+clean:
+	-rm \$(DEST) unresolved
+
+# Last upload timestamp
+.PHONY: ftp
+ftp: ftpstamp
+
+# if any file is newer than the last upload,
+# send it and recreate timestamp
+ftpstamp: \$(INET)
+	artemus --ftp \$?
+	touch ftpstamp
+
+EOF
+
+	exit(0);
+}
+
+
+sub build_site_map
+# builds a site map from current directory to stdout
+{
+	my (@dirs)=@_;
+
+	# special artemus token site-map-head
+	print "{-site-map-head}\n\n";
+	print "<ul>\n";
+
+	foreach my $dir (@dirs)
+	{
+		my ($cnt,@l);
+
+		open F, "find $dir -name \"*.html\" -follow|" or next;
+
+		while(<F>)
+		{
+			chop;
+			s/^\.\///;
+			push(@l,$_) unless /index.html$/;
+		}
+
+		close F;
+
+		@l=sort(@l);
+
+		# the (supposed) index.html is put the first
+		unshift(@l,"$dir/index.html");
+
+		# travel the list
+		$cnt=0;
+		foreach my $i (@l)
+		{
+			my ($size,$file,$title);
+
+			$size=-s $i;
+
+			# slurps all
+			open F, $i or next;
+			$file=join("",<F>);
+			close F;
+
+			if ($file =~ /<title>([^<]*)/i)
+			{
+				$title=$1;
+			}
+			else
+			{
+				$title=$i;
+			}
+
+			print "<li><a href='../$i'>$title</a> [$i] $size bytes\n";
+			print "<ul>\n" unless $cnt;
+
+			$cnt++;
+		}
+		print "</ul>\n";
+	}
+
+	print "</ul>\n";
+
+	# special artemus token site-map-foot
+	print "{-site-map-foot}\n";
+
+	exit(0);
+}

@@ -1,0 +1,314 @@
+#!/usr/bin/perl
+
+=pod
+
+=head1 NAME
+
+artemus - Programa de sustitución de texto mediante templates (moldes).
+
+=head1 SYNOPSIS
+
+ artemus [-i|--input=<fichero origen>]
+	 [-o|--output=<fichero destino>]
+	 [-d|--template_dir=<directorio>]
+	 [-s|--start_mark=<marca inicio de comentario>]
+	 [-e|--end_mark=<marca fin de comentario>]
+	 [-h|-help]
+
+ artemus [-M|--dep] <fichero(s)>
+
+=head1 DESCRIPTION
+
+Pendiente.
+
+=head1 AUTHOR
+
+	Angel Ortega
+	angel@triptico.com
+
+=cut
+
+########################################
+#	Disposiciones iniciales y 
+#	módulos requeridos
+########################################
+
+use Getopt::Long;
+
+
+########################################
+#	Variables globales
+########################################
+
+# Código de salida
+$ExitCode = 0;
+
+# ID del programa
+$prog_id="artemus 1.04";
+
+# directorio de templates
+$templ_dir="./templates";
+
+# hash de templates
+%templates={};
+
+# Marcas en los ficheros
+$start_mark="<!-- ";
+$mid_mark="#artemus ";
+$end_mark=" -->";
+$mark="";
+
+# fichero de entrada
+$org="";
+
+# fichero de salida
+$des="";
+
+# ayuda
+$help=0;
+
+# Variables generales
+%vars={};
+
+# generar dependencias
+$dep=0;
+
+
+########################################
+#	Punto de entrada al programa
+########################################
+
+if(!GetOptions( "i|input=s"		=>	\$org,
+		"o|output=s"		=>	\$des,
+		"d|template_dir=s"	=>	\$templ_dir,
+		"s|start_mark=s"	=>	\$start_mark,
+		"e|end_mark=s"		=>	\$end_mark,
+		"h|help"		=>	\$help,
+		"M|MM|dep"		=>	\$dep)
+
+		or $help)
+{
+	system("perldoc $0");
+	exit(1);
+}
+
+
+# Crea la marca de identificación
+$mark=$start_mark . $mid_mark;
+
+read_variables();
+
+read_templates() or die "Error leyendo templates $!";
+
+unless($dep)
+{
+	process($org, $des);
+}
+else
+{
+	foreach $i (@ARGV)
+	{
+		process($i, undef);
+	}
+}
+
+
+########################################
+#	Punto de salida del programa
+########################################
+
+exit ($ExitCode);
+
+
+########################################
+#	Métodos y funciones públicas
+########################################
+
+
+sub read_variables
+# Lee las variables
+{
+	my ($var,$value);
+
+	return(undef) unless open(F,"$templ_dir/VARS");
+
+	while(<F>)
+	{
+		chop;
+
+		unless(/^#/ or /^$/)
+		{
+			($var,$value)=split("=",$_,2);
+
+			$vars{"\\\$".$var}=$value;
+		}
+	}
+
+	close F;
+
+	return(1);
+}
+
+
+sub read_templates
+# Lee los templates del directorio
+{
+	# Abre el directorio
+	return(undef) unless opendir(DIR, $templ_dir);
+
+	while($file=readdir(DIR))
+	{
+		if(-f $templ_dir."/".$file)
+		{
+			open(F,$templ_dir."/".$file) or return(undef);
+
+			while(<F>)
+			{
+				$templates{$file}.=$_;
+			}
+
+			close(F);
+		}
+	}
+
+	closedir(DIR);
+
+	return(1);
+}
+
+
+sub process
+# procesa origen y destino
+{
+	my ($org,$des)=@_;
+	my ($template,$params);
+	my ($t,$n,$c,$field,$value);
+	my ($i,$o,@d,$org2);
+	my ($base_rel);
+
+	if($org)
+	{
+		# calcula base_rel
+		$t=$org;
+		while($c=chop($t))
+		{
+			$n++ if $c eq "/";
+		}
+
+		while($n)
+		{
+			$base_rel.="../";
+			$n--;
+		}
+
+		$org2=$org;
+
+		if($dep)
+		{
+			$org2 =~ s/\.[a-z]*$/\.src/g;
+		}
+
+		open(ORG,$org2) or die "Imposible abrir $org2: $!";
+		$i=\*ORG;
+	}
+	else
+	{
+		$i=\*STDIN;
+	}
+
+	if($des)
+	{
+		open(DES,">".$des) or die "Imposible crear $des: $!";
+		$o=\*DES;
+	}
+	else
+	{
+		$o=\*STDOUT;
+	}
+
+	$vars{"\\\$base_rel"}=$base_rel;
+	$vars{"\\\$/"}=$base_rel;
+
+	print $o "$start_mark Built with $prog_id Angel Ortega 1999 $end_mark\n" unless($dep);
+	print $o "<meta name='generator' content='$prog_id'>\n\n";
+
+	@d=();
+
+	while(<$i>)
+	{
+		if(/^\Q$mark\E/)
+		{
+			chop;
+
+			# quita la marca inicial
+			s/\Q$mark\E//g;
+
+			# y la final
+			s/\Q$end_mark\E//g;
+
+			# recoge el template y los parámetros
+			($template,$params)=split(" ",$_,2);
+
+			# almacena en la lista de dependencias
+			# (si no está ya)
+			$t=$templ_dir."/".$template;
+
+			push(@d,$t) unless grep(/\Q$t\E/,@d);
+
+			$t=$templates{$template} or
+				die "Template $template inexistente";
+
+			# recorre los parámetros haciendo
+			# las sustituciones
+			while(($field,$params)=split("=",$params,2))
+			{
+				$field="\\\$".$field;
+
+				if($params =~ /^"/)
+				{
+					$params =~ s/^"//;
+
+					# valor entre comillas
+					($value,$params)=split(/"/,$params,2);
+
+					# extrae posibles espacios
+					$params =~ s/^ //;
+				}
+				else
+				{
+					# valor delimitado por espacio
+					($value,$params)=split(" ",$params,2);
+				}
+
+				# sustituye
+				$t =~ s/$field/$value/g;
+			}
+		}
+		else
+		{
+			$t=$_;
+		}
+
+		# sustituciones especiales
+
+		$now=scalar localtime;
+		$t =~ s/\$date/$now/g;
+
+		# sustitución de variables globales
+
+		foreach $i (keys %vars)
+		{
+			$t =~ s/$i/$vars{$i}/g;
+		}
+
+		print $o $t unless($dep);
+	}
+
+	print $o "$org: $org2 @d\n" if($dep);
+
+	close(ORG);
+	close(DES);
+}
+
+
+###########  Fin del programa ############

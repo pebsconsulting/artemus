@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# artemus handle for apache
+#
+# 1. copy this to $WWWROOT/cgi-bin
+# 2. Insert into httpd.conf
+#	AddHandler artemus artemus
+#	Action artemus /cgi-bin/artemus-handler
+#
+# Angel Ortega <angel@triptico.com>
+
+CONFIG_FILE=/home/angel/src/www/triptico/artemus.conf
+
+echo "Content-Type: text/html"
+echo
+
+/usr/local/bin/artemus -q -c $CONFIG_FILE -i $PATH_TRANSLATED -o -
+
