@@ -2,7 +2,7 @@
 #
 #   Artemus - Template Toolkit
 #
-#   Copyright (C) 2000/2003 Angel Ortega <angel@triptico.com>
+#   Copyright (C) 2000/2007 Angel Ortega <angel@triptico.com>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License
@@ -26,7 +26,7 @@ use locale;
 
 package Artemus;
 
-$VERSION = '4.0.5';
+$VERSION = '4.0.6-svn';
 
 =pod
 
@@ -600,6 +600,9 @@ sub _process_do
 				{
 					$text = join("",<INC>);
 					close INC;
+
+					# cache it as a variable
+					$ah->{vars}->{$key} = $text;
 
 					$text = $ah->params($text,@params);
 
