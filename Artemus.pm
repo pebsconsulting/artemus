@@ -26,7 +26,7 @@ use locale;
 
 package Artemus;
 
-$VERSION = '4.0.6-svn';
+$VERSION = '4.0.6-dev';
 
 =pod
 
@@ -39,7 +39,7 @@ Artemus - Template Toolkit
  use Artemus;
  
  # normal variables
- %vars=(
+ %vars = (
 	"copyright" => 'Copyright 2002',   # normal variable
 	"number" => 100,		   # another
 	"about" => '{-copyright} My Self', # can be nested
@@ -47,17 +47,17 @@ Artemus - Template Toolkit
 	);
  
  # functions as templates
- %funcs=(
+ %funcs = (
 	"random" => sub { int(rand(100)) }, # normal function
 	"sqrt" => sub { sqrt($_[0]) }	    # can accept parameters
 	);
  
  # create a new Artemus instance
- $ah=new Artemus( "vars" => \%vars, "funcs" => \%funcs );
+ $ah = new Artemus( "vars" => \%vars, "funcs" => \%funcs );
  
  # do it
- $out=$ah->process('Click on {-link|http://my.page|my page}, {-about}');
- $out2=$ah->process('The square root of {-number} is {-sqrt|{-number}}');
+ $out = $ah->process('Click on {-link|http://my.page|my page}, {-about}');
+ $out2 = $ah->process('The square root of {-number} is {-sqrt|{-number}}');
 
 =head1 DESCRIPTION
 
@@ -241,7 +241,7 @@ prepended (\END) to the text being processed.
 
 =head2 B<new>
 
- $ah=new Artemus(
+ $ah = new Artemus(
 	[ "vars" => \%variables, ]
 	[ "funcs" => \%functions, ]
 	[ "inv-vars" => \%inverse_variables, ]
@@ -344,30 +344,30 @@ sent as the first argument.
 
 sub new
 {
-	my ($class,%ah) = @_;
+	my ($class, %ah) = @_;
 
 	# special variables
 	$ah{'vars'}->{'\n'} = "\n";
-	$ah{'vars'}->{'\BEGIN'} ||= "";
-	$ah{'vars'}->{'\END'} ||= "";
+	$ah{'vars'}->{'\BEGIN'} ||= '';
+	$ah{'vars'}->{'\END'} ||= '';
 	$ah{'vars'}->{'\VERSION'} = $Artemus::VERSION;
 
 	# special functions
 	$ah{'funcs'}->{"localtime"} = sub { scalar(localtime) };
-	$ah{'funcs'}->{"if"} = sub { $_[0] ? return($_[1]) : return("") };
-	$ah{'funcs'}->{"ifelse"} = sub { $_[0] ? return($_[1]) : return($_[2]) };
-	$ah{'funcs'}->{"ifeq"} = sub { $_[0] eq $_[1] ? return($_[2]) : return("") };
-	$ah{'funcs'}->{"ifneq"} = sub { $_[0] ne $_[1] ? return($_[2]) : return("") };
-	$ah{'funcs'}->{"ifeqelse"} = sub { $_[0] eq $_[1] ? return($_[2]) : return($_[3]) };
+	$ah{'funcs'}->{"if"} = sub { $_[0] ? return($_[1]) : return '' };
+	$ah{'funcs'}->{"ifelse"} = sub { $_[0] ? return $_[1] : return $_[2] };
+	$ah{'funcs'}->{"ifeq"} = sub { $_[0] eq $_[1] ? return $_[2] : return '' };
+	$ah{'funcs'}->{"ifneq"} = sub { $_[0] ne $_[1] ? return $_[2] : return '' };
+	$ah{'funcs'}->{"ifeqelse"} = sub { $_[0] eq $_[1] ? return $_[2] : return $_[3] };
 
-	bless(\%ah,$class);
-	return(\%ah);
+	bless(\%ah, $class);
+	return \%ah;
 }
 
 
 =head2 B<armor>
 
- $str=$ah->armor($str);
+ $str = $ah->armor($str);
 
 Translate Artemus markup to HTML entities, to avoid being
 interpreted by the parser.
@@ -376,7 +376,7 @@ interpreted by the parser.
 
 sub armor
 {
-	my ($ah,$t) = @_;
+	my ($ah, $t) = @_;
 
 	$t =~ s/{/\&#123;/g;
 	$t =~ s/\|/\&#124;/g;
@@ -384,13 +384,13 @@ sub armor
 	$t =~ s/\$/\&#36;/g;
 	$t =~ s/=/\&#61;/g;
 
-	return($t);
+	return $t;
 }
 
 
 =head2 B<unarmor>
 
- $str=$ah->unarmor($str);
+ $str = $ah->unarmor($str);
 
 Translate back the Artemus markup from HTML entities. This
 is the reverse operation of B<armor>.
@@ -399,7 +399,7 @@ is the reverse operation of B<armor>.
 
 sub unarmor
 {
-	my ($ah,$t) = @_;
+	my ($ah, $t) = @_;
 
 	$t =~ s/\&#123;/{/g;
 	$t =~ s/\&#124;/\|/g;
@@ -407,13 +407,13 @@ sub unarmor
 	$t =~ s/\&#36;/\$/g;
 	$t =~ s/\&#61;/=/g;
 
-	return($t);
+	return $t;
 }
 
 
 =head2 B<strip>
 
- $str=$ah->strip($str);
+ $str = $ah->strip($str);
 
 Strips all Artemus markup from the string.
 
@@ -421,17 +421,17 @@ Strips all Artemus markup from the string.
 
 sub strip
 {
-	my ($ah,$t) = @_;
+	my ($ah, $t) = @_;
 
 	$t =~ s/{-([-\\\w_ \.]+)[^{}]*}/$1/g;
 
-	return($t);
+	return $t;
 }
 
 
 =head2 B<params>
 
- $str=$ah->params($str,@params);
+ $str = $ah->params($str,@params);
 
 Interpolates all $0, $1, $2... occurrences in the string into
 the equivalent element from @params.
@@ -440,20 +440,19 @@ the equivalent element from @params.
 
 sub params
 {
-	my ($ah,$t,@params) = @_;
+	my ($ah, $t, @params) = @_;
 
-	for(my $n=0;$t =~ /\$$n/;$n++)
-	{
+	for(my $n = 0; $t =~ /\$$n/; $n++) {
 		$t =~ s/\$$n/$params[$n]/g;
 	}
 
-	return($t);
+	return $t;
 }
 
 
 =head2 B<process>
 
- $str=$ah->process($str);
+ $str = $ah->process($str);
 
 Processes the string, translating all Artemus markup. This
 is the main template processing method. The I<abort-flag> flag and
@@ -463,7 +462,7 @@ I<unresolved> list are reset on each call to this method.
 
 sub process
 {
-	my ($ah,$data) = @_;
+	my ($ah, $data) = @_;
 
 	# not aborted by now
 	$$ah->{'abort-flag'} = 0 if ref($ah->{'abort-flag'});
@@ -480,20 +479,18 @@ sub process
 	# finally, convert end of lines if necessary
 	$data =~ s/\n/\r\n/g if $ah->{'use-cr-lf'};
 
-	return($data);
+	return $data;
 }
 
 
 sub _process_do
 {
-	my ($ah,$data,$template_name) = @_;
+	my ($ah, $data, $template_name) = @_;
 	my ($cache_time);
 
 	# test if the template includes cache info
-	if($data =~ s/{-\\CACHE\W([^}]*)}//)
-	{
-		if($template_name and $ah->{'cache-path'})
-		{
+	if ($data =~ s/{-\\CACHE\W([^}]*)}//) {
+		if ($template_name and $ah->{'cache-path'}) {
 			$cache_time = $1;
 
 			# convert strange chars to :
@@ -501,25 +498,22 @@ sub _process_do
 
 			my ($f) = "$ah->{'cache-path'}/$template_name";
 
-			if(-r $f and -M $f < $cache_time)
-			{
+			if (-r $f and -M $f < $cache_time) {
 				open F, $f;
 				flock F, 1;
 				$data = join("",<F>);
 				close F;
 
-				return($data);
+				return $data;
 			}
 		}
 	}
 
 	# strip POD documentation, if any
-	if($data =~ /=cut/ and not $ah->{'contains-pod'})
-	{
+	if ($data =~ /=cut/ and not $ah->{'contains-pod'}) {
 		my (@d);
 
-		foreach (split("\n",$data))
-		{
+		foreach (split("\n",$data)) {
 			push(@d, $_) unless(/^=/ .. /^=cut/);
 		}
 
@@ -527,15 +521,13 @@ sub _process_do
 	}
 
 	# strips HTML comments
-	if($ah->{'strip-html-comments'})
-	{
+	if ($ah->{'strip-html-comments'}) {
 		$data =~ s/<!--.*?-->//gs;
 	}
 
 	# if defined, substitute the paragraphs
 	# with the paragraph separator
-	if($ah->{'paragraph-separator'})
-	{
+	if ($ah->{'paragraph-separator'}) {
 		$data =~ s/\n\n/\n$ah->{'paragraph-separator'}\n/g;
 	}
 
@@ -547,22 +539,18 @@ sub _process_do
 #	 }
 
 	# main function, variable and include substitutions
-	while($data =~ /{-([^}{]*)}/s)
-	{
+	while ($data =~ /{-([^}{]*)}/s) {
 		my ($found) = $1;
 		my ($key,@params,$text);
 
 		# take key and params
-		if(($key,$text) = ($found =~ /^([-\\\w_ \.]+)\|(.*)$/s))
-		{
+		if (($key,$text) = ($found =~ /^([-\\\w_ \.]+)\|(.*)$/s)) {
 			# now split the parameters
 			@params = split(/\|/,$text);
 		}
-		else
-		{
+		else {
 			# no separator nor parameters; try key alone
-			unless(($key) = ($found =~ /^([-\\\w_ \.]+)$/s))
-			{
+			unless (($key) = ($found =~ /^([-\\\w_ \.]+)$/s)) {
 				# invalid key; replace and try next
 				$data =~ s/{-\Q$found\E}/$found/;
 				next;
@@ -572,16 +560,14 @@ sub _process_do
 		}
 
 		# is it a variable?
-		if(defined $ah->{'vars'}->{$key})
-		{
+		if (defined $ah->{'vars'}->{$key}) {
 			$text = $ah->{'vars'}->{$key};
 			$text = $ah->params($text,@params);
 		}
 
 		# is it a function?
-		elsif(defined $ah->{'funcs'}->{$key} and
-		      ref($ah->{'funcs'}->{$key}))
-		{
+		elsif (defined $ah->{'funcs'}->{$key} and
+		      ref($ah->{'funcs'}->{$key})) {
 			my ($func);
 
 			$func = $ah->{'funcs'}->{$key};
@@ -592,12 +578,9 @@ sub _process_do
 		}
 
 		# is it an include?
-		elsif($ah->{'include-path'})
-		{
-			foreach my $p (split(/:/,$ah->{'include-path'}))
-			{
-				if(open(INC, "$p/$key"))
-				{
+		elsif ($ah->{'include-path'}) {
+			foreach my $p (split(/:/,$ah->{'include-path'})) {
+				if (open(INC, "$p/$key")) {
 					$text = join("",<INC>);
 					close INC;
 
@@ -611,8 +594,7 @@ sub _process_do
 			}
 		}
 
-		unless(defined $text)
-		{
+		unless (defined $text) {
 			$text = $found;
 
 			push(@{$ah->{'unresolved'}},$found)
@@ -633,15 +615,14 @@ sub _process_do
 
 	# if the template included cache info,
 	# store the result there
-	if($cache_time)
-	{
-		open F, ">".$ah->{'cache-path'}."/".$template_name;
+	if ($cache_time) {
+		open F, '>' . $ah->{'cache-path'} . '/' . $template_name;
 		flock F,2;
 		print F $data;
 		close F;
 	}
 
-	return($data);
+	return $data;
 }
 
 
