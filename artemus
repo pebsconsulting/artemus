@@ -87,7 +87,7 @@ $funcs{"shell"} = sub { $_=`$_[0]`; chop; return $_ };
 $VERSION = $Artemus::VERSION;
 $artemus_id = "Artemus $VERSION";
 
-usage() if(!GetOptions( "i|input=s"	   => \$src,
+usage() if (!GetOptions( "i|input=s"	   => \$src,
 			"o|output=s"	   => \$dst,
 			"c|conf=s"	   => \$config_file,
 			"p|paragraph=s"    => \$para_sep,
@@ -110,8 +110,7 @@ make_makefile() if $makefile_template;
 
 build_site_map(@ARGV) if $site_map;
 
-if(!$use_ftp)
-{
+if (!$use_ftp) {
 	usage() unless $src;
 	usage() unless $dst;
 }
@@ -149,8 +148,7 @@ open F, ($append ? ">" : "").">$dst" or die "can't write '$dst'";
 print F $data;
 close F;
 
-foreach my $t (@unresolved)
-{
+foreach my $t (@unresolved) {
 	print STDERR "Artemus: unresolved '$t'\n";
 }
 
@@ -164,43 +162,38 @@ sub read_config
 	local (*F);
 
 	# read config file
-	unless(open F, $conf)
-	{
-		if($quiet)
-		{ return }
-		else
-		{ die "'$conf' bad config file"; }
+	unless (open F, $conf) {
+		if($quiet) {
+			return;
+		}
+		else {
+			die "'$conf' bad config file";
+		}
 	}
 
-	while(<F>)
-	{
-		my ($key,$val);
+	while (<F>) {
+		my ($key, $val);
 
 		chomp($_);
 
-		unless(/^#/ or /^$/)
-		{
-			($key,$val) = split("=",$_,2);
+		unless (/^#/ or /^$/) {
+			($key, $val) = split("=",$_,2);
 
-			if($val =~ s/^\|//)
-			{
+			if ($val =~ s/^\|//) {
 				$val = `$val`;
 				chop($val);
 			}
-			elsif($val eq "<<EOF")
-			{
+			elsif ($val eq "<<EOF") {
 				# 'document here' construction
-				$val = "";
+				$val = '';
 
-				while(<F>)
-				{
+				while (<F>) {
 					last if /^EOF/;
 
 					$val .= $_;
 				}
 			}
-			elsif($key eq "\\INCLUDE")
-			{
+			elsif ($key eq "\\INCLUDE") {
 				read_config($val);
 				next;
 			}
@@ -251,8 +244,7 @@ sub ftp_send
 
 	require Net::FTP;
 
-	if(scalar(@ARGV) == 0)
-	{
+	if (scalar(@ARGV) == 0) {
 		print "Nothing to send.\n";
 		exit(0);
 	}
@@ -266,8 +258,7 @@ sub ftp_send
 		or die "ftp login error";
 	print "OK\n";
 
-	if(defined($vars{'ftp.dir'}))
-	{
+	if (defined($vars{'ftp.dir'})) {
 		print "Chdir $vars{'ftp.dir'}...\n";
 		$ftp->cwd($vars{'ftp.dir'});
 		print "OK\n";
@@ -275,8 +266,7 @@ sub ftp_send
 
 	$ftp->binary();
 
-	foreach my $f (@ARGV)
-	{
+	foreach my $f (@ARGV) {
 		print "Sending $f...\n";
 		$ftp->put($f,$f);
 		print "OK\n";
@@ -367,14 +357,12 @@ sub build_site_map
 	print "{-site-map-head}\n\n";
 	print "<ul>\n";
 
-	foreach my $dir (@dirs)
-	{
-		my ($cnt,@l);
+	foreach my $dir (@dirs) {
+		my ($cnt, @l);
 
 		open F, "find $dir -name \"*.html\" -follow|" or next;
 
-		while(<F>)
-		{
+		while (<F>) {
 			chop;
 			s/^\.\///;
 			push(@l,$_) unless /index.html$/;
@@ -389,9 +377,8 @@ sub build_site_map
 
 		# travel the list
 		$cnt = 0;
-		foreach my $i (@l)
-		{
-			my ($size,$file,$title);
+		foreach my $i (@l) {
+			my ($size, $file, $title);
 
 			$size = -s $i;
 
@@ -400,12 +387,10 @@ sub build_site_map
 			$file = join("",<F>);
 			close F;
 
-			if ($file =~ /<title>([^<]*)/i)
-			{
+			if ($file =~ /<title>([^<]*)/i) {
 				$title = $1;
 			}
-			else
-			{
+			else {
 				$title = $i;
 			}
 
