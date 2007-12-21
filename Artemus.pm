@@ -26,7 +26,7 @@ use locale;
 
 package Artemus;
 
-$VERSION = '4.0.6';
+$VERSION = '4.0.7-dev';
 
 =pod
 
@@ -539,14 +539,19 @@ sub _process_do
 #	 }
 
 	# main function, variable and include substitutions
-	while ($data =~ /{-([^}{]*)}/s) {
+	while ($data =~ /{-([^{}\\]*(\\.[^{}\\]*)*)}/s) {
 		my ($found) = $1;
-		my ($key,@params,$text);
+		my ($key, @params, $text);
 
 		# take key and params
-		if (($key,$text) = ($found =~ /^([-\\\w_ \.]+)\|(.*)$/s)) {
+		if (($key, $text) = ($found =~ /^([-\\\w_ \.]+)\|(.*)$/s)) {
+
+			# replace escaped { and }
+			$text =~ s/\\{/{/g;
+			$text =~ s/\\}/}/g;
+
 			# now split the parameters
-			@params = split(/\|/,$text);
+			@params = split(/\|/, $text);
 		}
 		else {
 			# no separator nor parameters; try key alone
