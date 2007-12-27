@@ -601,20 +601,22 @@ sub _process_do
 		}
 
 		# is it a function?
-		elsif (defined $ah->{'funcs'}->{$key} and
-		      ref($ah->{'funcs'}->{$key})) {
+		elsif (defined $ah->{'funcs'}->{$key}) {
 			my ($func);
 
 			$func = $ah->{'funcs'}->{$key};
-			$text = &$func(@params);
+			$text = $func->(@params);
 
 			# functions can abort further execution
-			last if ref($ah->{'abort-flag'}) and $$ah->{'abort-flag'};
+
+			if (ref($ah->{'abort-flag'}) and $$ah->{'abort-flag'}) {
+				last;
+			}
 		}
 
 		# is it an include?
 		elsif ($ah->{'include-path'}) {
-			foreach my $p (split(/:/,$ah->{'include-path'})) {
+			foreach my $p (split(/:/, $ah->{'include-path'})) {
 				if (open(INC, "$p/$key")) {
 					$text = join('', <INC>);
 					close INC;
