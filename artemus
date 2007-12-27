@@ -130,13 +130,14 @@ $data = join("",<F>);
 close F;
 
 # create the Artemus handle
-$ah = new Artemus("paragraph-separator" => $para_sep,
-		"vars"		      => \%vars,
-		"inv-vars"	      => \%inv_vars,
-		"funcs" 	      => \%funcs,
-		"include-path"	      => $include_path,
-		"use-cr-lf"	      => $use_cr_lf,
-		"unresolved"	      => \@unresolved
+$ah = Artemus->new('paragraph-separator'	=> $para_sep,
+		'vars'				=> \%vars,
+		'inv-vars'			=> \%inv_vars,
+		'funcs'				=> \%funcs,
+		'include-path'			=> $include_path,
+		'use-cr-lf'			=> $use_cr_lf,
+		'unresolved'			=> \@unresolved,
+		'debug'				=> $debug
 	      );
 
 # do it
