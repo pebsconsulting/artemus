@@ -576,34 +576,28 @@ sub _process_do
 	# main function, variable and include substitutions
 	while ($data =~ /{-([^{}\\]*(\\.[^{}\\]*)*)}/s) {
 		my ($found) = $1;
-		my ($key, @params, $text);
 
 		# take key and params
-		if (($key, $text) = ($found =~ /^([-\\\w_ \.]+)\|(.*)$/s)) {
+		my ($key, $params) = ($found =~ /^([-\\\w_]+)\|?(.*)$/);
 
-			# replace escaped chars
-			$text =~ s/\\{/{/g;
-			$text =~ s/\\}/}/g;
-			$text =~ s/\\\$/\$/g;
+		# replace escaped chars
+		$params =~ s/\\{/{/g;
+		$params =~ s/\\}/}/g;
+		$params =~ s/\\\$/\$/g;
 
-			# now split the parameters
-			@params = split(/\|/, $text);
+		# split parameters
+		my @params = ();
+
+		while ($params && $params =~ s/^([^\|\\]*(\\.[^\|\\]*)*)\|?//s) {
+			push(@params, $1);
 		}
-		else {
-			# no separator nor parameters; try key alone
-			unless (($key) = ($found =~ /^([-\\\w_ \.]+)$/s)) {
-				# invalid key; replace and try next
-				$data =~ s/{-\Q$found\E}/$found/;
-				next;
-			}
 
-			@params = ();
-		}
+		my $text = undef;
 
 		# is it a variable?
 		if (defined $ah->{'vars'}->{$key}) {
 			$text = $ah->{'vars'}->{$key};
-			$text = $ah->params($text,@params);
+			$text = $ah->params($text, @params);
 		}
 
 		# is it a function?
@@ -650,7 +644,7 @@ sub _process_do
 		# do the recursivity
 		# if params are not to be cached,
 		# use $key instead of $found
-		$text = $ah->_process_do($text,$found);
+		$text = $ah->_process_do($text, $found);
 
 		# make the substitution
 		$data =~ s/{-\Q$found\E}/$text/;
