@@ -589,7 +589,10 @@ sub _process_do
 		my @params = ();
 
 		while ($params && $params =~ s/^([^\|\\]*(\\.[^\|\\]*)*)\|?//s) {
-			push(@params, $1);
+			my $p = $1;
+			$p =~ s/\\\|/\|/g;
+
+			push(@params, $p);
 		}
 
 		my $text = undef;
