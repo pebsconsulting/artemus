@@ -494,6 +494,11 @@ sub _process_do
 	my ($ah, $data, $template_name) = @_;
 	my ($cache_time);
 
+	if ($ah->{debug}) {
+		print STDERR sprintf('Artemus: template="%s", data="%s"',
+			$template_name || 'NONE', $data || ''), "\n";
+	}
+
 	# test if the template includes cache info
 	if ($data =~ s/{-\\CACHE\W([^}]*)}//) {
 		if ($template_name and $ah->{'cache-path'}) {
