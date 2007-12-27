@@ -578,7 +578,7 @@ sub _process_do
 		my ($found) = $1;
 
 		# take key and params
-		my ($key, $params) = ($found =~ /^([-\\\w_]+)\|?(.*)$/);
+		my ($key, $params) = ($found =~ /^([-\\\w_]+)\|?(.*)$/s);
 
 		# replace escaped chars
 		$params =~ s/\\{/{/g;
