@@ -1,8 +1,25 @@
-Artemus TODO
-============
+Artemus TODO / Bug List
+=======================
 
-Improvements
-------------
+Release Critical Bugs
+---------------------
 
- - Add a new clear_cache() function to delete cache entries older
+None!
+
+Open Bugs
+---------
+
+None!
+
+Pending Enhancements
+--------------------
+
+ * 1000: Add a new clear_cache() function to delete cache entries older
    than a specified number of days.
+
+Closed
+------
+
+None!
+
+Email bugs to angel@triptico.com
