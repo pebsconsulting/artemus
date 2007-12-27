@@ -553,9 +553,10 @@ sub _process_do
 		# take key and params
 		if (($key, $text) = ($found =~ /^([-\\\w_ \.]+)\|(.*)$/s)) {
 
-			# replace escaped { and }
+			# replace escaped chars
 			$text =~ s/\\{/{/g;
 			$text =~ s/\\}/}/g;
+			$test =~ s/\\\$/\$/g;
 
 			# now split the parameters
 			@params = split(/\|/, $text);
