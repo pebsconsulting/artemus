@@ -101,7 +101,7 @@ by the parameters used when inserting the call.
 
 So, if you create the 'link' template containing
 
- <a href="$0">$1</a>
+ <a href = "$0">$1</a>
 
 you can insert the following call:
 
@@ -119,14 +119,14 @@ is created which values are references to Perl functions. For
 example, you can create a function returning a random value
 by using:
 
- $funcs{'random'}=sub { int(rand(100)) };
+ $funcs{'random'} = sub { int(rand(100)) };
 
 And each time the {-random} template is found, it is evaluated
 and returns a random number between 0 and 99.
 
 Functions also can accept parameters; so, if you define it as
 
- $funcs{'random'}=sub { int(rand($_[0])) };
+ $funcs{'random'} = sub { int(rand($_[0])) };
 
 then calling the template as
 
@@ -347,18 +347,18 @@ sub new
 	my ($class, %ah) = @_;
 
 	# special variables
-	$ah{'vars'}->{'\n'} = "\n";
-	$ah{'vars'}->{'\BEGIN'} ||= '';
-	$ah{'vars'}->{'\END'} ||= '';
-	$ah{'vars'}->{'\VERSION'} = $Artemus::VERSION;
+	$ah{'vars'}->{'\n'}		= "\n";
+	$ah{'vars'}->{'\BEGIN'}		||= '';
+	$ah{'vars'}->{'\END'}		||= '';
+	$ah{'vars'}->{'\VERSION'}	= $Artemus::VERSION;
 
 	# special functions
-	$ah{'funcs'}->{"localtime"} = sub { scalar(localtime) };
-	$ah{'funcs'}->{"if"} = sub { $_[0] ? return($_[1]) : return '' };
-	$ah{'funcs'}->{"ifelse"} = sub { $_[0] ? return $_[1] : return $_[2] };
-	$ah{'funcs'}->{"ifeq"} = sub { $_[0] eq $_[1] ? return $_[2] : return '' };
-	$ah{'funcs'}->{"ifneq"} = sub { $_[0] ne $_[1] ? return $_[2] : return '' };
-	$ah{'funcs'}->{"ifeqelse"} = sub { $_[0] eq $_[1] ? return $_[2] : return $_[3] };
+	$ah{'funcs'}->{'localtime'}	= sub { scalar(localtime) };
+	$ah{'funcs'}->{'if'}		= sub { $_[0] ? return $_[1] : return '' };
+	$ah{'funcs'}->{'ifelse'}	= sub { $_[0] ? return $_[1] : return $_[2] };
+	$ah{'funcs'}->{'ifeq'}		= sub { $_[0] eq $_[1] ? return $_[2] : return '' };
+	$ah{'funcs'}->{'ifneq'}		= sub { $_[0] ne $_[1] ? return $_[2] : return '' };
+	$ah{'funcs'}->{'ifeqelse'}	= sub { $_[0] eq $_[1] ? return $_[2] : return $_[3] };
 
 	bless(\%ah, $class);
 	return \%ah;
@@ -465,10 +465,14 @@ sub process
 	my ($ah, $data) = @_;
 
 	# not aborted by now
-	$$ah->{'abort-flag'} = 0 if ref($ah->{'abort-flag'});
+	if (ref ($ah->{'abort-flag'})) {
+		${$ah->{'abort-flag'}} = 0;
+	}
 
 	# no unresolved templates by now
-	@{$ah->{'unresolved'}} = () if ref($ah->{'unresolved'});
+	if (ref ($ah->{'unresolved'})) {
+		@{$ah->{'unresolved'}} = ();
+	}
 
 	# surround with \BEGIN and \END
 	$data = $ah->{'vars'}->{'\BEGIN'} . $data . $ah->{'vars'}->{'\END'};
@@ -477,7 +481,9 @@ sub process
 	$data = $ah->_process_do($data);
 
 	# finally, convert end of lines if necessary
-	$data =~ s/\n/\r\n/g if $ah->{'use-cr-lf'};
+	if ($ah->{'use-cr-lf'}) {
+		$data =~ s/\n/\r\n/g;
+	}
 
 	return $data;
 }
@@ -501,7 +507,7 @@ sub _process_do
 			if (-r $f and -M $f < $cache_time) {
 				open F, $f;
 				flock F, 1;
-				$data = join("",<F>);
+				$data = join('', <F>);
 				close F;
 
 				return $data;
@@ -513,11 +519,13 @@ sub _process_do
 	if ($data =~ /=cut/ and not $ah->{'contains-pod'}) {
 		my (@d);
 
-		foreach (split("\n",$data)) {
-			push(@d, $_) unless(/^=/ .. /^=cut/);
+		foreach (split("\n", $data)) {
+			unless (/^=/ .. /^=cut/) {
+				push(@d, $_);
+			}
 		}
 
-		$data = join("\n",@d);
+		$data = join("\n", @d);
 	}
 
 	# strips HTML comments
@@ -533,8 +541,7 @@ sub _process_do
 
 	# inverse substitutions
 	# (disabled until it works)
-#	 while(my ($i,$v)=each(%{$ah->{'inv-vars'}}))
-#	 {
+#	 while (my ($i, $v) = each(%{$ah->{'inv-vars'}})) {
 #		 $data =~ s/\b$i\b/$v/g;
 #	 }
 
@@ -586,13 +593,13 @@ sub _process_do
 		elsif ($ah->{'include-path'}) {
 			foreach my $p (split(/:/,$ah->{'include-path'})) {
 				if (open(INC, "$p/$key")) {
-					$text = join("",<INC>);
+					$text = join('', <INC>);
 					close INC;
 
 					# cache it as a variable
 					$ah->{vars}->{$key} = $text;
 
-					$text = $ah->params($text,@params);
+					$text = $ah->params($text, @params);
 
 					last;
 				}
@@ -602,11 +609,13 @@ sub _process_do
 		unless (defined $text) {
 			$text = $found;
 
-			push(@{$ah->{'unresolved'}},$found)
-				if ref $ah->{'unresolved'};
+			if (ref $ah->{'unresolved'}) {
+				push(@{$ah->{'unresolved'}}, $found);
+			}
 
-			$text = $ah->{'AUTOLOAD'}($found)
-				if ref $ah->{'AUTOLOAD'};
+			if (ref $ah->{'AUTOLOAD'}) {
+				$text = $ah->{'AUTOLOAD'}($found);
+			}
 		}
 
 		# do the recursivity
@@ -622,7 +631,7 @@ sub _process_do
 	# store the result there
 	if ($cache_time) {
 		open F, '>' . $ah->{'cache-path'} . '/' . $template_name;
-		flock F,2;
+		flock F, 2;
 		print F $data;
 		close F;
 	}
