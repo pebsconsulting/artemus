@@ -462,7 +462,7 @@ sub params
 {
 	my ($ah, $t, @params) = @_;
 
-	for(my $n = 0; $n < scalar(@params); $n++) {
+	for(my $n = 0; $t =~ /\$$n/; $n++) {
 		$t =~ s/(^|[^\\])\$$n/$1$params[$n]/g;
 	}
 
