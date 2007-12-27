@@ -26,7 +26,7 @@ use locale;
 
 package Artemus;
 
-$VERSION = '4.0.7-dev';
+$VERSION = '4.1.0-dev';
 
 =pod
 
