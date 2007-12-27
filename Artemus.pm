@@ -26,7 +26,10 @@ use locale;
 
 package Artemus;
 
-$VERSION = '4.1.0-dev';
+use strict;
+use warnings;
+
+$Artemus::VERSION = '4.1.0-dev';
 
 =pod
 
@@ -581,7 +584,7 @@ sub _process_do
 			# replace escaped chars
 			$text =~ s/\\{/{/g;
 			$text =~ s/\\}/}/g;
-			$test =~ s/\\\$/\$/g;
+			$text =~ s/\\\$/\$/g;
 
 			# now split the parameters
 			@params = split(/\|/, $text);
