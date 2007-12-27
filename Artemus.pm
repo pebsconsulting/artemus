@@ -344,24 +344,41 @@ sent as the first argument.
 
 sub new
 {
-	my ($class, %ah) = @_;
+	my ($class, %params) = @_;
+
+	my $a = bless({ %params }, $class);
 
 	# special variables
-	$ah{'vars'}->{'\n'}		= "\n";
-	$ah{'vars'}->{'\BEGIN'}		||= '';
-	$ah{'vars'}->{'\END'}		||= '';
-	$ah{'vars'}->{'\VERSION'}	= $Artemus::VERSION;
+	$a->{'vars'}->{'\n'}		= "\n";
+	$a->{'vars'}->{'\BEGIN'}	||= '';
+	$a->{'vars'}->{'\END'}		||= '';
+	$a->{'vars'}->{'\VERSION'}	= $Artemus::VERSION;
 
 	# special functions
-	$ah{'funcs'}->{'localtime'}	= sub { scalar(localtime) };
-	$ah{'funcs'}->{'if'}		= sub { $_[0] ? return $_[1] : return '' };
-	$ah{'funcs'}->{'ifelse'}	= sub { $_[0] ? return $_[1] : return $_[2] };
-	$ah{'funcs'}->{'ifeq'}		= sub { $_[0] eq $_[1] ? return $_[2] : return '' };
-	$ah{'funcs'}->{'ifneq'}		= sub { $_[0] ne $_[1] ? return $_[2] : return '' };
-	$ah{'funcs'}->{'ifeqelse'}	= sub { $_[0] eq $_[1] ? return $_[2] : return $_[3] };
+	$a->{'funcs'}->{'localtime'}	= sub { scalar(localtime) };
+	$a->{'funcs'}->{'if'}		= sub { $_[0] ? return $_[1] : return '' };
+	$a->{'funcs'}->{'ifelse'}	= sub { $_[0] ? return $_[1] : return $_[2] };
+	$a->{'funcs'}->{'ifeq'}		= sub { $_[0] eq $_[1] ? return $_[2] : return '' };
+	$a->{'funcs'}->{'ifneq'}	= sub { $_[0] ne $_[1] ? return $_[2] : return '' };
+	$a->{'funcs'}->{'ifeqelse'}	= sub { $_[0] eq $_[1] ? return $_[2] : return $_[3] };
 
-	bless(\%ah, $class);
-	return \%ah;
+	$a->{funcs}->{'foreach'}	= sub {
+		my $list	= shift;
+		my $code	= shift;
+		my $sep		= shift || '';
+
+		my @ret = ();
+
+		foreach my $l (split(/:/, $list)) {
+			my @e = split(/,/, $l);
+
+			push(@ret, $a->params($code, @e));
+		}
+
+		return join($sep, @ret);
+	};
+
+	return $a;
 }
 
 
