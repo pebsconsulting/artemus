@@ -485,6 +485,9 @@ sub process
 		$data =~ s/\n/\r\n/g;
 	}
 
+	# strip comments
+	$data =~ s/{%[^}]+}//g;
+
 	return $data;
 }
 
