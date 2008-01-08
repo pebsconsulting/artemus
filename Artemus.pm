@@ -367,7 +367,7 @@ sub new
 
 	$a->{funcs}->{'foreach'}	= sub {
 		my $list	= shift;
-		my $code	= shift;
+		my $code	= shift || '$0';
 		my $sep		= shift || '';
 
 		my @ret = ();
