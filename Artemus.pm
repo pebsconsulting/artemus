@@ -381,6 +381,8 @@ sub new
 		return join($sep, @ret);
 	};
 
+	$a->{funcs}->{set} = sub { $a->{vars}->{$_[0]} = $_[1]; return ''; };
+
 	return $a;
 }
 
