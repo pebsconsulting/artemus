@@ -371,15 +371,7 @@ sub new
 		my $sep		= shift || '';
 
 		my @ret = ();
-		my @l;
-
-		# split by : or, if none present, by ,
-		if ($list =~ /:/) {
-			@l = split(/\s*:\s*/, $list);
-		}
-		else {
-			@l = split(/\s*,\s*/, $list);
-		}
+		my @l = split(/\s*:\s*/, $list);
 
 		foreach my $l (@l) {
 			my @e = split(/\s*,\s*/, $l);
