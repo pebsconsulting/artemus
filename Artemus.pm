@@ -2,7 +2,7 @@
 #
 #   Artemus - Template Toolkit
 #
-#   Copyright (C) 2000/2007 Angel Ortega <angel@triptico.com>
+#   Copyright (C) 2000/2008 Angel Ortega <angel@triptico.com>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#   http://www.triptico.com
+#   http://triptico.com
 #
 #####################################################################
 
@@ -73,7 +73,7 @@ the Artemus markup as well as the API.
 You can download the latest version of this package and get
 more information from its home page at
 
- http://www.triptico.com/software/artemus.html
+ http://triptico.com/software/artemus.html
 
 =head1 THE ARTEMUS MARKUP
 
@@ -108,7 +108,7 @@ So, if you create the 'link' template containing
 
 you can insert the following call:
 
- {-link|http://www.triptico.com|Angel Ortega's Home Page}
+ {-link|http://triptico.com|Angel Ortega's Home Page}
 
 As you can see, you use the | character as a separator
 among the parameters and the template name itself.
@@ -352,20 +352,20 @@ sub new
 	my $a = bless({ %params }, $class);
 
 	# special variables
-	$a->{'vars'}->{'\n'}		= "\n";
-	$a->{'vars'}->{'\BEGIN'}	||= '';
-	$a->{'vars'}->{'\END'}		||= '';
-	$a->{'vars'}->{'\VERSION'}	= $Artemus::VERSION;
+	$a->{vars}->{'\n'}		= "\n";
+	$a->{vars}->{'\BEGIN'}	||= '';
+	$a->{vars}->{'\END'}		||= '';
+	$a->{vars}->{'\VERSION'}	= $Artemus::VERSION;
 
 	# special functions
-	$a->{'funcs'}->{'localtime'}	= sub { scalar(localtime) };
-	$a->{'funcs'}->{'if'}		= sub { $_[0] ? return $_[1] : return '' };
-	$a->{'funcs'}->{'ifelse'}	= sub { $_[0] ? return $_[1] : return $_[2] };
-	$a->{'funcs'}->{'ifeq'}		= sub { $_[0] eq $_[1] ? return $_[2] : return '' };
-	$a->{'funcs'}->{'ifneq'}	= sub { $_[0] ne $_[1] ? return $_[2] : return '' };
-	$a->{'funcs'}->{'ifeqelse'}	= sub { $_[0] eq $_[1] ? return $_[2] : return $_[3] };
+	$a->{funcs}->{localtime}	= sub { scalar(localtime) };
+	$a->{funcs}->{if}		= sub { $_[0] ? return $_[1] : return '' };
+	$a->{funcs}->{ifelse}		= sub { $_[0] ? return $_[1] : return $_[2] };
+	$a->{funcs}->{ifeq}		= sub { $_[0] eq $_[1] ? return $_[2] : return '' };
+	$a->{funcs}->{ifneq}		= sub { $_[0] ne $_[1] ? return $_[2] : return '' };
+	$a->{funcs}->{ifeqelse}		= sub { $_[0] eq $_[1] ? return $_[2] : return $_[3] };
 
-	$a->{funcs}->{'foreach'}	= sub {
+	$a->{funcs}->{foreach}		= sub {
 		my $list	= shift;
 		my $code	= shift || '$0';
 		my $sep		= shift || '';
