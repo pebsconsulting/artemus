@@ -365,6 +365,13 @@ sub new
 	$a->{funcs}->{ifneq}		= sub { $_[0] ne $_[1] ? return $_[2] : return '' };
 	$a->{funcs}->{ifeqelse}		= sub { $_[0] eq $_[1] ? return $_[2] : return $_[3] };
 
+	$a->{funcs}->{add}		= sub { $_[0] + $_[1]; };
+	$a->{funcs}->{sub}		= sub { $_[0] - $_[1]; };
+	$a->{funcs}->{gt}		= sub { $_[0] > $_[1]; };
+	$a->{funcs}->{lt}		= sub { $_[0] < $_[1]; };
+	$a->{funcs}->{eq}		= sub { $_[0] eq $_[1] ? 1 : 0; };
+	$a->{funcs}->{random}		= sub { $_[rand(scalar(@_))]; };
+
 	$a->{funcs}->{foreach}		= sub {
 		my $list	= shift;
 		my $code	= shift || '$0';
