@@ -233,6 +233,13 @@ This functions add or substract the values and returns the result.
 This functions compare if I<value1> is greater-than, lesser-than or equal to
 I<value2>. Meant primarily to use with the I<if> template.
 
+=item B<random>
+
+ {-random|value1|value2|...}
+
+This function returns randomly one of the values sent as arguments. There can
+any number of arguments.
+
 =item B<\CACHE>
 
  {-\CACHE|time}
