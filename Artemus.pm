@@ -240,6 +240,27 @@ I<value2>. Meant primarily to use with the I<if> template.
 This function returns randomly one of the values sent as arguments. There can
 any number of arguments.
 
+=item B<and>
+
+ {-and|value_or_condition_1|value_or_condition_2}
+
+If both values are true or defined, returns I<value_or_condition_2>; otherwise,
+returns the empty string.
+
+=item B<or>
+
+ {-or|value_or_condition_1|value_or_condition_2}
+
+If I<value_or_condition_1> is true or defined, returns it; otherwise, if
+I<value_or_condition_2> is true or defined, returns it; otherwise, returns
+the empty string.
+
+=item <not>
+
+ {-not|condition}
+
+Returns the negation of I<condition>.
+
 =item B<\CACHE>
 
  {-\CACHE|time}
@@ -396,6 +417,10 @@ sub new
 	$a->{funcs}->{lt}		= sub { $_[0] < $_[1]; };
 	$a->{funcs}->{eq}		= sub { $_[0] eq $_[1] ? 1 : 0; };
 	$a->{funcs}->{random}		= sub { $_[rand(scalar(@_))]; };
+
+	$a->{funcs}->{and}		= sub { $_[0] && $_[1] ? $_[0] : ($_[1] || ''); };
+	$a->{funcs}->{or}		= sub { $_[0] || $_[1] || ''; };
+	$a->{funcs}->{not}		= sub { $_[0] ? 0 : 1; };
 
 	$a->{funcs}->{foreach}		= sub {
 		my $list	= shift;
