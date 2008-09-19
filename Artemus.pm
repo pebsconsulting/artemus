@@ -705,10 +705,12 @@ sub _process_do
 			}
 		}
 
+		$text ||= '';
+
 		# do the recursivity
 		# if params are not to be cached,
 		# use $key instead of $found
-		$text = $ah->_process_do($text, $found);
+		$text = $ah->_process_do($text, $found) || '';
 
 		# make the substitution
 		$data =~ s/{-\Q$found\E}/$text/;
