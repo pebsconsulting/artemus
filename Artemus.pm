@@ -648,7 +648,7 @@ sub _process_do
 		# split parameters
 		my @params = ();
 
-		while ($params && $params =~ s/^([^\|\\]*(\\.[^\|\\]*)*)\|?//s) {
+		while (length($params) && $params =~ s/^([^\|\\]*(\\.[^\|\\]*)*)\|?//s) {
 			my $p = $1;
 			$p =~ s/\\\|/\|/g;
 
