@@ -353,17 +353,19 @@ sub new
 
 	# special variables
 	$a->{vars}->{'\n'}		= "\n";
-	$a->{vars}->{'\BEGIN'}	||= '';
+	$a->{vars}->{'\BEGIN'}		||= '';
 	$a->{vars}->{'\END'}		||= '';
 	$a->{vars}->{'\VERSION'}	= $Artemus::VERSION;
 
 	# special functions
 	$a->{funcs}->{localtime}	= sub { scalar(localtime) };
-	$a->{funcs}->{if}		= sub { $_[0] ? return $_[1] : return '' };
-	$a->{funcs}->{ifelse}		= sub { $_[0] ? return $_[1] : return $_[2] };
-	$a->{funcs}->{ifeq}		= sub { $_[0] eq $_[1] ? return $_[2] : return '' };
-	$a->{funcs}->{ifneq}		= sub { $_[0] ne $_[1] ? return $_[2] : return '' };
-	$a->{funcs}->{ifeqelse}		= sub { $_[0] eq $_[1] ? return $_[2] : return $_[3] };
+
+	$a->{funcs}->{if}		= sub { $_[0] ? return $_[1] : return ($_[2] || '') };
+	$a->{funcs}->{ifelse}		= $a->{funcs}->{if};
+
+	$a->{funcs}->{ifeq}		= sub { $_[0] eq $_[1] ? return $_[2] : return ($_[3] || '') };
+	$a->{funcs}->{ifneq}		= sub { $_[0] ne $_[1] ? return $_[2] : return ($_[3] || '') };
+	$a->{funcs}->{ifeqelse}		= $a->{funcs}->{ifeq};
 
 	$a->{funcs}->{add}		= sub { $_[0] + $_[1]; };
 	$a->{funcs}->{sub}		= sub { $_[0] - $_[1]; };
