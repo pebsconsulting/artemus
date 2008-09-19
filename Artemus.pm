@@ -217,6 +217,22 @@ nothing otherwise.
 This is an alias for the I<ifeq> template provided for backwards-compatibility.
 Don't use it.
 
+=item B<add>, B<sub>
+
+ {-add|num1|num2}
+ {-sub|num1|num2}
+
+This functions add or substract the values and returns the result.
+
+=item B<gt>, B<lt>, B<eq>
+
+ {-gt|value1|value2}
+ {-lt|value1|value2}
+ {-eq|value1|value2}
+
+This functions compare if I<value1> is greater-than, lesser-than or equal to
+I<value2>. Meant primarily to use with the I<if> template.
+
 =item B<\CACHE>
 
  {-\CACHE|time}
