@@ -51,7 +51,7 @@ Artemus - Template Toolkit
  
  # functions as templates
  %funcs = (
-	"random" => sub { int(rand(100)) }, # normal function
+	"rnd" => sub { int(rand(100)) },    # normal function
 	"sqrt" => sub { sqrt($_[0]) }	    # can accept parameters
 	);
  
@@ -122,18 +122,18 @@ is created which values are references to Perl functions. For
 example, you can create a function returning a random value
 by using:
 
- $funcs{'random'} = sub { int(rand(100)) };
+ $funcs{'rnd'} = sub { int(rand(100)) };
 
 And each time the {-random} template is found, it is evaluated
 and returns a random number between 0 and 99.
 
 Functions also can accept parameters; so, if you define it as
 
- $funcs{'random'} = sub { int(rand($_[0])) };
+ $funcs{'rnd'} = sub { int(rand($_[0])) };
 
 then calling the template as
 
- {-random|500}
+ {-rnd|500}
 
 will return each time it's evaluated a random value between 0 and 499.
 
