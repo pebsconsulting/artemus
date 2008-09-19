@@ -184,24 +184,26 @@ was created.
 =item B<if>
 
  {-if|condition|text}
+ {-if|condition|text_if_true|text_unless_true}
 
 If I<condition> is true, this template returns I<text>, or nothing
-otherwise. A condition is true if is not zero or the empty string
-(the same as in Perl).
+otherwise; in the 3 argument version, returns I<text_if_true> or
+I<text_unless_true>. A condition is true if is not zero or the empty
+string (the same as in Perl).
 
 =item B<ifelse>
 
- {-ifelse|condition|text_if_true|text_unless_true}
-
-If I<condition> is true, this template returns I<text_if_true>, or
-I<text_unless_true> otherwise.
+This is an alias for the I<if> template provided for backwards-compatibility.
+Don't use it.
 
 =item B<ifeq>
 
  {-ifeq|term1|term2|text}
+ {-ifeq|term1|term2|text_if_true|text_unless_true}
 
 If I<term1> is equal to I<term2>, this template returns I<text>, or nothing
-otherwise.
+otherwise. in the 3 argument version, returns I<text_if_true> or
+I<text_unless_true>.
 
 =item B<ifneq>
 
@@ -212,10 +214,8 @@ nothing otherwise.
 
 =item B<ifeqelse>
 
- {-ifeqelse|term1|term2|text_if_true|text_unless_true}
-
-If I<term1> is equal to I<term2>, this template returns I<text_if_true>, or
-I<text_unless_true> otherwise.
+This is an alias for the I<ifeq> template provided for backwards-compatibility.
+Don't use it.
 
 =item B<\CACHE>
 
