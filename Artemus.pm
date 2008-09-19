@@ -418,7 +418,7 @@ sub new
 	$a->{funcs}->{eq}		= sub { $_[0] eq $_[1] ? 1 : 0; };
 	$a->{funcs}->{random}		= sub { $_[rand(scalar(@_))]; };
 
-	$a->{funcs}->{and}		= sub { $_[0] && $_[1] ? $_[0] : ($_[1] || ''); };
+	$a->{funcs}->{and}		= sub { ($_[0] && $_[1]) || ''; };
 	$a->{funcs}->{or}		= sub { $_[0] || $_[1] || ''; };
 	$a->{funcs}->{not}		= sub { $_[0] ? 0 : 1; };
 
