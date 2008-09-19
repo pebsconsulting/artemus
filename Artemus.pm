@@ -655,7 +655,7 @@ sub _process_do
 			push(@params, $p);
 		}
 
-		my $text = undef;
+		my $text = '';
 
 		# is it a variable?
 		if (defined $ah->{'vars'}->{$key}) {
@@ -693,8 +693,7 @@ sub _process_do
 				}
 			}
 		}
-
-		unless (defined $text) {
+		else {
 			$text = $found;
 
 			if (ref $ah->{'unresolved'}) {
