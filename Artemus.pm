@@ -441,6 +441,14 @@ sub new
 
 	$a->{funcs}->{set} = sub { $a->{vars}->{$_[0]} = $_[1]; return ''; };
 
+	$a->{_abort} = 0;
+	$a->{_unresolved} = [];
+
+	# ensure 'abort-flag' and 'unresolved' point to
+	# appropriate holders
+	$a->{'abort-flag'}	||= \$a->{_abort};
+	$a->{unresolved}	||= \$a->{_unresolved};
+
 	return $a;
 }
 
@@ -545,14 +553,10 @@ sub process
 	my ($ah, $data) = @_;
 
 	# not aborted by now
-	if (ref ($ah->{'abort-flag'})) {
-		${$ah->{'abort-flag'}} = 0;
-	}
+	${$ah->{'abort-flag'}} = 0;
 
 	# no unresolved templates by now
-	if (ref ($ah->{'unresolved'})) {
-		@{$ah->{'unresolved'}} = ();
-	}
+	@{$ah->{'unresolved'}} = ();
 
 	# surround with \BEGIN and \END
 	$data = $ah->{'vars'}->{'\BEGIN'} . $data . $ah->{'vars'}->{'\END'};
@@ -672,7 +676,7 @@ sub _process_do
 
 			# functions can abort further execution
 
-			if (ref($ah->{'abort-flag'}) and $$ah->{'abort-flag'}) {
+			if ($$ah->{'abort-flag'}) {
 				last;
 			}
 		}
@@ -696,9 +700,7 @@ sub _process_do
 		else {
 			$text = $found;
 
-			if (ref $ah->{'unresolved'}) {
-				push(@{$ah->{'unresolved'}}, $found);
-			}
+			push(@{$ah->{'unresolved'}}, $found);
 
 			if (ref $ah->{'AUTOLOAD'}) {
 				$text = $ah->{'AUTOLOAD'}($found);
