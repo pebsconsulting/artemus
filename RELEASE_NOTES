@@ -1,0 +1,21 @@
+Artemus Release Notes
+=====================
+
+4.1.0
+-----
+
+ * New template function 'foreach', to implement loops.
+ * New template function 'set', for assigning a value to
+   a variable.
+ * New template arithmethic functions 'add' and 'sub'.
+ * New template comparison functions 'gt', 'lt' and 'eq'.
+ * New template logical functions 'and', 'or' and 'not'.
+ * New template function 'random'.
+ * Comments can now be included with the {% } markup (they
+   are deleted from the final output).
+ * Old cruft has been deleted from the script (ftp, makefile
+   and sitemap generation).
+ * Template parameters are always expanded (instead of short-
+   circuiting when one is not found).
+ * Artemus markup can be escaped to allow templates being used
+   from another ones with being executed first.
