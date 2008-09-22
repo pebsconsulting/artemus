@@ -726,7 +726,7 @@ sub _process_do
 
 			# functions can abort further execution
 
-			if ($$ah->{'abort-flag'}) {
+			if (${$ah->{'abort-flag'}}) {
 				last;
 			}
 		}
