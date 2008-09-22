@@ -4,7 +4,7 @@ Artemus TODO / Bug List
 Release Critical Bugs
 ---------------------
 
- * 1001: Document all function templates.
+None!
 
 Open Bugs
 ---------
@@ -20,6 +20,7 @@ Pending Enhancements
 Closed
 ------
 
-None!
+ * 1001: Document all function templates
+   (Mon, 22 Sep 2008 12:36:29 +0200).
 
 Email bugs to angel@triptico.com

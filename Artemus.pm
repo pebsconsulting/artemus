@@ -202,7 +202,7 @@ Don't use it.
  {-ifeq|term1|term2|text_if_true|text_unless_true}
 
 If I<term1> is equal to I<term2>, this template returns I<text>, or nothing
-otherwise. in the 3 argument version, returns I<text_if_true> or
+otherwise. in the 4 argument version, returns I<text_if_true> or
 I<text_unless_true>.
 
 =item B<ifneq>
@@ -261,6 +261,42 @@ the empty string.
 
 Returns the negation of I<condition>.
 
+=item B<set>
+
+ {-set|template_name|value}
+
+Assigns a value to a template. Same as setting a value from the 'vars'
+argument to B<new>, but from Artemus code.
+
+If you must change a variable from inside an I<if> directive, don't
+forget to escape the I<set> directive, as in
+
+ {-ifeq|{-user}|admin|\{-set\|powers\|EVERYTHING\}}
+
+IF you don't escape it, the I<powers> variable will be inevitably set
+to EVERYTHING.
+
+=item B<foreach>
+
+ {-foreach|list:of:colon:separated:values|output_text|separator}
+
+Iterates the list of colon separated values and returns I<output_text>
+for each one of the values, separating each of them with I<separator>
+(if one is defined). Each element itself can be a list of comma
+separated values that will be split and assigned to the $0, $1... etc
+parameters set to I<output_text>. For example, to create a I<select>
+HTML tag:
+
+ <select name = 'work_days'>
+ {-foreach|Monday,1:Tuesday,2:Wednesday,3:Thursday,4:Friday,5|
+ <option value = '\$1'>\$0</option>
+ }
+ </select>
+
+Remember to escape the dollar signs to avoid being expanded too early,
+and if the I<output_text> include calls to other Artemus templates,
+to escape them as well.
+
 =item B<\CACHE>
 
  {-\CACHE|time}
@@ -281,6 +317,20 @@ If you set these templates, they will be appended (\BEGIN) and
 prepended (\END) to the text being processed.
 
 =back
+
+=head2 Escaping
+
+Escaping has been briefly mentioned above; this is a way to avoid
+prematurely expanding and executing Artemus templates, and a direct
+derivative of the simple text substitution approach of the Artemus
+engine.
+
+To escape an Artemus template call you must escape ALL characters
+that has special meaning to the uber-simple Artemus parser (that is,
+the opening and closing braces, the pipe argument separator and
+the optional dollar prefixes for arguments). If you nest some
+directives (for example, two I<foreach> calls), you must
+double-escape everything. Yes, this can get really cumbersome.
 
 =head1 FUNCTIONS AND METHODS
 
