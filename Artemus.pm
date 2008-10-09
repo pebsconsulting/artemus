@@ -29,7 +29,7 @@ package Artemus;
 use strict;
 use warnings;
 
-$Artemus::VERSION = '4.1.0';
+$Artemus::VERSION = '4.1.1-dev';
 
 =pod
 
@@ -490,6 +490,29 @@ sub new
 	};
 
 	$a->{funcs}->{set} = sub { $a->{vars}->{$_[0]} = $_[1]; return ''; };
+
+	$a->{funcs}->{case}		= sub {
+		my $var		= shift;
+		my $ret		= '';
+
+		# if args are odd, the last one is
+		# the 'otherwise' case
+		if (scalar(@_) / 2 != int(scalar(@_) / 2)) {
+			$ret = pop(@_);
+		}
+
+		while (@_) {
+			my $val = shift;
+			my $out = shift;
+
+			if ($var eq $val) {
+				$ret = $out;
+				last;
+			}
+		}
+
+		return $ret;
+	};
 
 	$a->{_abort} = 0;
 	$a->{_unresolved} = [];

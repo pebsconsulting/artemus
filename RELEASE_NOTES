@@ -1,6 +1,11 @@
 Artemus Release Notes
 =====================
 
+4.1.1
+-----
+
+ * New template function 'case'.
+
 4.1.0
 -----
 
