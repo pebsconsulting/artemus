@@ -518,6 +518,8 @@ sub new
 		return $ret;
 	};
 
+	$a->{funcs}->{env} = sub { $ENV{$_[0]} || ''; };
+
 	$a->{_abort} = 0;
 	$a->{_unresolved} = [];
 

@@ -4,7 +4,8 @@ Artemus TODO / Bug List
 Release Critical Bugs
 ---------------------
 
-None!
+ * 1002: Document the 'case' function template.
+ * 1003: Document the 'env' function template.
 
 Open Bugs
 ---------
