@@ -5,6 +5,8 @@ Artemus Release Notes
 -----
 
  * New template function 'case'.
+ * New template function 'env', to get values from the
+   environment.
 
 4.1.0
 -----
