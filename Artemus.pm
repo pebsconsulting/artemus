@@ -518,7 +518,7 @@ sub new
 		return $ret;
 	};
 
-	$a->{funcs}->{env} = sub { $ENV{$_[0]} || ''; };
+	$a->{funcs}->{env} = sub { scalar(@_) ? ($ENV{$_[0]} || '') : join(':', keys(%ENV)); };
 
 	$a->{_abort} = 0;
 	$a->{_unresolved} = [];
