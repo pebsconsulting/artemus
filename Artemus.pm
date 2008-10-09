@@ -495,6 +495,8 @@ sub new
 		my $var		= shift;
 		my $ret		= '';
 
+		chomp($var);
+
 		# if args are odd, the last one is
 		# the 'otherwise' case
 		if (scalar(@_) / 2 != int(scalar(@_) / 2)) {
@@ -504,6 +506,8 @@ sub new
 		while (@_) {
 			my $val = shift;
 			my $out = shift;
+
+			chomp($val);
 
 			if ($var eq $val) {
 				$ret = $out;
