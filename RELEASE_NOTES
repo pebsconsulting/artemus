@@ -9,6 +9,8 @@ Artemus Release Notes
    environment.
  * New template function 'size', to return the number
    of elements in a colon-separated list.
+ * New template function 'seq', to generate a sequence
+   between two numbers as a colon-separated list.
 
 4.1.0
 -----

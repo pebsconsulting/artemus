@@ -519,8 +519,8 @@ sub new
 	};
 
 	$a->{funcs}->{env} = sub { scalar(@_) ? ($ENV{$_[0]} || '') : join(':', keys(%ENV)); };
-
 	$a->{funcs}->{size} = sub { scalar(@_) ? split(/\s*:\s*/, $_[0]) : 0; };
+	$a->{funcs}->{seq} = sub { join(':', $_[0] .. $_[1]); };
 
 	$a->{_abort} = 0;
 	$a->{_unresolved} = [];
