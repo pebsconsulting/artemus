@@ -7,6 +7,8 @@ Artemus Release Notes
  * New template function 'case'.
  * New template function 'env', to get values from the
    environment.
+ * New template function 'size', to return the number
+   of elements in a colon-separated list.
 
 4.1.0
 -----

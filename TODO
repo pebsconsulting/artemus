@@ -6,6 +6,7 @@ Release Critical Bugs
 
  * 1002: Document the 'case' function template.
  * 1003: Document the 'env' function template.
+ * 1004: Document the 'size' function template.
 
 Open Bugs
 ---------
