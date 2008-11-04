@@ -70,6 +70,8 @@ text substitution. These templates can be plain text, text with
 parameters and hooks to real Perl code. This document describes
 the Artemus markup as well as the API.
 
+=for html <->
+
 You can download the latest version of this package and get
 more information from its home page at
 
