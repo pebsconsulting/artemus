@@ -1,0 +1,85 @@
+=pod
+
+=head1 NAME
+
+artemus - Text substitution tool and much more
+
+=head1 SYNOPSIS
+
+ # substitutes text
+ artemus -i|--input={input file} -o|--output={output file}
+	[-c|--conf={config file}]
+	[-p|--paragraph={paragraph_separator}]
+	[-m|--msdos] [-a|--append]
+
+=head1 DESCRIPTION
+
+B<artemus> is a text substitution tool (thought mainly for preprocessing HTML).
+Macros are defined in the file F<artemus.conf>, in the form B<key=value>,
+being B<value> the destination text, that can have parameters. The macro is
+included in the source file between the B<{-> and B<}> marks. The (possible)
+parameters are delimited by the B<|> symbol.
+
+Examples:
+
+In F<artemus.conf> file:
+
+ # some simple definitions
+ Perl=<a href="http://www.perl.com">Perl</a>
+ LWN=<a href="http://www.lwn.net">Linux Weekly News</a>
+ separator=<br><hr><br>
+ head=<html><body bgcolor=ffffff>
+
+ # definitions with parameters
+ # generic link
+ link=<a href="http://$1">$0</a>
+ # generic meta
+ meta=<meta name="$1" content="$0">
+ # link using the link macro
+ CPAN={-link|CPAN|www.cpan.org}
+
+In a source file F<index.artemus>:
+
+ {-head}
+ {-meta|links, free software|keywords}
+ <h1>Links</h1>
+ <ul>
+ <li>{-Perl}
+ <li>{-LWN}
+ <li>{-CPAN}
+ <li>{-link|kernel.org|www.kernel.org}
+ </ul>
+ {-separator}
+
+By running
+
+ artemus -i index.artemus -o index.html
+
+you obtain the file F<index.html>:
+
+ <html><body bgcolor=ffffff>
+ <meta name="keywords" content="links, free software">
+ <h1>Links</h1>
+ <ul>
+ <li><a href="http://www.perl.com">Perl</a>
+ <li><a href="http://www.lwn.net">Linux Weekly News</a>
+ <li><a href="http://www.cpan.org">CPAN</a>
+ <li><a href="http://www.kernel.org">kernel.org</a>
+ </ul>
+ <br><hr><br>
+
+The I<--paragraph> argument let us define a string to substitute the empty
+lines in the document. If defined as <p>, you can create HTML documents
+separating the paragraphs with only a blank line, as B<artemus> will fill
+them with <p>.
+
+The I<--msdos> argument creates the typical MSDOS end of line, CR+LF.
+
+The I<--append> argument appends the output to destination file, instead
+of overwriting it.
+
+=head1 AUTHOR
+
+(C) Angel Ortega <angel@triptico.com> 2000/2008
+
+=cut
