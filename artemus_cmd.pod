@@ -20,6 +20,8 @@ being B<value> the destination text, that can have parameters. The macro is
 included in the source file between the B<{-> and B<}> marks. The (possible)
 parameters are delimited by the B<|> symbol.
 
+=for html <->
+
 Examples:
 
 In F<artemus.conf> file:
