@@ -146,6 +146,21 @@ foreach my $t (@unresolved) {
 	print STDERR "Artemus: unresolved '$t'\n";
 }
 
+if ($debug) {
+	foreach my $c (@{$ah->{call_stack}}) {
+		my ($t, $level, $full_line, $ret) = @{$c};
+
+		$ret =~ s/\n/\\n/g;
+		$full_line =~ s/\n/\\n/g;
+
+		print STDERR ('  ' x $level),
+			'{-', $full_line, '} -> ',
+			$ret,
+			"\n"
+		;
+	}
+}
+
 exit(0);
 
 ######################################################################

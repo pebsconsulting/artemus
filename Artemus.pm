@@ -667,12 +667,6 @@ sub _process_do
 	my ($ah, $data, $level, $template_name) = @_;
 	my ($cache_time);
 
-	if ($ah->{debug}) {
-		push(@{$ah->{call_stack}},
-			[ ($template_name || '_MAIN_', $level, $data) ]
-		);
-	}
-
 	# test if the template includes cache info
 	if ($data =~ s/{-\\CACHE\W([^}]*)}//) {
 		if ($template_name and $ah->{'cache-path'}) {
@@ -795,6 +789,12 @@ sub _process_do
 		}
 
 		$text ||= '';
+
+		if ($ah->{debug}) {
+			push(@{$ah->{call_stack}},
+				[ $key, $level, $found, $text ]
+			);
+		}
 
 		# do the recursivity
 		$text = $ah->_process_do($text, $level + 1, $key) || '';
