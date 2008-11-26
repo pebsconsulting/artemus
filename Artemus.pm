@@ -645,7 +645,7 @@ sub process
 	$data = $ah->{'vars'}->{'\BEGIN'} . $data . $ah->{'vars'}->{'\END'};
 
 	# really do it, recursively
-	$data = $ah->_process_do($data);
+	$data = $ah->_process_do($data, 0);
 
 	# finally, convert end of lines if necessary
 	if ($ah->{'use-cr-lf'}) {
@@ -661,7 +661,7 @@ sub process
 
 sub _process_do
 {
-	my ($ah, $data, $template_name) = @_;
+	my ($ah, $data, $level, $template_name) = @_;
 	my ($cache_time);
 
 	if ($ah->{debug}) {
@@ -793,9 +793,7 @@ sub _process_do
 		$text ||= '';
 
 		# do the recursivity
-		# if params are not to be cached,
-		# use $key instead of $found
-		$text = $ah->_process_do($text, $found) || '';
+		$text = $ah->_process_do($text, $level + 1, $found) || '';
 
 		# make the substitution
 		$data =~ s/{-\Q$found\E}/$text/;
