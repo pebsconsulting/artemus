@@ -641,6 +641,9 @@ sub process
 	# no unresolved templates by now
 	@{$ah->{'unresolved'}} = ();
 
+	# reset calling stack
+	@{$ah->{call_stack}} = ();
+
 	# surround with \BEGIN and \END
 	$data = $ah->{'vars'}->{'\BEGIN'} . $data . $ah->{'vars'}->{'\END'};
 
@@ -665,8 +668,9 @@ sub _process_do
 	my ($cache_time);
 
 	if ($ah->{debug}) {
-		print STDERR sprintf('Artemus: template="%s", data="%s"',
-			$template_name || 'NONE', $data || ''), "\n";
+		push(@{$ah->{call_stack}},
+			[ ($template_name || '_MAIN_', $level, $data) ]
+		);
 	}
 
 	# test if the template includes cache info
@@ -793,7 +797,7 @@ sub _process_do
 		$text ||= '';
 
 		# do the recursivity
-		$text = $ah->_process_do($text, $level + 1, $found) || '';
+		$text = $ah->_process_do($text, $level + 1, $key) || '';
 
 		# make the substitution
 		$data =~ s/{-\Q$found\E}/$text/;
