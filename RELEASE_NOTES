@@ -4,24 +4,25 @@ Artemus Release Notes
 4.1.1
 -----
 
- * New template function 'case'.
- * New template function 'env', to get values from the
+ * New template function `case'.
+ * New template function `env', to get values from the
    environment.
- * New template function 'size', to return the number
+ * New template function `size', to return the number
    of elements in a colon-separated list.
- * New template function 'seq', to generate a sequence
+ * New template function `seq', to generate a sequence
    between two numbers as a colon-separated list.
+ * Improved debugging information.
 
 4.1.0
 -----
 
- * New template function 'foreach', to implement loops.
- * New template function 'set', for assigning a value to
+ * New template function `foreach', to implement loops.
+ * New template function `set', for assigning a value to
    a variable.
- * New template arithmethic functions 'add' and 'sub'.
- * New template comparison functions 'gt', 'lt' and 'eq'.
- * New template logical functions 'and', 'or' and 'not'.
- * New template function 'random'.
+ * New template arithmethic functions `add' and `sub'.
+ * New template comparison functions `gt', `lt' and `eq'.
+ * New template logical functions `and', `or' and `not'.
+ * New template function `random'.
  * Comments can now be included with the {% } markup (they
    are deleted from the final output).
  * Old cruft has been deleted from the script (ftp, makefile
