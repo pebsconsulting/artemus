@@ -299,6 +299,38 @@ Remember to escape the dollar signs to avoid being expanded too early,
 and if the I<output_text> include calls to other Artemus templates,
 to escape them as well.
 
+=item B<case>
+
+ {-case|string|value_1|return_1|value_2|return_2|...}
+ {-case|string|value_1|return_1|value_2|return_2|...|default_value}
+
+Compares I<string> against the list of I<value_1>, I<value_2>... and
+returns the appropriate I<return_1>, I<return_2>... value. If I<default_value>
+is set (that is, I<case> has an odd number of arguments) it's returned
+if I<string> does not match any value.
+
+=item B<env>
+
+ {-case|env|environment_variable}
+ {-case|env}
+
+If I<environment_variable> has a value set in the environment, it's returned,
+or the empty string otherwise. If no environment variable is set, returns
+a colon-separated list of environment variable names.
+
+=item B<size>
+
+ {-size|colon_separated_list}
+
+Returns the number of elements in I<colon_separated_list>.
+
+=item B<seq>
+
+ {-seq|from_number|to_number}
+
+Generates a colon-separated list of the numbers from I<from_number>
+to I<to_number>. Useful in a I<foreach> loop.
+
 =item B<\CACHE>
 
  {-\CACHE|time}

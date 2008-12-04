@@ -4,10 +4,7 @@ Artemus TODO / Bug List
 Release Critical Bugs
 ---------------------
 
- * 1002: Document the 'case' function template.
- * 1003: Document the 'env' function template.
- * 1004: Document the 'size' function template.
- * 1005: Document the 'seq' function template.
+None!
 
 Open Bugs
 ---------
@@ -25,5 +22,13 @@ Closed
 
  * 1001: Document all function templates
    (Mon, 22 Sep 2008 12:36:29 +0200).
+ * 1002: Document the 'case' function template
+   (Thu, 04 Dec 2008 15:46:07 +0100).
+ * 1003: Document the 'env' function template.
+   (Thu, 04 Dec 2008 15:46:07 +0100).
+ * 1004: Document the 'size' function template.
+   (Thu, 04 Dec 2008 15:46:07 +0100).
+ * 1005: Document the 'seq' function template.
+   (Thu, 04 Dec 2008 15:46:07 +0100).
 
 Email bugs to angel@triptico.com
