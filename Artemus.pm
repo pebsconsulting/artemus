@@ -311,8 +311,8 @@ if I<string> does not match any value.
 
 =item B<env>
 
- {-case|env|environment_variable}
- {-case|env}
+ {-env|environment_variable}
+ {-env}
 
 If I<environment_variable> has a value set in the environment, it's returned,
 or the empty string otherwise. If no environment variable is set, returns
