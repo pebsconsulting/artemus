@@ -29,7 +29,7 @@ package Artemus;
 use strict;
 use warnings;
 
-$Artemus::VERSION = '4.1.1-dev';
+$Artemus::VERSION = '4.1.1';
 
 =pod
 
