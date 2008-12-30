@@ -495,10 +495,10 @@ sub new
 	$a->{funcs}->{ifneq}		= sub { $_[0] ne $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
 	$a->{funcs}->{ifeqelse}		= $a->{funcs}->{ifeq};
 
-	$a->{funcs}->{add}		= sub { $_[0] + $_[1]; };
-	$a->{funcs}->{sub}		= sub { $_[0] - $_[1]; };
-	$a->{funcs}->{gt}		= sub { $_[0] > $_[1]; };
-	$a->{funcs}->{lt}		= sub { $_[0] < $_[1]; };
+	$a->{funcs}->{add}		= sub { ($_[0] || 0) + ($_[1] || 0); };
+	$a->{funcs}->{sub}		= sub { ($_[0] || 0) - ($_[1] || 0); };
+	$a->{funcs}->{gt}		= sub { ($_[0] || 0) > ($_[1] || 0); };
+	$a->{funcs}->{lt}		= sub { ($_[0] || 0) < ($_[1] || 0); };
 	$a->{funcs}->{eq}		= sub { $_[0] eq $_[1] ? 1 : 0; };
 	$a->{funcs}->{random}		= sub { $_[rand(scalar(@_))]; };
 
@@ -646,7 +646,8 @@ sub params
 	my ($ah, $t, @params) = @_;
 
 	for(my $n = 0; $t =~ /\$$n/; $n++) {
-		$t =~ s/(^|[^\\])\$$n/$1$params[$n]/g;
+		my $s = $params[$n] || '';
+		$t =~ s/(^|[^\\])\$$n/$1$s/g;
 	}
 
 	return $t;
