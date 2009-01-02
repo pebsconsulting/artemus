@@ -3,7 +3,7 @@
 #
 #   artemus - HTML (and other things) Preprocessor
 #
-#   Copyright (C) 2000/2007 Angel Ortega <angel@triptico.com>
+#   Copyright (C) 2000/2009 Angel Ortega <angel@triptico.com>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License
@@ -222,7 +222,7 @@ sub read_config
 sub usage
 {
 	print("$artemus_id - HTML (and other things) Preprocessor\n");
-	print("Copyright (C) 2000/2007 Angel Ortega <angel\@triptico.com>\n\n");
+	print("Copyright (C) 2000/2009 Angel Ortega <angel\@triptico.com>\n\n");
 
 	print("Usage:\n");
 	print("  artemus -i|--input={input file} -o|--output={output file}\n");

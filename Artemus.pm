@@ -2,7 +2,7 @@
 #
 #   Artemus - Template Toolkit
 #
-#   Copyright (C) 2000/2008 Angel Ortega <angel@triptico.com>
+#   Copyright (C) 2000/2009 Angel Ortega <angel@triptico.com>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@ package Artemus;
 use strict;
 use warnings;
 
-$Artemus::VERSION = '4.1.1';
+$Artemus::VERSION = '4.1.2-dev';
 
 =pod
 
