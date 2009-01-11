@@ -477,36 +477,36 @@ sub new
 {
 	my ($class, %params) = @_;
 
-	my $a = bless({ %params }, $class);
+	my $self = bless({ %params }, $class);
 
 	# special variables
-	$a->{vars}->{'\n'}		= "\n";
-	$a->{vars}->{'\BEGIN'}		||= '';
-	$a->{vars}->{'\END'}		||= '';
-	$a->{vars}->{'\VERSION'}	= $Artemus::VERSION;
+	$self->{vars}->{'\n'}		= "\n";
+	$self->{vars}->{'\BEGIN'}	||= '';
+	$self->{vars}->{'\END'}		||= '';
+	$self->{vars}->{'\VERSION'}	= $Artemus::VERSION;
 
 	# special functions
-	$a->{funcs}->{localtime}	= sub { scalar(localtime) };
+	$self->{funcs}->{localtime}	= sub { scalar(localtime) };
 
-	$a->{funcs}->{if}		= sub { $_[0] ? $_[1] : (scalar(@_) == 3 ? $_[2] : '') };
-	$a->{funcs}->{ifelse}		= $a->{funcs}->{if};
+	$self->{funcs}->{if}		= sub { $_[0] ? $_[1] : (scalar(@_) == 3 ? $_[2] : '') };
+	$self->{funcs}->{ifelse}	= $self->{funcs}->{if};
 
-	$a->{funcs}->{ifeq}		= sub { $_[0] eq $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
-	$a->{funcs}->{ifneq}		= sub { $_[0] ne $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
-	$a->{funcs}->{ifeqelse}		= $a->{funcs}->{ifeq};
+	$self->{funcs}->{ifeq}		= sub { $_[0] eq $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
+	$self->{funcs}->{ifneq}		= sub { $_[0] ne $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
+	$self->{funcs}->{ifeqelse}	= $self->{funcs}->{ifeq};
 
-	$a->{funcs}->{add}		= sub { ($_[0] || 0) + ($_[1] || 0); };
-	$a->{funcs}->{sub}		= sub { ($_[0] || 0) - ($_[1] || 0); };
-	$a->{funcs}->{gt}		= sub { ($_[0] || 0) > ($_[1] || 0); };
-	$a->{funcs}->{lt}		= sub { ($_[0] || 0) < ($_[1] || 0); };
-	$a->{funcs}->{eq}		= sub { $_[0] eq $_[1] ? 1 : 0; };
-	$a->{funcs}->{random}		= sub { $_[rand(scalar(@_))]; };
+	$self->{funcs}->{add}		= sub { ($_[0] || 0) + ($_[1] || 0); };
+	$self->{funcs}->{sub}		= sub { ($_[0] || 0) - ($_[1] || 0); };
+	$self->{funcs}->{gt}		= sub { ($_[0] || 0) > ($_[1] || 0); };
+	$self->{funcs}->{lt}		= sub { ($_[0] || 0) < ($_[1] || 0); };
+	$self->{funcs}->{eq}		= sub { $_[0] eq $_[1] ? 1 : 0; };
+	$self->{funcs}->{random}	= sub { $_[rand(scalar(@_))]; };
 
-	$a->{funcs}->{and}		= sub { ($_[0] && $_[1]) || ''; };
-	$a->{funcs}->{or}		= sub { $_[0] || $_[1] || ''; };
-	$a->{funcs}->{not}		= sub { $_[0] ? 0 : 1; };
+	$self->{funcs}->{and}		= sub { ($_[0] && $_[1]) || ''; };
+	$self->{funcs}->{or}		= sub { $_[0] || $_[1] || ''; };
+	$self->{funcs}->{not}		= sub { $_[0] ? 0 : 1; };
 
-	$a->{funcs}->{foreach}		= sub {
+	$self->{funcs}->{foreach}	= sub {
 		my $list	= shift;
 		my $code	= shift || '$0';
 		my $sep		= shift || '';
@@ -517,15 +517,15 @@ sub new
 		foreach my $l (@l) {
 			my @e = split(/\s*,\s*/, $l);
 
-			push(@ret, $a->params($code, @e));
+			push(@ret, $self->params($code, @e));
 		}
 
 		return join($sep, @ret);
 	};
 
-	$a->{funcs}->{set} = sub { $a->{vars}->{$_[0]} = $_[1]; return ''; };
+	$self->{funcs}->{set} = sub { $self->{vars}->{$_[0]} = $_[1]; return ''; };
 
-	$a->{funcs}->{case}		= sub {
+	$self->{funcs}->{case}	= sub {
 		my $var		= shift;
 		my $ret		= '';
 
@@ -552,19 +552,19 @@ sub new
 		return $ret;
 	};
 
-	$a->{funcs}->{env} = sub { scalar(@_) ? ($ENV{$_[0]} || '') : join(':', keys(%ENV)); };
-	$a->{funcs}->{size} = sub { scalar(@_) ? split(/\s*:\s*/, $_[0]) : 0; };
-	$a->{funcs}->{seq} = sub { join(':', ($_[0] || 0) .. ($_[1] || 0)); };
+	$self->{funcs}->{env} = sub { scalar(@_) ? ($ENV{$_[0]} || '') : join(':', keys(%ENV)); };
+	$self->{funcs}->{size} = sub { scalar(@_) ? split(/\s*:\s*/, $_[0]) : 0; };
+	$self->{funcs}->{seq} = sub { join(':', ($_[0] || 0) .. ($_[1] || 0)); };
 
-	$a->{_abort} = 0;
-	$a->{_unresolved} = [];
+	$self->{_abort} = 0;
+	$self->{_unresolved} = [];
 
 	# ensure 'abort-flag' and 'unresolved' point to
 	# appropriate holders
-	$a->{'abort-flag'}	||= \$a->{_abort};
-	$a->{unresolved}	||= \$a->{_unresolved};
+	$self->{'abort-flag'}	||= \$self->{_abort};
+	$self->{unresolved}	||= \$self->{_unresolved};
 
-	return $a;
+	return $self;
 }
 
 
