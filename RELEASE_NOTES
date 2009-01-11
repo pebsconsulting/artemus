@@ -1,6 +1,11 @@
 Artemus Release Notes
 =====================
 
+4.1.2
+-----
+
+ * New template function `sort'.
+
 4.1.1
 -----
 

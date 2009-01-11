@@ -331,6 +331,15 @@ Returns the number of elements in I<colon_separated_list>.
 Generates a colon-separated list of the numbers from I<from_number>
 to I<to_number>. Useful in a I<foreach> loop.
 
+=item B<sort>
+
+ {-sort|list}
+ {-sort|list|field}
+
+Sorts the colon-separated list. The optional I<field> is the field
+to sort on (assuming the elements of the list are comma-separated
+lists themselves).
+
 =item B<\CACHE>
 
  {-\CACHE|time}
@@ -555,6 +564,19 @@ sub new
 	$self->{funcs}->{env} = sub { scalar(@_) ? ($ENV{$_[0]} || '') : join(':', keys(%ENV)); };
 	$self->{funcs}->{size} = sub { scalar(@_) ? split(/\s*:\s*/, $_[0]) : 0; };
 	$self->{funcs}->{seq} = sub { join(':', ($_[0] || 0) .. ($_[1] || 0)); };
+
+	$self->{funcs}->{sort} = sub {
+		my $list	= shift;
+		my $field	= shift || 0;
+
+		join(':',
+			sort {
+				my @a = split(',', $a);
+				my @b = split(',', $b);
+				$a[$field] cmp $b[$field];
+			} split(':', $list)
+		);
+	};
 
 	$self->{_abort} = 0;
 	$self->{_unresolved} = [];
