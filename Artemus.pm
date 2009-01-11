@@ -335,10 +335,11 @@ to I<to_number>. Useful in a I<foreach> loop.
 
  {-sort|list}
  {-sort|list|field}
+ {-sort|list|field|inverse}
 
 Sorts the colon-separated list. The optional I<field> is the field
 to sort on (assuming the elements of the list are comma-separated
-lists themselves).
+lists themselves). If I<inverse> is set, the sorting is reversed.
 
 =item B<\CACHE>
 
@@ -568,12 +569,15 @@ sub new
 	$self->{funcs}->{sort} = sub {
 		my $list	= shift;
 		my $field	= shift || 0;
+		my $inverse	= shift || 0;
 
 		join(':',
 			sort {
 				my @a = split(',', $a);
 				my @b = split(',', $b);
-				$a[$field] cmp $b[$field];
+
+				return $inverse ? $b[$field] cmp $a[$field] :
+					$a[$field] cmp $b[$field];
 			} split(':', $list)
 		);
 	};
