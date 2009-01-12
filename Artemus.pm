@@ -341,6 +341,12 @@ Sorts the colon-separated list. The optional I<field> is the field
 to sort on (assuming the elements of the list are comma-separated
 lists themselves). If I<inverse> is set, the sorting is reversed.
 
+=item B<reverse>
+
+ {-reverse|list}
+
+Reverses a colon-separated list.
+
 =item B<\CACHE>
 
  {-\CACHE|time}
@@ -581,6 +587,8 @@ sub new
 			} split(':', $list)
 		);
 	};
+
+	$self->{funcs}->{reverse} = sub { join(':', reverse(split(':', $_[0]))); };
 
 	$self->{_abort} = 0;
 	$self->{_unresolved} = [];

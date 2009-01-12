@@ -5,6 +5,7 @@ Artemus Release Notes
 -----
 
  * New template function `sort'.
+ * New template function `reverse'.
 
 4.1.1
 -----
