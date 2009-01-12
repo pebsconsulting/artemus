@@ -543,7 +543,7 @@ sub new
 
 		# if args are odd, the last one is
 		# the 'otherwise' case
-		if (scalar(@_) / 2 != int(scalar(@_) / 2)) {
+		if (scalar(@_) % 2) {
 			$ret = pop(@_);
 		}
 
