@@ -3,6 +3,7 @@ MANIFEST
 Makefile.PL
 Artemus.pm
 Artemus4.pm
+Artemus5.pm
 artemus
 artemus_cmd.pod
 TODO
