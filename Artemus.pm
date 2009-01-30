@@ -31,6 +31,399 @@ use warnings;
 
 $Artemus::VERSION = '4.1.2-dev';
 
+sub new
+{
+	my ($class, %params) = @_;
+
+	my $self = bless({ %params }, $class);
+
+	# special variables
+	$self->{vars}->{'\n'}		= "\n";
+	$self->{vars}->{'\BEGIN'}	||= '';
+	$self->{vars}->{'\END'}		||= '';
+	$self->{vars}->{'\VERSION'}	= $Artemus::VERSION;
+
+	# special functions
+	$self->{funcs}->{localtime}	= sub { scalar(localtime) };
+
+	$self->{funcs}->{if}		= sub { $_[0] ? $_[1] : (scalar(@_) == 3 ? $_[2] : '') };
+	$self->{funcs}->{ifelse}	= $self->{funcs}->{if};
+
+	$self->{funcs}->{ifeq}		= sub { $_[0] eq $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
+	$self->{funcs}->{ifneq}		= sub { $_[0] ne $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
+	$self->{funcs}->{ifeqelse}	= $self->{funcs}->{ifeq};
+
+	$self->{funcs}->{add}		= sub { ($_[0] || 0) + ($_[1] || 0); };
+	$self->{funcs}->{sub}		= sub { ($_[0] || 0) - ($_[1] || 0); };
+	$self->{funcs}->{gt}		= sub { ($_[0] || 0) > ($_[1] || 0); };
+	$self->{funcs}->{lt}		= sub { ($_[0] || 0) < ($_[1] || 0); };
+	$self->{funcs}->{eq}		= sub { $_[0] eq $_[1] ? 1 : 0; };
+	$self->{funcs}->{random}	= sub { $_[rand(scalar(@_))]; };
+
+	$self->{funcs}->{and}		= sub { ($_[0] && $_[1]) || ''; };
+	$self->{funcs}->{or}		= sub { $_[0] || $_[1] || ''; };
+	$self->{funcs}->{not}		= sub { $_[0] ? 0 : 1; };
+
+	$self->{funcs}->{foreach}	= sub {
+		my $list	= shift;
+		my $code	= shift || '$0';
+		my $sep		= shift || '';
+
+		my @ret = ();
+		my @l = split(/\s*:\s*/, $list);
+
+		foreach my $l (@l) {
+			my @e = split(/\s*,\s*/, $l);
+
+			push(@ret, $self->params($code, @e));
+		}
+
+		return join($sep, @ret);
+	};
+
+	$self->{funcs}->{set} = sub { $self->{vars}->{$_[0]} = $_[1]; return ''; };
+
+	$self->{funcs}->{case}	= sub {
+		my $var		= shift;
+		my $ret		= '';
+
+		chomp($var);
+
+		# if args are odd, the last one is
+		# the 'otherwise' case
+		if (scalar(@_) % 2) {
+			$ret = pop(@_);
+		}
+
+		while (@_) {
+			my $val = shift;
+			my $out = shift;
+
+			chomp($val);
+
+			if ($var eq $val) {
+				$ret = $out;
+				last;
+			}
+		}
+
+		return $ret;
+	};
+
+	$self->{funcs}->{env} = sub { scalar(@_) ? ($ENV{$_[0]} || '') : join(':', keys(%ENV)); };
+	$self->{funcs}->{size} = sub { scalar(@_) ? split(/\s*:\s*/, $_[0]) : 0; };
+	$self->{funcs}->{seq} = sub { join(':', ($_[0] || 0) .. ($_[1] || 0)); };
+
+	$self->{funcs}->{sort} = sub {
+		my $list	= shift;
+		my $field	= shift || 0;
+
+		join(':',
+			sort {
+				my @a = split(',', $a);
+				my @b = split(',', $b);
+
+				$a[$field] cmp $b[$field];
+			} split(':', $list)
+		);
+	};
+
+	$self->{funcs}->{reverse} = sub { join(':', reverse(split(':', $_[0]))); };
+
+	$self->{_abort} = 0;
+	$self->{_unresolved} = [];
+
+	# ensure 'abort-flag' and 'unresolved' point to
+	# appropriate holders
+	$self->{'abort-flag'}	||= \$self->{_abort};
+	$self->{unresolved}	||= \$self->{_unresolved};
+
+	return $self;
+}
+
+
+=head2 B<armor>
+
+ $str = $ah->armor($str);
+
+Translate Artemus markup to HTML entities, to avoid being
+interpreted by the parser.
+
+=cut
+
+sub armor
+{
+	my ($ah, $t) = @_;
+
+	$t =~ s/{/\&#123;/g;
+	$t =~ s/\|/\&#124;/g;
+	$t =~ s/}/\&#125;/g;
+	$t =~ s/\$/\&#36;/g;
+#	$t =~ s/=/\&#61;/g;
+
+	return $t;
+}
+
+
+=head2 B<unarmor>
+
+ $str = $ah->unarmor($str);
+
+Translate back the Artemus markup from HTML entities. This
+is the reverse operation of B<armor>.
+
+=cut
+
+sub unarmor
+{
+	my ($ah, $t) = @_;
+
+	$t =~ s/\&#123;/{/g;
+	$t =~ s/\&#124;/\|/g;
+	$t =~ s/\&#125;/}/g;
+	$t =~ s/\&#36;/\$/g;
+#	$t =~ s/\&#61;/=/g;
+
+	return $t;
+}
+
+
+=head2 B<strip>
+
+ $str = $ah->strip($str);
+
+Strips all Artemus markup from the string.
+
+=cut
+
+sub strip
+{
+	my ($ah, $t) = @_;
+
+	$t =~ s/{-([-\\\w_ \.]+)[^{}]*}/$1/g;
+
+	return $t;
+}
+
+
+=head2 B<params>
+
+ $str = $ah->params($str,@params);
+
+Interpolates all $0, $1, $2... occurrences in the string into
+the equivalent element from @params.
+
+=cut
+
+sub params
+{
+	my ($ah, $t, @params) = @_;
+
+	for(my $n = 0; $t =~ /\$$n/; $n++) {
+		my $s = $params[$n] || '';
+		$t =~ s/(^|[^\\])\$$n/$1$s/g;
+	}
+
+	return $t;
+}
+
+
+=head2 B<process>
+
+ $str = $ah->process($str);
+
+Processes the string, translating all Artemus markup. This
+is the main template processing method. The I<abort-flag> flag and
+I<unresolved> list are reset on each call to this method.
+
+=cut
+
+sub process
+{
+	my ($ah, $data) = @_;
+
+	# not aborted by now
+	${$ah->{'abort-flag'}} = 0;
+
+	# no unresolved templates by now
+	@{$ah->{'unresolved'}} = ();
+
+	# reset calling stack
+	@{$ah->{call_stack}} = ();
+
+	# surround with \BEGIN and \END
+	$data = $ah->{'vars'}->{'\BEGIN'} . $data . $ah->{'vars'}->{'\END'};
+
+	# really do it, recursively
+	$data = $ah->_process_do($data, 0);
+
+	# finally, convert end of lines if necessary
+	if ($ah->{'use-cr-lf'}) {
+		$data =~ s/\n/\r\n/g;
+	}
+
+	# strip comments
+	$data =~ s/{%[^}]+}//g;
+
+	return $data;
+}
+
+
+sub _process_do
+{
+	my ($ah, $data, $level, $template_name) = @_;
+	my ($cache_time);
+
+	# test if the template includes cache info
+	if ($data =~ s/{-\\CACHE\W([^}]*)}//) {
+		if ($template_name and $ah->{'cache-path'}) {
+			$cache_time = $1;
+
+			# convert strange chars to :
+			$template_name =~ s/[^\w\d_]/:/g;
+
+			my ($f) = "$ah->{'cache-path'}/$template_name";
+
+			if (-r $f and -M $f < $cache_time) {
+				open F, $f;
+				flock F, 1;
+				$data = join('', <F>);
+				close F;
+
+				return $data;
+			}
+		}
+	}
+
+	# strip POD documentation, if any
+	if ($data =~ /=cut/ and not $ah->{'contains-pod'}) {
+		my (@d);
+
+		foreach (split("\n", $data)) {
+			unless (/^=/ .. /^=cut/) {
+				push(@d, $_);
+			}
+		}
+
+		$data = join("\n", @d);
+	}
+
+	# strips HTML comments
+	if ($ah->{'strip-html-comments'}) {
+		$data =~ s/<!--.*?-->//gs;
+	}
+
+	# if defined, substitute the paragraphs
+	# with the paragraph separator
+	if ($ah->{'paragraph-separator'}) {
+		$data =~ s/\n\n/\n$ah->{'paragraph-separator'}\n/g;
+	}
+
+	# inverse substitutions
+	# (disabled until it works)
+#	 while (my ($i, $v) = each(%{$ah->{'inv-vars'}})) {
+#		 $data =~ s/\b$i\b/$v/g;
+#	 }
+
+	# main function, variable and include substitutions
+	while ($data =~ /{-([^{}\\]*(\\.[^{}\\]*)*)}/s) {
+		my ($found) = $1;
+
+		# take key and params
+		my ($key, $params) = ($found =~ /^([-\\\w_]+)\|?(.*)$/s);
+
+		# replace escaped chars
+		$params =~ s/\\{/{/g;
+		$params =~ s/\\}/}/g;
+		$params =~ s/\\\$/\$/g;
+
+		# split parameters
+		my @params = ();
+
+		while (length($params) && $params =~ s/^([^\|\\]*(\\.[^\|\\]*)*)\|?//s) {
+			my $p = $1;
+			$p =~ s/\\\|/\|/g;
+
+			push(@params, $p);
+		}
+
+		my $text = '';
+
+		# is it a variable?
+		if (defined $ah->{'vars'}->{$key}) {
+			$text = $ah->{'vars'}->{$key};
+			$text = $ah->params($text, @params);
+		}
+
+		# is it a function?
+		elsif (defined $ah->{'funcs'}->{$key}) {
+			my ($func);
+
+			$func = $ah->{'funcs'}->{$key};
+			$text = $func->(@params);
+
+			# functions can abort further execution
+
+			if (${$ah->{'abort-flag'}}) {
+				last;
+			}
+		}
+
+		# is it an include?
+		elsif ($ah->{'include-path'}) {
+			foreach my $p (split(/:/, $ah->{'include-path'})) {
+				if (open(INC, "$p/$key")) {
+					$text = join('', <INC>);
+					close INC;
+
+					# cache it as a variable
+					$ah->{vars}->{$key} = $text;
+
+					$text = $ah->params($text, @params);
+
+					last;
+				}
+			}
+		}
+		else {
+			$text = $found;
+
+			push(@{$ah->{'unresolved'}}, $found);
+
+			if (ref $ah->{'AUTOLOAD'}) {
+				$text = $ah->{'AUTOLOAD'}($found);
+			}
+		}
+
+		$text ||= '';
+
+		if ($ah->{debug}) {
+			push(@{$ah->{call_stack}},
+				[ $key, $level, $found, $text ]
+			);
+		}
+
+		# do the recursivity
+		$text = $ah->_process_do($text, $level + 1, $key) || '';
+
+		# make the substitution
+		$data =~ s/{-\Q$found\E}/$text/;
+	}
+
+	# if the template included cache info,
+	# store the result there
+	if ($cache_time) {
+		open F, '>' . $ah->{'cache-path'} . '/' . $template_name;
+		flock F, 2;
+		print F $data;
+		close F;
+	}
+
+	return $data;
+}
+
+1;
+__END__
 =pod
 
 =head1 NAME
@@ -486,404 +879,7 @@ sent as the first argument.
 
 =back
 
-=cut
-
-sub new
-{
-	my ($class, %params) = @_;
-
-	my $self = bless({ %params }, $class);
-
-	# special variables
-	$self->{vars}->{'\n'}		= "\n";
-	$self->{vars}->{'\BEGIN'}	||= '';
-	$self->{vars}->{'\END'}		||= '';
-	$self->{vars}->{'\VERSION'}	= $Artemus::VERSION;
-
-	# special functions
-	$self->{funcs}->{localtime}	= sub { scalar(localtime) };
-
-	$self->{funcs}->{if}		= sub { $_[0] ? $_[1] : (scalar(@_) == 3 ? $_[2] : '') };
-	$self->{funcs}->{ifelse}	= $self->{funcs}->{if};
-
-	$self->{funcs}->{ifeq}		= sub { $_[0] eq $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
-	$self->{funcs}->{ifneq}		= sub { $_[0] ne $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
-	$self->{funcs}->{ifeqelse}	= $self->{funcs}->{ifeq};
-
-	$self->{funcs}->{add}		= sub { ($_[0] || 0) + ($_[1] || 0); };
-	$self->{funcs}->{sub}		= sub { ($_[0] || 0) - ($_[1] || 0); };
-	$self->{funcs}->{gt}		= sub { ($_[0] || 0) > ($_[1] || 0); };
-	$self->{funcs}->{lt}		= sub { ($_[0] || 0) < ($_[1] || 0); };
-	$self->{funcs}->{eq}		= sub { $_[0] eq $_[1] ? 1 : 0; };
-	$self->{funcs}->{random}	= sub { $_[rand(scalar(@_))]; };
-
-	$self->{funcs}->{and}		= sub { ($_[0] && $_[1]) || ''; };
-	$self->{funcs}->{or}		= sub { $_[0] || $_[1] || ''; };
-	$self->{funcs}->{not}		= sub { $_[0] ? 0 : 1; };
-
-	$self->{funcs}->{foreach}	= sub {
-		my $list	= shift;
-		my $code	= shift || '$0';
-		my $sep		= shift || '';
-
-		my @ret = ();
-		my @l = split(/\s*:\s*/, $list);
-
-		foreach my $l (@l) {
-			my @e = split(/\s*,\s*/, $l);
-
-			push(@ret, $self->params($code, @e));
-		}
-
-		return join($sep, @ret);
-	};
-
-	$self->{funcs}->{set} = sub { $self->{vars}->{$_[0]} = $_[1]; return ''; };
-
-	$self->{funcs}->{case}	= sub {
-		my $var		= shift;
-		my $ret		= '';
-
-		chomp($var);
-
-		# if args are odd, the last one is
-		# the 'otherwise' case
-		if (scalar(@_) % 2) {
-			$ret = pop(@_);
-		}
-
-		while (@_) {
-			my $val = shift;
-			my $out = shift;
-
-			chomp($val);
-
-			if ($var eq $val) {
-				$ret = $out;
-				last;
-			}
-		}
-
-		return $ret;
-	};
-
-	$self->{funcs}->{env} = sub { scalar(@_) ? ($ENV{$_[0]} || '') : join(':', keys(%ENV)); };
-	$self->{funcs}->{size} = sub { scalar(@_) ? split(/\s*:\s*/, $_[0]) : 0; };
-	$self->{funcs}->{seq} = sub { join(':', ($_[0] || 0) .. ($_[1] || 0)); };
-
-	$self->{funcs}->{sort} = sub {
-		my $list	= shift;
-		my $field	= shift || 0;
-
-		join(':',
-			sort {
-				my @a = split(',', $a);
-				my @b = split(',', $b);
-
-				$a[$field] cmp $b[$field];
-			} split(':', $list)
-		);
-	};
-
-	$self->{funcs}->{reverse} = sub { join(':', reverse(split(':', $_[0]))); };
-
-	$self->{_abort} = 0;
-	$self->{_unresolved} = [];
-
-	# ensure 'abort-flag' and 'unresolved' point to
-	# appropriate holders
-	$self->{'abort-flag'}	||= \$self->{_abort};
-	$self->{unresolved}	||= \$self->{_unresolved};
-
-	return $self;
-}
-
-
-=head2 B<armor>
-
- $str = $ah->armor($str);
-
-Translate Artemus markup to HTML entities, to avoid being
-interpreted by the parser.
-
-=cut
-
-sub armor
-{
-	my ($ah, $t) = @_;
-
-	$t =~ s/{/\&#123;/g;
-	$t =~ s/\|/\&#124;/g;
-	$t =~ s/}/\&#125;/g;
-	$t =~ s/\$/\&#36;/g;
-#	$t =~ s/=/\&#61;/g;
-
-	return $t;
-}
-
-
-=head2 B<unarmor>
-
- $str = $ah->unarmor($str);
-
-Translate back the Artemus markup from HTML entities. This
-is the reverse operation of B<armor>.
-
-=cut
-
-sub unarmor
-{
-	my ($ah, $t) = @_;
-
-	$t =~ s/\&#123;/{/g;
-	$t =~ s/\&#124;/\|/g;
-	$t =~ s/\&#125;/}/g;
-	$t =~ s/\&#36;/\$/g;
-#	$t =~ s/\&#61;/=/g;
-
-	return $t;
-}
-
-
-=head2 B<strip>
-
- $str = $ah->strip($str);
-
-Strips all Artemus markup from the string.
-
-=cut
-
-sub strip
-{
-	my ($ah, $t) = @_;
-
-	$t =~ s/{-([-\\\w_ \.]+)[^{}]*}/$1/g;
-
-	return $t;
-}
-
-
-=head2 B<params>
-
- $str = $ah->params($str,@params);
-
-Interpolates all $0, $1, $2... occurrences in the string into
-the equivalent element from @params.
-
-=cut
-
-sub params
-{
-	my ($ah, $t, @params) = @_;
-
-	for(my $n = 0; $t =~ /\$$n/; $n++) {
-		my $s = $params[$n] || '';
-		$t =~ s/(^|[^\\])\$$n/$1$s/g;
-	}
-
-	return $t;
-}
-
-
-=head2 B<process>
-
- $str = $ah->process($str);
-
-Processes the string, translating all Artemus markup. This
-is the main template processing method. The I<abort-flag> flag and
-I<unresolved> list are reset on each call to this method.
-
-=cut
-
-sub process
-{
-	my ($ah, $data) = @_;
-
-	# not aborted by now
-	${$ah->{'abort-flag'}} = 0;
-
-	# no unresolved templates by now
-	@{$ah->{'unresolved'}} = ();
-
-	# reset calling stack
-	@{$ah->{call_stack}} = ();
-
-	# surround with \BEGIN and \END
-	$data = $ah->{'vars'}->{'\BEGIN'} . $data . $ah->{'vars'}->{'\END'};
-
-	# really do it, recursively
-	$data = $ah->_process_do($data, 0);
-
-	# finally, convert end of lines if necessary
-	if ($ah->{'use-cr-lf'}) {
-		$data =~ s/\n/\r\n/g;
-	}
-
-	# strip comments
-	$data =~ s/{%[^}]+}//g;
-
-	return $data;
-}
-
-
-sub _process_do
-{
-	my ($ah, $data, $level, $template_name) = @_;
-	my ($cache_time);
-
-	# test if the template includes cache info
-	if ($data =~ s/{-\\CACHE\W([^}]*)}//) {
-		if ($template_name and $ah->{'cache-path'}) {
-			$cache_time = $1;
-
-			# convert strange chars to :
-			$template_name =~ s/[^\w\d_]/:/g;
-
-			my ($f) = "$ah->{'cache-path'}/$template_name";
-
-			if (-r $f and -M $f < $cache_time) {
-				open F, $f;
-				flock F, 1;
-				$data = join('', <F>);
-				close F;
-
-				return $data;
-			}
-		}
-	}
-
-	# strip POD documentation, if any
-	if ($data =~ /=cut/ and not $ah->{'contains-pod'}) {
-		my (@d);
-
-		foreach (split("\n", $data)) {
-			unless (/^=/ .. /^=cut/) {
-				push(@d, $_);
-			}
-		}
-
-		$data = join("\n", @d);
-	}
-
-	# strips HTML comments
-	if ($ah->{'strip-html-comments'}) {
-		$data =~ s/<!--.*?-->//gs;
-	}
-
-	# if defined, substitute the paragraphs
-	# with the paragraph separator
-	if ($ah->{'paragraph-separator'}) {
-		$data =~ s/\n\n/\n$ah->{'paragraph-separator'}\n/g;
-	}
-
-	# inverse substitutions
-	# (disabled until it works)
-#	 while (my ($i, $v) = each(%{$ah->{'inv-vars'}})) {
-#		 $data =~ s/\b$i\b/$v/g;
-#	 }
-
-	# main function, variable and include substitutions
-	while ($data =~ /{-([^{}\\]*(\\.[^{}\\]*)*)}/s) {
-		my ($found) = $1;
-
-		# take key and params
-		my ($key, $params) = ($found =~ /^([-\\\w_]+)\|?(.*)$/s);
-
-		# replace escaped chars
-		$params =~ s/\\{/{/g;
-		$params =~ s/\\}/}/g;
-		$params =~ s/\\\$/\$/g;
-
-		# split parameters
-		my @params = ();
-
-		while (length($params) && $params =~ s/^([^\|\\]*(\\.[^\|\\]*)*)\|?//s) {
-			my $p = $1;
-			$p =~ s/\\\|/\|/g;
-
-			push(@params, $p);
-		}
-
-		my $text = '';
-
-		# is it a variable?
-		if (defined $ah->{'vars'}->{$key}) {
-			$text = $ah->{'vars'}->{$key};
-			$text = $ah->params($text, @params);
-		}
-
-		# is it a function?
-		elsif (defined $ah->{'funcs'}->{$key}) {
-			my ($func);
-
-			$func = $ah->{'funcs'}->{$key};
-			$text = $func->(@params);
-
-			# functions can abort further execution
-
-			if (${$ah->{'abort-flag'}}) {
-				last;
-			}
-		}
-
-		# is it an include?
-		elsif ($ah->{'include-path'}) {
-			foreach my $p (split(/:/, $ah->{'include-path'})) {
-				if (open(INC, "$p/$key")) {
-					$text = join('', <INC>);
-					close INC;
-
-					# cache it as a variable
-					$ah->{vars}->{$key} = $text;
-
-					$text = $ah->params($text, @params);
-
-					last;
-				}
-			}
-		}
-		else {
-			$text = $found;
-
-			push(@{$ah->{'unresolved'}}, $found);
-
-			if (ref $ah->{'AUTOLOAD'}) {
-				$text = $ah->{'AUTOLOAD'}($found);
-			}
-		}
-
-		$text ||= '';
-
-		if ($ah->{debug}) {
-			push(@{$ah->{call_stack}},
-				[ $key, $level, $found, $text ]
-			);
-		}
-
-		# do the recursivity
-		$text = $ah->_process_do($text, $level + 1, $key) || '';
-
-		# make the substitution
-		$data =~ s/{-\Q$found\E}/$text/;
-	}
-
-	# if the template included cache info,
-	# store the result there
-	if ($cache_time) {
-		open F, '>' . $ah->{'cache-path'} . '/' . $template_name;
-		flock F, 2;
-		print F $data;
-		close F;
-	}
-
-	return $data;
-}
-
-
 =head1 AUTHOR
 
 Angel Ortega angel@triptico.com
 
-=cut
-
-1;
