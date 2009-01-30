@@ -31,17 +31,7 @@ use warnings;
 
 $Artemus::VERSION = '4.1.2-dev';
 
-=head2 B<armor>
-
- $str = $ah->armor($str);
-
-Translate Artemus markup to HTML entities, to avoid being
-interpreted by the parser.
-
-=cut
-
-sub armor
-{
+sub armor {
 	my ($ah, $t) = @_;
 
 	$t =~ s/{/\&#123;/g;
@@ -54,17 +44,7 @@ sub armor
 }
 
 
-=head2 B<unarmor>
-
- $str = $ah->unarmor($str);
-
-Translate back the Artemus markup from HTML entities. This
-is the reverse operation of B<armor>.
-
-=cut
-
-sub unarmor
-{
+sub unarmor {
 	my ($ah, $t) = @_;
 
 	$t =~ s/\&#123;/{/g;
@@ -77,16 +57,7 @@ sub unarmor
 }
 
 
-=head2 B<strip>
-
- $str = $ah->strip($str);
-
-Strips all Artemus markup from the string.
-
-=cut
-
-sub strip
-{
+sub strip {
 	my ($ah, $t) = @_;
 
 	$t =~ s/{-([-\\\w_ \.]+)[^{}]*}/$1/g;
@@ -95,17 +66,7 @@ sub strip
 }
 
 
-=head2 B<params>
-
- $str = $ah->params($str,@params);
-
-Interpolates all $0, $1, $2... occurrences in the string into
-the equivalent element from @params.
-
-=cut
-
-sub params
-{
+sub params {
 	my ($ah, $t, @params) = @_;
 
 	for(my $n = 0; $t =~ /\$$n/; $n++) {
@@ -117,18 +78,7 @@ sub params
 }
 
 
-=head2 B<process>
-
- $str = $ah->process($str);
-
-Processes the string, translating all Artemus markup. This
-is the main template processing method. The I<abort-flag> flag and
-I<unresolved> list are reset on each call to this method.
-
-=cut
-
-sub process
-{
+sub process {
 	my ($ah, $data) = @_;
 
 	# not aborted by now
@@ -158,8 +108,7 @@ sub process
 }
 
 
-sub _process_do
-{
+sub _process_do {
 	my ($ah, $data, $level, $template_name) = @_;
 	my ($cache_time);
 
@@ -420,8 +369,7 @@ sub init {
 }
 
 
-sub new
-{
+sub new {
 	my ($class, %params) = @_;
 
 	my $self = bless({ %params }, $class);
@@ -886,6 +834,41 @@ in Perl standard modules. The unresolved template name will be
 sent as the first argument.
 
 =back
+
+=head2 armor
+
+ $str = $ah->armor($str);
+
+Translate Artemus markup to HTML entities, to avoid being
+interpreted by the parser.
+
+=head2 unarmor
+
+ $str = $ah->unarmor($str);
+
+Translate back the Artemus markup from HTML entities. This
+is the reverse operation of B<armor>.
+
+=head2 strip
+
+ $str = $ah->strip($str);
+
+Strips all Artemus markup from the string.
+
+=head2 params
+
+ $str = $ah->params($str, @params);
+
+Interpolates all $0, $1, $2... occurrences in the string into
+the equivalent element from @params.
+
+=head2 process
+
+ $str = $ah->process($str);
+
+Processes the string, translating all Artemus markup. This
+is the main template processing method. The I<abort-flag> flag and
+I<unresolved> list are reset on each call to this method.
 
 =head1 AUTHOR
 
