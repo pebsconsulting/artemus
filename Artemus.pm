@@ -31,117 +31,6 @@ use warnings;
 
 $Artemus::VERSION = '4.1.2-dev';
 
-sub new
-{
-	my ($class, %params) = @_;
-
-	my $self = bless({ %params }, $class);
-
-	# special variables
-	$self->{vars}->{'\n'}		= "\n";
-	$self->{vars}->{'\BEGIN'}	||= '';
-	$self->{vars}->{'\END'}		||= '';
-	$self->{vars}->{'\VERSION'}	= $Artemus::VERSION;
-
-	# special functions
-	$self->{funcs}->{localtime}	= sub { scalar(localtime) };
-
-	$self->{funcs}->{if}		= sub { $_[0] ? $_[1] : (scalar(@_) == 3 ? $_[2] : '') };
-	$self->{funcs}->{ifelse}	= $self->{funcs}->{if};
-
-	$self->{funcs}->{ifeq}		= sub { $_[0] eq $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
-	$self->{funcs}->{ifneq}		= sub { $_[0] ne $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
-	$self->{funcs}->{ifeqelse}	= $self->{funcs}->{ifeq};
-
-	$self->{funcs}->{add}		= sub { ($_[0] || 0) + ($_[1] || 0); };
-	$self->{funcs}->{sub}		= sub { ($_[0] || 0) - ($_[1] || 0); };
-	$self->{funcs}->{gt}		= sub { ($_[0] || 0) > ($_[1] || 0); };
-	$self->{funcs}->{lt}		= sub { ($_[0] || 0) < ($_[1] || 0); };
-	$self->{funcs}->{eq}		= sub { $_[0] eq $_[1] ? 1 : 0; };
-	$self->{funcs}->{random}	= sub { $_[rand(scalar(@_))]; };
-
-	$self->{funcs}->{and}		= sub { ($_[0] && $_[1]) || ''; };
-	$self->{funcs}->{or}		= sub { $_[0] || $_[1] || ''; };
-	$self->{funcs}->{not}		= sub { $_[0] ? 0 : 1; };
-
-	$self->{funcs}->{foreach}	= sub {
-		my $list	= shift;
-		my $code	= shift || '$0';
-		my $sep		= shift || '';
-
-		my @ret = ();
-		my @l = split(/\s*:\s*/, $list);
-
-		foreach my $l (@l) {
-			my @e = split(/\s*,\s*/, $l);
-
-			push(@ret, $self->params($code, @e));
-		}
-
-		return join($sep, @ret);
-	};
-
-	$self->{funcs}->{set} = sub { $self->{vars}->{$_[0]} = $_[1]; return ''; };
-
-	$self->{funcs}->{case}	= sub {
-		my $var		= shift;
-		my $ret		= '';
-
-		chomp($var);
-
-		# if args are odd, the last one is
-		# the 'otherwise' case
-		if (scalar(@_) % 2) {
-			$ret = pop(@_);
-		}
-
-		while (@_) {
-			my $val = shift;
-			my $out = shift;
-
-			chomp($val);
-
-			if ($var eq $val) {
-				$ret = $out;
-				last;
-			}
-		}
-
-		return $ret;
-	};
-
-	$self->{funcs}->{env} = sub { scalar(@_) ? ($ENV{$_[0]} || '') : join(':', keys(%ENV)); };
-	$self->{funcs}->{size} = sub { scalar(@_) ? split(/\s*:\s*/, $_[0]) : 0; };
-	$self->{funcs}->{seq} = sub { join(':', ($_[0] || 0) .. ($_[1] || 0)); };
-
-	$self->{funcs}->{sort} = sub {
-		my $list	= shift;
-		my $field	= shift || 0;
-
-		join(':',
-			sort {
-				my @a = split(',', $a);
-				my @b = split(',', $b);
-
-				$a[$field] cmp $b[$field];
-			} split(':', $list)
-		);
-	};
-
-	$self->{funcs}->{reverse} = sub { join(':', reverse(split(':', $_[0]))); };
-
-	$self->{_abort} = 0;
-	$self->{_unresolved} = [];
-
-	# ensure 'abort-flag' and 'unresolved' point to
-	# appropriate holders
-	$self->{'abort-flag'}	||= \$self->{_abort};
-	$self->{unresolved}	||= \$self->{_unresolved};
-
-	return $self;
-}
-
-
 =head2 B<armor>
 
  $str = $ah->armor($str);
@@ -421,6 +310,125 @@ sub _process_do
 
 	return $data;
 }
+
+
+sub init {
+	my $self = shift;
+
+	# special variables
+	$self->{vars}->{'\n'}		= "\n";
+	$self->{vars}->{'\BEGIN'}	||= '';
+	$self->{vars}->{'\END'}		||= '';
+	$self->{vars}->{'\VERSION'}	= $Artemus::VERSION;
+
+	# special functions
+	$self->{funcs}->{localtime}	= sub { scalar(localtime) };
+
+	$self->{funcs}->{if}		= sub { $_[0] ? $_[1] : (scalar(@_) == 3 ? $_[2] : '') };
+	$self->{funcs}->{ifelse}	= $self->{funcs}->{if};
+
+	$self->{funcs}->{ifeq}		= sub { $_[0] eq $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
+	$self->{funcs}->{ifneq}		= sub { $_[0] ne $_[1] ? $_[2] : (scalar(@_) == 4 ? $_[3] : '') };
+	$self->{funcs}->{ifeqelse}	= $self->{funcs}->{ifeq};
+
+	$self->{funcs}->{add}		= sub { ($_[0] || 0) + ($_[1] || 0); };
+	$self->{funcs}->{sub}		= sub { ($_[0] || 0) - ($_[1] || 0); };
+	$self->{funcs}->{gt}		= sub { ($_[0] || 0) > ($_[1] || 0); };
+	$self->{funcs}->{lt}		= sub { ($_[0] || 0) < ($_[1] || 0); };
+	$self->{funcs}->{eq}		= sub { $_[0] eq $_[1] ? 1 : 0; };
+	$self->{funcs}->{random}	= sub { $_[rand(scalar(@_))]; };
+
+	$self->{funcs}->{and}		= sub { ($_[0] && $_[1]) || ''; };
+	$self->{funcs}->{or}		= sub { $_[0] || $_[1] || ''; };
+	$self->{funcs}->{not}		= sub { $_[0] ? 0 : 1; };
+
+	$self->{funcs}->{foreach}	= sub {
+		my $list	= shift;
+		my $code	= shift || '$0';
+		my $sep		= shift || '';
+
+		my @ret = ();
+		my @l = split(/\s*:\s*/, $list);
+
+		foreach my $l (@l) {
+			my @e = split(/\s*,\s*/, $l);
+
+			push(@ret, $self->params($code, @e));
+		}
+
+		return join($sep, @ret);
+	};
+
+	$self->{funcs}->{set} = sub { $self->{vars}->{$_[0]} = $_[1]; return ''; };
+
+	$self->{funcs}->{case}	= sub {
+		my $var		= shift;
+		my $ret		= '';
+
+		chomp($var);
+
+		# if args are odd, the last one is
+		# the 'otherwise' case
+		if (scalar(@_) % 2) {
+			$ret = pop(@_);
+		}
+
+		while (@_) {
+			my $val = shift;
+			my $out = shift;
+
+			chomp($val);
+
+			if ($var eq $val) {
+				$ret = $out;
+				last;
+			}
+		}
+
+		return $ret;
+	};
+
+	$self->{funcs}->{env} = sub { scalar(@_) ? ($ENV{$_[0]} || '') : join(':', keys(%ENV)); };
+	$self->{funcs}->{size} = sub { scalar(@_) ? split(/\s*:\s*/, $_[0]) : 0; };
+	$self->{funcs}->{seq} = sub { join(':', ($_[0] || 0) .. ($_[1] || 0)); };
+
+	$self->{funcs}->{sort} = sub {
+		my $list	= shift;
+		my $field	= shift || 0;
+
+		join(':',
+			sort {
+				my @a = split(',', $a);
+				my @b = split(',', $b);
+
+				$a[$field] cmp $b[$field];
+			} split(':', $list)
+		);
+	};
+
+	$self->{funcs}->{reverse} = sub { join(':', reverse(split(':', $_[0]))); };
+
+	$self->{_abort} = 0;
+	$self->{_unresolved} = [];
+
+	# ensure 'abort-flag' and 'unresolved' point to
+	# appropriate holders
+	$self->{'abort-flag'}	||= \$self->{_abort};
+	$self->{unresolved}	||= \$self->{_unresolved};
+
+	return $self;
+}
+
+
+sub new
+{
+	my ($class, %params) = @_;
+
+	my $self = bless({ %params }, $class);
+
+	return $self->init();
+}
+
 
 1;
 __END__
