@@ -2,6 +2,7 @@ COPYING
 MANIFEST
 Makefile.PL
 Artemus.pm
+Artemus4.pm
 artemus
 artemus_cmd.pod
 TODO
