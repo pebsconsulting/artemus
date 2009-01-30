@@ -29,7 +29,7 @@ package Artemus5;
 use strict;
 use warnings;
 
-$Artemus::VERSION = '5.0.0-dev';
+$Artemus5::VERSION = '5.0.0-dev';
 
 sub tokenize {
 	my $source	= shift;
