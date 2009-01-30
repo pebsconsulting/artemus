@@ -314,7 +314,13 @@ sub init {
 		my @ret = ();
 
 		foreach my $e ($self->as_list($list)) {
-			push(@ret, $self->execute($block, @{$e}));
+
+			my $n = 1;
+			foreach my $v (@{$e}) {
+				$self->{vars}->{$n++} = $v;
+			}
+
+			push(@ret, $self->execute($block));
 		}
 
 		return join($sep, @ret);
