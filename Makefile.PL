@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'Artemus',
     'dist'		=> { COMPRESS => gzip, SUFFIX => '.gz'},
-    'VERSION_FROM'	=> 'Artemus.pm',
+    'VERSION_FROM'	=> 'Artemus4.pm',
     'EXE_FILES' 	=> [ 'artemus' ],
     'INSTALLSCRIPT'	=> '/usr/local/bin',
 );
