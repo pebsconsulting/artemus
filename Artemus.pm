@@ -209,7 +209,7 @@ sub _process_do {
 
 		# is it an include?
 		elsif ($ah->{'include-path'}) {
-			foreach my $p (split(/:/, $ah->{'include-path'})) {
+			foreach my $p (@{$ah->{'include-path'}}) {
 				if (open(INC, "$p/$key")) {
 					$text = join('', <INC>);
 					close INC;
@@ -364,6 +364,13 @@ sub init {
 	# appropriate holders
 	$self->{'abort-flag'}	||= \$self->{_abort};
 	$self->{unresolved}	||= \$self->{_unresolved};
+
+	# fix include-path
+	$self->{'include-path'}	||= [];
+
+	if (!ref($self->{'include-path'})) {
+		$self->{'include-path'} = [ split(/:/, $self->{'include-path'}) ];
+	}
 
 	return $self;
 }
@@ -740,7 +747,7 @@ double-escape everything. Yes, this can get really cumbersome.
 	[ "vars" => \%variables, ]
 	[ "funcs" => \%functions, ]
 	[ "inv-vars" => \%inverse_variables, ]
-	[ "include-path" => $dir_with_templates_in_files, ]
+	[ "include-path" => \@dir_with_templates_in_files, ]
 	[ "cache-path" => $dir_to_store_cached_templates, ]
 	[ "abort-flag" => \$abort_flag, ]
 	[ "unresolved" => \@unresolved_templates, ]
@@ -780,10 +787,8 @@ option is disabled by now until it works correctly).
 
 =item I<include-path>
 
-If this string is set, it must point to a readable directory
-that contains templates, one on each file. The file names
-will be treated as template names. Many directories can
-be specified by separating them with colons.
+This arrayref should contain directories where templates are
+to be found.
 
 =item I<cache-path>
 
