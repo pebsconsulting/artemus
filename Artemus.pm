@@ -6,6 +6,8 @@ use warnings;
 
 use base 'Artemus4';
 
+$Artemus::VERSION = $Artemus4::VERSION;
+
 1;
 __END__
 =pod
