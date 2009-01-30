@@ -16,6 +16,9 @@ Pending Enhancements
 
  * 1000: Add a new clear_cache() function to delete cache entries older
    than a specified number of days.
+ * 1006: Add optional blocks to foreach() to be returned whenever
+   some of the parameters change.
+ * 1007: Make 'use Artemus' a frontend to real version 4 or 5 modules.
 
 Closed
 ------
