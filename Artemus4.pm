@@ -71,7 +71,7 @@ sub params {
 	my $str		= shift;
 
 	my $n = 0;
-	foreach my $a (@_) {
+	foreach my $a (@_[0..9]) {
 		$a ||= '';
 		$str =~ s/(^|[^\\])\$$n/$1$a/g;
 		$n++;
