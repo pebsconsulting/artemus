@@ -4,7 +4,7 @@ Artemus TODO / Bug List
 Release Critical Bugs
 ---------------------
 
-None!
+1008: Fix params() to avoid shortcircuiting if an argument is not found.
 
 Open Bugs
 ---------
