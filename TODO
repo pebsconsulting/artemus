@@ -18,7 +18,6 @@ Pending Enhancements
    than a specified number of days.
  * 1006: Add optional blocks to foreach() to be returned whenever
    some of the parameters change.
- * 1010: Add a map() function.
 
 Closed
 ------
@@ -37,5 +36,7 @@ Closed
    (Fri, 30 Jan 2009 14:29:28 +0100).
  * 1008: Fix params() to avoid shortcircuiting if an argument is not
    found (Sat, 31 Jan 2009 12:11:45 +0100).
+ * 1010: Add a map() function (unnecessary, it can be done with foreach;
+   Sat, 31 Jan 2009 12:44:04 +0100).
 
 Email bugs to angel@triptico.com
