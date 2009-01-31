@@ -296,13 +296,37 @@ sub init {
 		my $code	= shift || '$0';
 		my $sep		= shift || '';
 
+		my @hdrs = ();
+		my @ftrs = ();
+
+		# pick optional footers and headers
+		while (@_) {
+			push(@hdrs, shift);
+			push(@ftrs, shift || '');
+		}
+
 		my @ret = ();
 		my @l = split(/\s*:\s*/, $list);
+
+		my @o = ();
 
 		foreach my $l (@l) {
 			my @e = split(/\s*,\s*/, $l);
 
-			push(@ret, $self->params($code, @e));
+			my $hdr = '';
+			my $ftr = '';
+
+			# generate headers and footers if this record is different
+			for (my $n = 0; $n < scalar(@hdrs); $n++) {
+				if ($e[$n] ne ($o[$n] || '')) {
+					$hdr .= $self->params($hdrs[$n], @e);
+					$ftr .= $self->params($ftrs[$n], @e);
+				}
+			}
+
+			@o = @e;
+
+			push(@ret, $hdr . $self->params($code, @e) . $ftr);
 		}
 
 		return join($sep, @ret);
