@@ -18,6 +18,7 @@ Pending Enhancements
    than a specified number of days.
  * 1006: Add optional blocks to foreach() to be returned whenever
    some of the parameters change.
+ * 1010: Add a map() function.
 
 Closed
 ------
