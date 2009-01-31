@@ -67,14 +67,17 @@ sub strip {
 
 
 sub params {
-	my ($ah, $t, @params) = @_;
+	my $self	= shift;
+	my $str		= shift;
 
-	for(my $n = 0; $t =~ /\$$n/; $n++) {
-		my $s = $params[$n] || '';
-		$t =~ s/(^|[^\\])\$$n/$1$s/g;
+	my $n = 0;
+	foreach my $a (@_) {
+		$a ||= '';
+		$str =~ s/(^|[^\\])\$$n/$1$a/g;
+		$n++;
 	}
 
-	return $t;
+	return $str;
 }
 
 

@@ -4,7 +4,7 @@ Artemus TODO / Bug List
 Release Critical Bugs
 ---------------------
 
-1008: Fix params() to avoid shortcircuiting if an argument is not found.
+None!
 
 Open Bugs
 ---------
@@ -34,5 +34,7 @@ Closed
    (Thu, 04 Dec 2008 15:46:07 +0100).
  * 1007: Make 'use Artemus' a frontend to real version 4 or 5 modules
    (Fri, 30 Jan 2009 14:29:28 +0100).
+ * 1008: Fix params() to avoid shortcircuiting if an argument is not
+   found (Sat, 31 Jan 2009 12:11:45 +0100).
 
 Email bugs to angel@triptico.com
