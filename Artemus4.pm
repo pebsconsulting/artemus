@@ -32,28 +32,34 @@ use warnings;
 $Artemus4::VERSION = '4.1.2-dev';
 
 sub armor {
-	my ($ah, $t) = @_;
+	my $self	= shift;
+	my $str		= shift;
 
-	$t =~ s/{/\&#123;/g;
-	$t =~ s/\|/\&#124;/g;
-	$t =~ s/}/\&#125;/g;
-	$t =~ s/\$/\&#36;/g;
-#	$t =~ s/=/\&#61;/g;
+	if ($str) {
+		$str =~ s/{/\&#123;/g;
+		$str =~ s/\|/\&#124;/g;
+		$str =~ s/}/\&#125;/g;
+		$str =~ s/\$/\&#36;/g;
+	#	$str =~ s/=/\&#61;/g;
+	}
 
-	return $t;
+	return $str;
 }
 
 
 sub unarmor {
-	my ($ah, $t) = @_;
+	my $self	= shift;
+	my $str		= shift;
 
-	$t =~ s/\&#123;/{/g;
-	$t =~ s/\&#124;/\|/g;
-	$t =~ s/\&#125;/}/g;
-	$t =~ s/\&#36;/\$/g;
-#	$t =~ s/\&#61;/=/g;
+	if ($str) {
+		$str =~ s/\&#123;/{/g;
+		$str =~ s/\&#124;/\|/g;
+		$str =~ s/\&#125;/}/g;
+		$str =~ s/\&#36;/\$/g;
+	#	$str =~ s/\&#61;/=/g;
+	}
 
-	return $t;
+	return $str;
 }
 
 
