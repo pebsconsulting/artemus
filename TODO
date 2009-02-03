@@ -4,7 +4,7 @@ Artemus TODO / Bug List
 Release Critical Bugs
 ---------------------
 
- * 1009: foreach() footers do not work.
+None!
 
 Open Bugs
 ---------
@@ -38,5 +38,7 @@ Closed
    found (Sat, 31 Jan 2009 12:11:45 +0100).
  * 1010: Add a map() function (unnecessary, it can be done with foreach;
    Sat, 31 Jan 2009 12:44:04 +0100).
+ * 1009: foreach() footers do not work
+   (Footers deleted by now; Tue, 03 Feb 2009 10:25:08 +0100).
 
 Email bugs to angel@triptico.com
