@@ -550,7 +550,7 @@ was created.
 
 =over 4
 
-=item B<if>
+=head3 if
 
  {-if|condition|text}
  {-if|condition|text_if_true|text_unless_true}
@@ -560,12 +560,12 @@ otherwise; in the 3 argument version, returns I<text_if_true> or
 I<text_unless_true>. A condition is true if is not zero or the empty
 string (the same as in Perl).
 
-=item B<ifelse>
+=head3 ifelse
 
 This is an alias for the I<if> template provided for backwards-compatibility.
 Don't use it.
 
-=item B<ifeq>
+=head3 ifeq
 
  {-ifeq|term1|term2|text}
  {-ifeq|term1|term2|text_if_true|text_unless_true}
@@ -574,26 +574,26 @@ If I<term1> is equal to I<term2>, this template returns I<text>, or nothing
 otherwise. in the 4 argument version, returns I<text_if_true> or
 I<text_unless_true>.
 
-=item B<ifneq>
+=head3 ifneq
 
  {-ifneq|term1|term2|text}
 
 If I<term1> is not equal to I<term2>, this template returns I<text>, or
 nothing otherwise.
 
-=item B<ifeqelse>
+=head3 ifeqelse
 
 This is an alias for the I<ifeq> template provided for backwards-compatibility.
 Don't use it.
 
-=item B<add>, B<sub>
+=head3 add, sub
 
  {-add|num1|num2}
  {-sub|num1|num2}
 
 This functions add or substract the values and returns the result.
 
-=item B<gt>, B<lt>, B<eq>
+=head3 gt, lt, eq
 
  {-gt|value1|value2}
  {-lt|value1|value2}
@@ -602,21 +602,21 @@ This functions add or substract the values and returns the result.
 This functions compare if I<value1> is greater-than, lesser-than or equal to
 I<value2>. Meant primarily to use with the I<if> template.
 
-=item B<random>
+=head3 random
 
  {-random|value1|value2|...}
 
 This function returns randomly one of the values sent as arguments. There can
 any number of arguments.
 
-=item B<and>
+=head3 and
 
  {-and|value_or_condition_1|value_or_condition_2}
 
 If both values are true or defined, returns I<value_or_condition_2>; otherwise,
 returns the empty string.
 
-=item B<or>
+=head3 or
 
  {-or|value_or_condition_1|value_or_condition_2}
 
@@ -624,13 +624,13 @@ If I<value_or_condition_1> is true or defined, returns it; otherwise, if
 I<value_or_condition_2> is true or defined, returns it; otherwise, returns
 the empty string.
 
-=item B<not>
+=head3 not
 
  {-not|condition}
 
 Returns the negation of I<condition>.
 
-=item B<set>
+=head3 set
 
  {-set|template_name|value}
 
@@ -645,7 +645,7 @@ forget to escape the I<set> directive, as in
 IF you don't escape it, the I<powers> variable will be inevitably set
 to EVERYTHING.
 
-=item B<foreach>
+=head3 foreach
 
  {-foreach|list:of:colon:separated:values|output_text|separator}
 
@@ -666,7 +666,7 @@ Remember to escape the dollar signs to avoid being expanded too early,
 and if the I<output_text> include calls to other Artemus4 templates,
 to escape them as well.
 
-=item B<case>
+=head3 case
 
  {-case|string|value_1|return_1|value_2|return_2|...}
  {-case|string|value_1|return_1|value_2|return_2|...|default_value}
@@ -676,7 +676,7 @@ returns the appropriate I<return_1>, I<return_2>... value. If I<default_value>
 is set (that is, I<case> has an odd number of arguments) it's returned
 if I<string> does not match any value.
 
-=item B<env>
+=head3 env
 
  {-env|environment_variable}
  {-env}
@@ -685,20 +685,20 @@ If I<environment_variable> has a value set in the environment, it's returned,
 or the empty string otherwise. If no environment variable is set, returns
 a colon-separated list of environment variable names.
 
-=item B<size>
+=head3 size
 
  {-size|colon_separated_list}
 
 Returns the number of elements in I<colon_separated_list>.
 
-=item B<seq>
+=head3 seq
 
  {-seq|from_number|to_number}
 
 Generates a colon-separated list of the numbers from I<from_number>
 to I<to_number>. Useful in a I<foreach> loop.
 
-=item B<sort>
+=head3 sort
 
  {-sort|list}
  {-sort|list|field}
@@ -707,27 +707,27 @@ Sorts the colon-separated list. The optional I<field> is the field
 to sort on (assuming the elements of the list are comma-separated
 lists themselves).
 
-=item B<reverse>
+=head3 reverse
 
  {-reverse|list}
 
 Reverses a colon-separated list.
 
-=item B<\CACHE>
+=head3 \CACHE
 
  {-\CACHE|time}
 
 Marks a template as cacheable and sets its cache time. See above.
 
-=item B<\VERSION>
+=head3 \VERSION
 
  {-\VERSION}
 
 Returns current Artemus4 version.
 
-=item B<\BEGIN>
+=head3 \BEGIN
 
-=item B<\END>
+=head3 \END
 
 If you set these templates, they will be appended (\BEGIN) and
 prepended (\END) to the text being processed.
@@ -752,7 +752,7 @@ double-escape everything. Yes, this can get really cumbersome.
 
 =cut
 
-=head2 B<new>
+=head2 new
 
  $ah = new Artemus4(
 	[ "vars" => \%variables, ]
@@ -774,19 +774,19 @@ as a hash) can be used:
 
 =over 4
 
-=item I<vars>
+=head3 vars
 
 This argument must be a reference to a hash containing
 I<template> - I<content> pairs.
 
-=item I<funcs>
+=head3 funcs
 
 This argument must be a reference to a hash containing
 I<template name> - I<code reference> pairs. Each time one of these
 templates is evaluated, the function will be called with
 the template parameters passed as the function's arguments.
 
-=item I<inv-vars>
+=head3 inv-vars
 
 This argument must be a reference to a hash containing
 I<text> - I<content> pairs. Any occurrence of I<text> will be
@@ -796,52 +796,52 @@ markup, but can contain anything. This is really a plain
 text substitution, so use it with care (B<NOTE>: this
 option is disabled by now until it works correctly).
 
-=item I<include-path>
+=head3 include-path
 
 This arrayref should contain directories where templates are
 to be found.
 
-=item I<cache-path>
+=head3 cache-path
 
 If this string is set, it must contain the path to a readable
 and writable directory where the cacheable templates are cached.
 See L<Caching templates> for further information.
 
-=item I<abort-flag>
+=head3 abort-flag
 
 This argument must be a reference to a scalar. When the template
 processing is started, this scalar is set to 0. Template functions
 can set it to any other non-zero value to stop template processing.
 
-=item I<unresolved>
+=head3 unresolved
 
 If this argument points to an array reference, it will be filled
 with the name of any unresolved templates. Each time a template
 processing is started, the array is emptied.
 
-=item I<use-cr-lf>
+=head3 use-cr-lf
 
 If this flag is set, all lines are separated using CR/LF instead
 of just LF (useful to generate MSDOS/Windows compatible text files).
 
-=item I<contains-pod>
+=head3 contains-pod
 
 If this flag is set, the (possible) POD documentation inside the
 templates are not stripped-out. Understand this flag as saying
 'this template has pod as part of its content, so do not strip it'.
 See L<Documenting templates>.
 
-=item I<paragraph-separator>
+=head3 paragraph-separator
 
 If this argument is set to some string, all empty lines will be
 substituted by it (can be another Artemus4 template).
 
-=item I<strip-html-comments>
+=head3 strip-html-comments
 
 If this flag is set, HTML comments are stripped before any
 processing.
 
-=item I<AUTOLOAD>
+=head3 AUTOLOAD
 
 If this argument points to a sub reference, the subrutine will
 be executed when a template is unresolved and its return value used
