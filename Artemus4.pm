@@ -624,7 +624,7 @@ If I<value_or_condition_1> is true or defined, returns it; otherwise, if
 I<value_or_condition_2> is true or defined, returns it; otherwise, returns
 the empty string.
 
-=item <not>
+=item B<not>
 
  {-not|condition}
 
