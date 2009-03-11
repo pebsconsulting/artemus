@@ -767,6 +767,7 @@ double-escape everything. Yes, this can get really cumbersome.
 	[ "funcs" => \%functions, ]
 	[ "inv-vars" => \%inverse_variables, ]
 	[ "include-path" => \@dir_with_templates_in_files, ]
+	[ "loader_func" => \&template_loader_function, ]
 	[ "cache-path" => $dir_to_store_cached_templates, ]
 	[ "abort-flag" => \$abort_flag, ]
 	[ "unresolved" => \@unresolved_templates, ]
@@ -808,6 +809,15 @@ option is disabled by now until it works correctly).
 
 This arrayref should contain directories where templates are
 to be found.
+
+=head3 loader_func
+
+If this reference to code exists, it's called with the template
+name as argument as a method to load templates from external
+sources. The function should return the template content or
+C<undef> if the template is not found. It's called after testing
+for variables or functions and before trying to load from
+the C<include-path>.
 
 =head3 cache-path
 
