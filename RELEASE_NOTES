@@ -6,6 +6,8 @@ Artemus Release Notes
 
  * New template function `sort'.
  * New template function `reverse'.
+ * Templates can be loaded from external sources by
+   using the new `loader_func' argument to new().
 
 4.1.1
 -----
