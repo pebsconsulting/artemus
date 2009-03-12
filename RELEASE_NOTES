@@ -8,6 +8,10 @@ Artemus Release Notes
  * New template function `reverse'.
  * Templates can be loaded from external sources by
    using the new `loader_func' argument to new().
+ * The Perl module Artemus is now an alias for the
+   Artemus4 module, as a way to smooth the future
+   transition to version 5. No changes need to be
+   done.
 
 4.1.1
 -----
