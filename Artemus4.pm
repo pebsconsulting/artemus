@@ -29,7 +29,7 @@ package Artemus4;
 use strict;
 use warnings;
 
-$Artemus4::VERSION = '4.1.2-dev';
+$Artemus4::VERSION = '4.1.2';
 
 sub armor {
 	my $self	= shift;
