@@ -29,7 +29,7 @@ package Artemus4;
 use strict;
 use warnings;
 
-$Artemus4::VERSION = '4.1.2';
+$Artemus4::VERSION = '4.1.3-dev';
 
 sub armor {
 	my $self	= shift;
@@ -334,6 +334,7 @@ sub init {
 		my $ret		= '';
 
 		chomp($var);
+		$var =~ s/\r//g;
 
 		# if args are odd, the last one is
 		# the 'otherwise' case
@@ -346,6 +347,7 @@ sub init {
 			my $out = shift;
 
 			chomp($val);
+			$val =~ s/\r//g;
 
 			if ($var eq $val) {
 				$ret = $out;
