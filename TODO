@@ -40,5 +40,7 @@ Closed
    Sat, 31 Jan 2009 12:44:04 +0100).
  * 1009: foreach() footers do not work
    (Footers deleted by now; Tue, 03 Feb 2009 10:25:08 +0100).
+ * 1011: Test for 'defined' and not for 'true' in the value returned
+   from the loader_func (Fri, 31 Jul 2009 11:27:35 +0200).
 
 Email bugs to angel@triptico.com

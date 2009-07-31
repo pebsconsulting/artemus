@@ -221,7 +221,7 @@ sub _process_do {
 		# can it be loaded externally?
 		elsif (defined $ah->{loader_func} &&
 			(ref($ah->{loader_func}) eq 'CODE') &&
-			($text = $ah->{loader_func}->($key))) {
+			defined($text = $ah->{loader_func}->($key))) {
 
 			$text = $ah->params($text, @params);
 		}
