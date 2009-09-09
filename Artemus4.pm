@@ -361,6 +361,7 @@ sub init {
 	$self->{funcs}->{env} = sub { scalar(@_) ? ($ENV{$_[0]} || '') : join(':', keys(%ENV)); };
 	$self->{funcs}->{size} = sub { scalar(@_) ? split(/\s*:\s*/, $_[0]) : 0; };
 	$self->{funcs}->{seq} = sub { join(':', ($_[0] || 0) .. ($_[1] || 0)); };
+	$self->{funcs}->{item} = sub { (split(/\s*:\s*/, $_[0]))[$_[1]]; };
 
 	$self->{funcs}->{sort} = sub {
 		my $list	= shift;

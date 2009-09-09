@@ -1,6 +1,12 @@
 Artemus Release Notes
 =====================
 
+4.1.3
+-----
+
+ * New template function `item', to return an item
+   from a colon-separated list given its subscript.
+
 4.1.2
 -----
 
