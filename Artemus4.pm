@@ -314,14 +314,34 @@ sub init {
 		my $list	= shift;
 		my $code	= shift || '$0';
 		my $sep		= shift || '';
+		my $hdr		= shift || '';
 
 		my @ret = ();
 		my @l = split(/\s*:\s*/, $list);
+		my $ph = '';
 
 		foreach my $l (@l) {
 			my @e = split(/\s*,\s*/, $l);
 
-			push(@ret, $self->params($code, @e));
+			my $o = '';
+
+			if ($hdr) {
+				# generate header
+				my $tc = $self->params($hdr, @e);
+
+				# is it different from previous? add
+				if ($tc ne $ph) {
+					$o = $tc;
+				}
+
+				# store for later
+				$ph = $tc;
+			}
+
+			# add main body
+			$o .= $self->params($code, @e);
+
+			push(@ret, $o);
 		}
 
 		return join($sep, @ret);
