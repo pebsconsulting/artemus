@@ -326,8 +326,12 @@ sub init {
 			my $o = '';
 
 			if ($hdr) {
-				# generate header
+				# generate header: parse parameters
 				my $tc = $self->params($hdr, @e);
+
+				# and process (we want the output of
+				# the possible code, no the code itself)
+				$tc = $self->_process_do($tc);
 
 				# is it different from previous? add
 				if ($tc ne $ph) {
