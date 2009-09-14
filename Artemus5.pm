@@ -31,11 +31,25 @@ use warnings;
 
 $Artemus5::VERSION = '5.0.0-dev';
 
+sub code {
+	my $self	= shift;
+	my $op		= shift;
+
+	if (!exists($self->{op}->{$op})) {
+		# try to load and compile from the path
+		# ...
+
+		# fail otherwise
+		$self->{op}->{$op} = "UNDEF{$op}";
+	}
+
+	return $self->{op}->{$op};
+}
+
 sub exec {
 	my $self	= shift;
 	my $prg		= shift;
 	my @args	= @_;
-	my $ret		= '';
 
 	if (ref($prg) eq 'ARRAY') {
 		# stream of Artemus5 code
@@ -45,11 +59,11 @@ sub exec {
 		my $op = shift(@stream);
 
 		# pick code
-		my $c = $self->{op}->{$op};
+		my $c = $self->code($op);
 
-		if (!defined $c) {
-			# opcode not found: error
-			return "UNDEF{$op}";
+		if (!ref($c)) {
+			# direct value
+			return $c;
 		}
 
 		# map arguments ($0, $1...)
@@ -63,32 +77,28 @@ sub exec {
 			$_ = $v;
 		} @stream;
 
-		if (! ref($c)) {
-			# direct value
-			$ret = $c;
-		}
-		elsif (ref($c) eq 'ARRAY') {
+		if (ref($c) eq 'ARRAY') {
 			# another Artemus5 stream
-			$ret = $self->exec($c, @stream);
+			return $self->exec($c, @stream);
 		}
 		elsif (ref($c) eq 'CODE') {
 			# function call
-			$ret = $c->(@stream);
+			return $c->(@stream);
 		}
 	}
 	else {
 		if ($prg =~ /^%(.+)$/) {
 			# variable from external hash
 			#(for example, CGI variables)
-			$ret = $self->{xh}->{$1};
+			return $self->{xh}->{$1};
 		}
 		else {
 			# direct value
-			$ret = $prg;
+			return $prg;
 		}
 	}
 
-	return $ret;
+	return '';
 }
 
 sub init {
