@@ -241,6 +241,16 @@ sub init {
 }
 
 
+sub process {
+	my $self	= shift;
+	my $src		= shift;
+
+	my $c = $self->compile($src);
+
+	return $self->exec($c, @_);
+}
+
+
 sub new {
 	my $class	= shift;
 

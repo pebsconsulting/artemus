@@ -2,15 +2,10 @@
 
 use Artemus5;
 
-my $t = [ '?', 'Hola: ', [ 'env', 'HOME' ], '$0',
-	' Adios: ', 2, [ '=', 'test', 'value' ],
-	[ 'test' ], '%arch', [ 'VERSION_STR' ] ];
-
 my $a = Artemus5->new();
 
-my $src = 'This is literal code <{? "Hola: " { env "HOME" } $0 VERSION { = "test" "value" } %arch VERSION_STR}> back to literal code';
+my $src = join('', <>);
 
-my $c = $a->compile($src);
+print $a->process($src);
 
-print $a->exec($c, 666), "\n";
-
+exit 0;
