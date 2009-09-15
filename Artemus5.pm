@@ -135,11 +135,23 @@ sub code {
 	my $op		= shift;
 
 	if (!exists($self->{op}->{$op})) {
-		# try to load and compile from the path
-		# ...
+		my $c = undef;
 
-		# fail otherwise
-		$self->{op}->{$op} = "UNDEF{$op}";
+		# try to load and compile from the path
+		foreach my $p (@{$self->{path}}) {
+			if (open(F, $p . '/' . $op)) {
+				$c = join('', <F>);
+				close F;
+
+				last;
+			}
+		}
+
+		if (!defined($c)) {
+			$c = "UNDEF{$op}";
+		}
+
+		$self->{op}->{$op} = $c;
 	}
 
 	return $self->{op}->{$op};
