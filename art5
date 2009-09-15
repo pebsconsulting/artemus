@@ -8,5 +8,10 @@ my $t = [ '?', 'Hola: ', [ 'env', 'HOME' ], '$0',
 
 my $a = Artemus5->new();
 
-print $a->exec($t, 666), "\n";
+#my $src = '? "thi\"s stri\nng" that $0 { env "HOME" } %var';
+my $src = '? "Hola: " { env "HOME" } $0 VERSION { = "test" "value" } %arch VERSION_STR';
+
+my $c = $a->compile_c(\$src);
+
+print $a->exec($c, 666), "\n";
 

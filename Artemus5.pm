@@ -31,6 +31,70 @@ use warnings;
 
 $Artemus5::VERSION = '5.0.0-dev';
 
+sub compile_c {
+	my $self	= shift;
+	my $seq		= shift;
+	my @ret		= ();
+
+	# pick opcode first
+	if ($$seq =~ s/^\s*\{?\s*([^\s\{]+)//) {
+		push(@ret, $1);
+	}
+	else {
+		die "Syntax error near $$seq";
+	}
+
+	while ($$seq) {
+		if ($$seq =~ s/^\s*"(([^"\\]*(\\.[^"\\]*)*))"//) {
+			# double quoted string
+			my $str = $1;
+
+			# replace usual escaped characters
+			$str =~ s/\\n/\n/g;
+			$str =~ s/\\r/\r/g;
+			$str =~ s/\\t/\t/g;
+			$str =~ s/\\"/\"/g;
+			$str =~ s/\\\\/\\/g;
+
+			push(@ret, $str);
+		}
+		elsif ($$seq =~ s/^\s*'(([^'\\]*(\\.[^'\\]*)*))'//) {
+			# single quoted string
+			my $str = $1;
+
+			$str =~ s/\\'/\'/g;
+			$str =~ s/\\\\/\\/g;
+
+			push(@ret, $str);
+		}
+		elsif ($$seq =~ /^\s*\{/) {
+			# another code sequence
+			push(@ret, $self->compile_c($seq));
+		}
+		elsif ($$seq =~ s/^\s*\}//) {
+			# end of sequence
+			last;
+		}
+		elsif ($$seq =~ s/^\s*(%[^\s\{]+)//) {
+			# external hash value
+			push(@ret, $1);
+		}
+		elsif ($$seq =~ s/^\s*(\$\d+)//) {
+			# argument
+			push(@ret, $1);
+		}
+		elsif ($$seq =~ s/^\s*([^\s\{]+)//) {
+			# code sequence without arguments
+			push(@ret, [ $1 ]);
+		}
+		else {
+			die "Syntax error near $$seq";
+		}
+	}
+
+	return [ @ret ];
+}
+
 sub code {
 	my $self	= shift;
 	my $op		= shift;
