@@ -234,20 +234,36 @@ sub init {
 		return '';
 	};
 
-	$self->{op}->{'eq'} = sub {
+	$self->{op}->{eq} = sub {
 		($self->exec($_[0]) || '') eq
 			($self->exec($_[1]) || '') ? 1 : 0;
 	};
-	$self->{op}->{'ne'} = sub {
+	$self->{op}->{ne} = sub {
 		($self->exec($_[0]) || '') ne
 			($self->exec($_[1]) || '') ? 1 : 0;
 	};
 
-	$self->{op}->{'and'} = sub {
+	$self->{op}->{and} = sub {
 		($self->exec($_[0]) && $self->exec($_[1])) || '';
 	};
-	$self->{op}->{'or'} = sub {
+	$self->{op}->{or} = sub {
 		$self->exec($_[0]) || $self->exec($_[1]) || '';
+	};
+	$self->{op}->{not} = sub {
+		$self->exec($_[0]) ? 0 : 1;
+	};
+
+	$self->{op}->{if} = sub {
+		my $ret = '';
+
+		if ($self->exec($_[0])) {
+			$ret = $self->exec($_[1]);
+		}
+		elsif (scalar(@_) == 3) {
+			$ret = $self->exec($_[2]);
+		}
+
+		$ret;
 	};
 
 	$self->{op}->{'+'} = sub {
