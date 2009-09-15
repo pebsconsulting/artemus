@@ -95,6 +95,39 @@ sub compile_c {
 	return [ @ret ];
 }
 
+
+sub compile {
+	my $self	= shift;
+	my $str		= shift;
+
+	my @ret = ( '?' );
+
+	# split by the Artemus5 marks
+	my @stream = split(/(<\{|\}>)/, $str);
+
+	# optimization: no Artemus5 code as a scalar
+	if (scalar(@stream) == 1) {
+		return $stream[0];
+	}
+
+	# alternate between literal strings and Artemus5 code
+	while (@stream) {
+		my $p = shift(@stream);
+
+		if ($p eq '<{') {
+			$p = shift(@stream);
+			push(@ret, $self->compile_c(\$p));
+			shift(@stream);
+		}
+		else {
+			push(@ret, $p);
+		}
+	}
+
+	return [ @ret ];
+}
+
+
 sub code {
 	my $self	= shift;
 	my $op		= shift;
