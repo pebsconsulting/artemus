@@ -234,6 +234,22 @@ sub init {
 		return '';
 	};
 
+	$self->{op}->{'eq'} = sub {
+		($self->exec($_[0]) || '') eq
+			($self->exec($_[1]) || '') ? 1 : 0;
+	};
+	$self->{op}->{'ne'} = sub {
+		($self->exec($_[0]) || '') ne
+			($self->exec($_[1]) || '') ? 1 : 0;
+	};
+
+	$self->{op}->{'and'} = sub {
+		($self->exec($_[0]) && $self->exec($_[1])) || '';
+	};
+	$self->{op}->{'or'} = sub {
+		$self->exec($_[0]) || $self->exec($_[1]) || '';
+	};
+
 	$self->{op}->{'+'} = sub {
 		return ($self->exec($_[0]) || 0) + ($self->exec($_[1]) || 0);
 	};
