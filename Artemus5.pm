@@ -79,9 +79,9 @@ sub compile_c {
 			# end of sequence
 			last;
 		}
-		elsif ($$seq =~ s/^(%[^\s\{]+)\s*//) {
+		elsif ($$seq =~ s/^%([^\s\{]+)\s*//) {
 			# external hash value
-			push(@ret, $1);
+			push(@ret, [ 'var', $1 ]);
 		}
 		elsif ($$seq =~ s/^(\$\d+)\s*//) {
 			# argument
@@ -236,6 +236,8 @@ sub init {
 		$self->{op}->{$self->exec($_[0])} = $self->exec($_[1]);
 		return '';
 	};
+
+	$self->{op}->{var} = sub { $self->{xh}->{$self->exec($_[0])}; };
 
 	$self->{op}->{eq} = sub {
 		($self->exec($_[0]) || '') eq
