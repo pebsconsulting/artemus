@@ -67,6 +67,10 @@ sub compile_c {
 
 			push(@ret, $str);
 		}
+		elsif ($$seq =~ s/^(\d+(\.\d+)?)\s*//) {
+			# number
+			push(@ret, $1);
+		}
 		elsif ($$seq =~ /^\{\s*/) {
 			# another code sequence
 			push(@ret, $self->compile_c($seq));
@@ -226,8 +230,7 @@ sub init {
 	};
 
 	$self->{op}->{'='} = sub {
-		$self->{op}->{$self->exec($_[0])} =
-			$self->exec($_[1]);
+		$self->{op}->{$self->exec($_[0])} = $self->exec($_[1]);
 		return '';
 	};
 
