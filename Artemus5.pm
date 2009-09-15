@@ -100,15 +100,15 @@ sub compile {
 	my $self	= shift;
 	my $str		= shift;
 
+	# was this code already compiled?
+	if (exists($self->{pc}->{$str})) {
+		return $self->{pc}->{$str};
+	}
+
 	my @ret = ( '?' );
 
 	# split by the Artemus5 marks
 	my @stream = split(/(<\{|\}>)/, $str);
-
-	# optimization: no Artemus5 code as a scalar
-	if (scalar(@stream) == 1) {
-		return $stream[0];
-	}
 
 	# alternate between literal strings and Artemus5 code
 	while (@stream) {
@@ -124,7 +124,9 @@ sub compile {
 		}
 	}
 
-	return [ @ret ];
+	my $ret = [ @ret ];
+
+	return $self->{pc}->{$str} = $ret;
 }
 
 
