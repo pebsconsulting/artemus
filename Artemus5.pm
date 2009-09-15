@@ -231,6 +231,19 @@ sub init {
 		return '';
 	};
 
+	$self->{op}->{'+'} = sub {
+		return ($self->exec($_[0]) || 0) + ($self->exec($_[1]) || 0);
+	};
+	$self->{op}->{'-'} = sub {
+		return ($self->exec($_[0]) || 0) - ($self->exec($_[1]) || 0);
+	};
+	$self->{op}->{'*'} = sub {
+		return ($self->exec($_[0]) || 0) * ($self->exec($_[1]) || 0);
+	};
+	$self->{op}->{'/'} = sub {
+		return ($self->exec($_[0]) || 0) / ($self->exec($_[1]) || 1);
+	};
+
 	$self->{op}->{env} = sub {
 		return $ENV{$self->exec($_[0])};
 	};
