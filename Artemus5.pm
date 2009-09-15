@@ -37,7 +37,7 @@ sub compile_c {
 	my @ret		= ();
 
 	# pick opcode first
-	if ($$seq =~ s/^\s*\{?\s*([^\s\{]+)//) {
+	if ($$seq =~ s/^\s*\{?\s*([^\s\{]+)\s*//) {
 		push(@ret, $1);
 	}
 	else {
@@ -45,7 +45,7 @@ sub compile_c {
 	}
 
 	while ($$seq) {
-		if ($$seq =~ s/^\s*"(([^"\\]*(\\.[^"\\]*)*))"//) {
+		if ($$seq =~ s/^"(([^"\\]*(\\.[^"\\]*)*))"\s*//) {
 			# double quoted string
 			my $str = $1;
 
@@ -58,7 +58,7 @@ sub compile_c {
 
 			push(@ret, $str);
 		}
-		elsif ($$seq =~ s/^\s*'(([^'\\]*(\\.[^'\\]*)*))'//) {
+		elsif ($$seq =~ s/^'(([^'\\]*(\\.[^'\\]*)*))'\s*//) {
 			# single quoted string
 			my $str = $1;
 
@@ -67,23 +67,23 @@ sub compile_c {
 
 			push(@ret, $str);
 		}
-		elsif ($$seq =~ /^\s*\{/) {
+		elsif ($$seq =~ /^\{\s*/) {
 			# another code sequence
 			push(@ret, $self->compile_c($seq));
 		}
-		elsif ($$seq =~ s/^\s*\}//) {
+		elsif ($$seq =~ s/^\}\s*//) {
 			# end of sequence
 			last;
 		}
-		elsif ($$seq =~ s/^\s*(%[^\s\{]+)//) {
+		elsif ($$seq =~ s/^(%[^\s\{]+)\s*//) {
 			# external hash value
 			push(@ret, $1);
 		}
-		elsif ($$seq =~ s/^\s*(\$\d+)//) {
+		elsif ($$seq =~ s/^(\$\d+)\s*//) {
 			# argument
 			push(@ret, $1);
 		}
-		elsif ($$seq =~ s/^\s*([^\s\{]+)//) {
+		elsif ($$seq =~ s/^([^\s\{]+)\s*//) {
 			# code sequence without arguments
 			push(@ret, [ $1 ]);
 		}
