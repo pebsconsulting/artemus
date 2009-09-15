@@ -154,6 +154,9 @@ sub code {
 		if (!defined($c)) {
 			$c = "UNDEF{$op}";
 		}
+		else {
+			$c = $self->compile($c);
+		}
 
 		$self->{op}->{$op} = $c;
 	}
