@@ -25,10 +25,10 @@ $a->{op}->{url} = $url;
 
 # navigator
 # <span class = 'prev'><{if $2
-#	{? "<a href = "
+#	{?	"<a href = "
 #		{url "INDEX" "topic" $0 "offset" {sub $2 $1}}
-#		">&lt;&lt;</a>}
-#	}></span>
+#		">&lt;&lt;</a>
+#	}}></span>
 
 # <html>\n<{url 'LOGIN' 'Login page'}>\n<{url 'INDEX'}></html>
 
