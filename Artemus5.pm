@@ -137,6 +137,7 @@ sub compile {
 sub code {
 	my $self	= shift;
 	my $op		= shift;
+	my @args	= @_;
 
 	if (!exists($self->{op}->{$op})) {
 		my $c = undef;
@@ -152,12 +153,10 @@ sub code {
 		}
 
 		if (!defined($c)) {
-			$c = "UNDEF{$op}";
-		}
-		else {
-			$c = $self->compile($c);
+			die "Undefined opcode: $op";
 		}
 
+		$c = $self->compile($c);
 		$self->{op}->{$op} = $c;
 	}
 
@@ -167,66 +166,78 @@ sub code {
 sub exec {
 	my $self	= shift;
 	my $prg		= shift;
-	my @args	= @_;
 
-	if (ref($prg) eq 'ARRAY') {
-		# stream of Artemus5 code
-		my @stream = @{$prg};
+	# stream of Artemus5 code
+	my @stream = @{$prg};
 
-		# pick opcode
-		my $op = shift(@stream);
+	# pick opcode
+	my $op = shift(@stream);
 
-		# pick code
-		my $c = $self->code($op);
+	# pick code
+	my $c = $self->code($op, @stream);
 
-		if (!ref($c)) {
-			# direct value
-			return $c;
-		}
-
-		# map arguments ($0, $1...)
-		@stream = map {
-			my $v = $_;
-
-			if ($v =~ /^\$(\d+)$/) {
-				$v = $args[$1] || '';
-			}
-
-			$_ = $v;
-		} @stream;
-
-		if (ref($c) eq 'ARRAY') {
-			# another Artemus5 stream
-			return $self->exec($c, @stream);
-		}
-		elsif (ref($c) eq 'CODE') {
-			# function call
-			return $c->(@stream);
-		}
+	if (ref($c) eq 'ARRAY') {
+		# another Artemus5 stream
+		return $self->exec($c, @stream);
 	}
-	else {
-		if ($prg =~ /^%(.+)$/) {
-			# variable from external hash
-			#(for example, CGI variables)
-			return $self->{xh}->{$1};
-		}
-		else {
-			# direct value
-			return $prg;
-		}
+	elsif (ref($c) eq 'CODE') {
+		# function call
+		return $c->(@stream);
 	}
 
-	return '';
+	return 'ERROR';
 }
+
 
 sub init {
 	my $self	= shift;
+
+	$self->{stack} = [ [] ];
 
 	$self->{op}->{VERSION} = $Artemus5::VERSION;
 
 	$self->{op}->{VERSION_STR} = [
 		'?', 'Artemus ', [ 'VERSION' ]
 	];
+
+	# literal
+	$self->{op}->{'"'} = sub {
+		return $_[0] || '';
+	};
+
+	# subroutine frame
+	$self->{op}->{'()'} = sub {
+		my $code = shift;
+
+		# pick code's arguments
+		my @args = @{$code};
+		shift @args;
+
+		# push the results to the stack
+		push(@{$self->{stack}},
+			[ map { $self->exec($_); }
+				@args ]);
+
+		my $ret = $self->exec($code);
+
+		# drop stack
+		pop(@{$self->{stack}});
+
+		return $ret;
+	};
+
+	# argument
+	$self->{op}->{'$'} = sub {
+		return $self->{stack}->[-1]->[$_[0]] || '';
+	};
+
+	# external hash (e.g. CGI variables)
+	$self->{op}->{'%'} = sub {
+		return $self->{xh}->{$_[0]} || '';
+	};
+
+
+
 
 	$self->{op}->{'?'} = sub {
 		return join('', map { $self->exec($_); } @_);

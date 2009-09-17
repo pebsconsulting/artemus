@@ -4,8 +4,42 @@ use Artemus5;
 
 my $a = Artemus5->new();
 
-my $src = join('', <>);
+#my $src = join('', <>);
 
-print $a->process($src);
+#print $a->process($src);
+
+# <a href = http://host?t=<{$0}>;offset=0><{or $1 "Main index"}></a>
+
+my $url = [ '?',
+		[ '"', '<a href = http://host/?t=' ],
+		[ '$', 0 ],
+		[ '"', ';offset=0>'],
+		[ 'or',
+			[ '$', 1 ],
+			[ '"', 'Main index' ],
+		],
+		[ '"', '</a>' ]
+	];
+
+$a->{op}->{url} = $url;
+
+# navigator
+# <span class = 'prev'><{if $2
+#	{? "<a href = "
+#		{url "INDEX" "topic" $0 "offset" {sub $2 $1}}
+#		">&lt;&lt;</a>}
+#	}></span>
+
+# <html>\n<{url 'LOGIN' 'Login page'}>\n<{url 'INDEX'}></html>
+
+my $p = [ '?',
+		[ '"', "<html>\n" ],
+		[ '()', [ 'url', [ '"', 'LOGIN'], ['"', 'Login page'] ] ],
+		[ '"', "\n" ],
+		[ '()', [ 'url', [ '"', 'INDEX'] ] ],
+		[ '"', "\n</html>" ]
+	];
+
+print $a->exec($p), "\n";
 
 exit 0;
