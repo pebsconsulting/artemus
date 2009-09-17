@@ -134,17 +134,16 @@ sub compile {
 }
 
 
-sub code {
+sub script {
 	my $self	= shift;
-	my $op		= shift;
-	my @args	= @_;
+	my $sc		= shift;
 
-	if (!exists($self->{op}->{$op})) {
+	if (!exists($self->{sc}->{$sc})) {
 		my $c = undef;
 
 		# try to load and compile from the path
 		foreach my $p (@{$self->{path}}) {
-			if (open(F, $p . '/' . $op)) {
+			if (open(F, $p . '/' . $sc)) {
 				$c = join('', <F>);
 				close F;
 
@@ -153,15 +152,16 @@ sub code {
 		}
 
 		if (!defined($c)) {
-			die "Undefined opcode: $op";
+			die "Undefined script: $sc";
 		}
 
 		$c = $self->compile($c);
-		$self->{op}->{$op} = $c;
+		$self->{sc}->{$sc} = $c;
 	}
 
-	return $self->{op}->{$op};
+	return $self->{sc}->{$sc};
 }
+
 
 sub exec {
 	my $self	= shift;
@@ -173,19 +173,12 @@ sub exec {
 	# pick opcode
 	my $op = shift(@stream);
 
-	# pick code
-	my $c = $self->code($op, @stream);
-
-	if (ref($c) eq 'ARRAY') {
-		# another Artemus5 stream
-		return $self->exec($c, @stream);
-	}
-	elsif (ref($c) eq 'CODE') {
-		# function call
+	# and execute
+	if (my $c = $self->{op}->{$op}) {
 		return $c->(@stream);
 	}
 
-	return 'ERROR';
+	die "Opcode not found: $op";
 }
 
 
@@ -194,7 +187,7 @@ sub init {
 
 	$self->{stack} = [ [] ];
 
-	$self->{op}->{VERSION} = $Artemus5::VERSION;
+	$self->{op}->{VERSION} = [ '"', $Artemus5::VERSION ];
 
 	$self->{op}->{VERSION_STR} = [
 		'?', 'Artemus ', [ 'VERSION' ]
