@@ -36,13 +36,8 @@ sub compile_c {
 	my $seq		= shift;
 	my @ret		= ();
 
-	# pick opcode first
-	if ($$seq =~ s/^\s*\{?\s*([^\s\{]+)\s*//) {
-		push(@ret, $1);
-	}
-	else {
-		die "Syntax error near $$seq";
-	}
+	# delete leading blanks and a possible brace
+	$$seq =~ s/^\s*\{?\s*//;
 
 	while ($$seq) {
 		if ($$seq =~ s/^"(([^"\\]*(\\.[^"\\]*)*))"\s*//) {
@@ -56,7 +51,7 @@ sub compile_c {
 			$str =~ s/\\"/\"/g;
 			$str =~ s/\\\\/\\/g;
 
-			push(@ret, $str);
+			push(@ret, [ '"', $str ]);
 		}
 		elsif ($$seq =~ s/^'(([^'\\]*(\\.[^'\\]*)*))'\s*//) {
 			# single quoted string
@@ -65,11 +60,11 @@ sub compile_c {
 			$str =~ s/\\'/\'/g;
 			$str =~ s/\\\\/\\/g;
 
-			push(@ret, $str);
+			push(@ret, [ '"', $str ]);
 		}
 		elsif ($$seq =~ s/^(\d+(\.\d+)?)\s*//) {
 			# number
-			push(@ret, $1);
+			push(@ret, [ '"', $1 ]);
 		}
 		elsif ($$seq =~ /^\{\s*/) {
 			# another code sequence
@@ -81,18 +76,33 @@ sub compile_c {
 		}
 		elsif ($$seq =~ s/^%([^\s\{]+)\s*//) {
 			# external hash value
-			push(@ret, [ 'var', $1 ]);
+			push(@ret, [ '%', $1 ]);
 		}
 		elsif ($$seq =~ s/^(\$\d+)\s*//) {
 			# argument
-			push(@ret, $1);
+			push(@ret, [ '$', $1 ]);
 		}
 		elsif ($$seq =~ s/^([^\s\{]+)\s*//) {
 			# code sequence without arguments
+
+			# nothing yet? operator call
+			if (scalar(@ret) == 0) {
+				push(@ret, $1);
+
+				# the rest will be args for this one
+				next;
+			}
+
 			push(@ret, [ $1 ]);
 		}
 		else {
 			die "Syntax error near $$seq";
+		}
+
+		# if arrived here with only one instruction,
+		# we're over
+		if (scalar(@ret) == 1) {
+			return $ret[0];
 		}
 	}
 
@@ -125,7 +135,7 @@ sub compile {
 			shift(@stream);
 		}
 		else {
-			push(@ret, $p);
+			push(@ret, [ '"', $p ]);
 		}
 	}
 
@@ -232,7 +242,9 @@ sub init {
 	};
 
 	$self->{op}->{'='} = sub {
-		$self->{op}->{$self->exec($_[0])} = $self->exec($_[1]);
+		$self->{op}->{$self->exec($_[0])} =
+			[ '"', $self->exec($_[1]) ];
+
 		return '';
 	};
 
@@ -270,16 +282,16 @@ sub init {
 		$ret;
 	};
 
-	$self->{op}->{'+'} = sub {
+	$self->{op}->{add} = sub {
 		return ($self->exec($_[0]) || 0) + ($self->exec($_[1]) || 0);
 	};
-	$self->{op}->{'-'} = sub {
+	$self->{op}->{sub} = sub {
 		return ($self->exec($_[0]) || 0) - ($self->exec($_[1]) || 0);
 	};
-	$self->{op}->{'*'} = sub {
+	$self->{op}->{mul} = sub {
 		return ($self->exec($_[0]) || 0) * ($self->exec($_[1]) || 0);
 	};
-	$self->{op}->{'/'} = sub {
+	$self->{op}->{div} = sub {
 		return ($self->exec($_[0]) || 0) / ($self->exec($_[1]) || 1);
 	};
 

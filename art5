@@ -50,4 +50,24 @@ my $p = [ '?',
 
 print $a->exec($p), "\n";
 
+use Data::Dumper;
+
+my $c;
+$c = $a->compile("Leading <{%arch}> Trailing");
+print $a->exec($c), "\n";
+$c = $a->compile("Leading <{? 'Arch: ' %arch}> Trailing");
+print $a->exec($c), "\n";
+$c = $a->compile("Leading <{mul {add 10 20} 1000}> Trailing");
+print $a->exec($c), "\n";
+$c = $a->compile("Leading <{? {= 'TEST' 'here'} { TEST }}> Trailing");
+print $a->exec($c), "\n";
+$c = $a->compile("Leading <{if {eq 1 2} 'Equal' 'Different'}> Trailing");
+print $a->exec($c), "\n";
+$c = $a->compile("Leading <{if {eq 1 1} 'Equal' 'Different'}> Trailing");
+print $a->exec($c), "\n";
+$c = $a->compile("Leading <{if {eq 1 2} {'Equal'} {'Different'}}> Trailing");
+print $a->exec($c), "\n";
+$c = $a->compile("Leading <{if {eq 1 1} {'Equal'} {'Different'}}> Trailing");
+print $a->exec($c), "\n";
+
 exit 0;
