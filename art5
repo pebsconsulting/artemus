@@ -13,7 +13,12 @@ my $a = Artemus5->new();
 my $url = [ '?',
 		[ '"', '<a href = http://host/?t=' ],
 		[ '$', 0 ],
-		[ '"', ';offset=0>'],
+		[ '"', ';offset='],
+		[ 'or',
+			[ '$', 2 ],
+			[ '"', 0 ],
+		],
+		[ '"', '>'],
 		[ 'or',
 			[ '$', 1 ],
 			[ '"', 'Main index' ],
@@ -24,19 +29,22 @@ my $url = [ '?',
 $a->{op}->{url} = $url;
 
 # navigator
-# <span class = 'prev'><{if $2
-#	{?	"<a href = "
+# <span class = 'prev'><{
+#	if $2
+#	{?
+#		"<a href = "
 #		{url "INDEX" "topic" $0 "offset" {sub $2 $1}}
-#		">&lt;&lt;</a>
-#	}}></span>
+#		">&lt;&lt;</a>"
+#	}
+#}></span>
 
 # <html>\n<{url 'LOGIN' 'Login page'}>\n<{url 'INDEX'}></html>
 
 my $p = [ '?',
 		[ '"', "<html>\n" ],
-		[ '()', [ 'url', [ '"', 'LOGIN'], ['"', 'Login page'] ] ],
+		[ 'url', [ '"', 'LOGIN'], ['"', 'Login page'], ['"', 10 ]],
 		[ '"', "\n" ],
-		[ '()', [ 'url', [ '"', 'INDEX'] ] ],
+		[ 'url', [ '"', 'INDEX'] ],
 		[ '"', "\n</html>" ]
 	];
 

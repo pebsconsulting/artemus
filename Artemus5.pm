@@ -109,6 +109,7 @@ sub compile {
 		return $self->{pc}->{$str};
 	}
 
+	# joiner opcode
 	my @ret = ( '?' );
 
 	# split by the Artemus5 marks
@@ -134,16 +135,17 @@ sub compile {
 }
 
 
-sub script {
+sub code {
 	my $self	= shift;
-	my $sc		= shift;
+	my $op		= shift;
 
-	if (!exists($self->{sc}->{$sc})) {
+	if (!exists($self->{op}->{$op})) {
 		my $c = undef;
 
-		# try to load and compile from the path
+		# try to resolve it by loading
+		# and compiling it from the path
 		foreach my $p (@{$self->{path}}) {
-			if (open(F, $p . '/' . $sc)) {
+			if (open(F, $p . '/' . $op)) {
 				$c = join('', <F>);
 				close F;
 
@@ -151,21 +153,19 @@ sub script {
 			}
 		}
 
-		if (!defined($c)) {
-			die "Undefined script: $sc";
+		if (defined($c)) {
+			$self->{op}->{$op} = $self->compile($c);
 		}
-
-		$c = $self->compile($c);
-		$self->{sc}->{$sc} = $c;
 	}
 
-	return $self->{sc}->{$sc};
+	return $self->{op}->{$op};
 }
 
 
 sub exec {
 	my $self	= shift;
 	my $prg		= shift;
+	my $ret		= '';
 
 	# stream of Artemus5 code
 	my @stream = @{$prg};
@@ -173,12 +173,28 @@ sub exec {
 	# pick opcode
 	my $op = shift(@stream);
 
-	# and execute
-	if (my $c = $self->{op}->{$op}) {
-		return $c->(@stream);
+	# pick code
+	my $c = $self->code($op);
+
+	if (ref($c) eq 'CODE') {
+		$ret = $c->(@stream);
+	}
+	elsif (ref($c) eq 'ARRAY') {
+		# push the arguments to the stack
+		push(@{$self->{stack}},
+			[ map { $self->exec($_); }
+				@stream ]);
+
+		$ret = $self->exec($c);
+
+		# drop stack
+		pop(@{$self->{stack}});
+	}
+	else {
+		die "Opcode not found: $op";
 	}
 
-	die "Opcode not found: $op";
+	return $ret;
 }
 
 
@@ -196,27 +212,6 @@ sub init {
 	# literal
 	$self->{op}->{'"'} = sub {
 		return $_[0] || '';
-	};
-
-	# subroutine frame
-	$self->{op}->{'()'} = sub {
-		my $code = shift;
-
-		# pick code's arguments
-		my @args = @{$code};
-		shift @args;
-
-		# push the results to the stack
-		push(@{$self->{stack}},
-			[ map { $self->exec($_); }
-				@args ]);
-
-		my $ret = $self->exec($code);
-
-		# drop stack
-		pop(@{$self->{stack}});
-
-		return $ret;
 	};
 
 	# argument
