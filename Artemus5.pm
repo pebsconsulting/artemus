@@ -204,6 +204,10 @@ sub exec {
 		die "Opcode not found: $op";
 	}
 
+	if (!defined($ret)) {
+		$ret = '';
+	}
+
 	return $ret;
 }
 
@@ -221,26 +225,25 @@ sub init {
 
 	# literal
 	$self->{op}->{'"'} = sub {
-		return $_[0] || '';
+		return $_[0];
 	};
 
 	# argument
 	$self->{op}->{'$'} = sub {
-		return $self->{stack}->[-1]->[$_[0]] || '';
+		return $self->{stack}->[-1]->[$_[0]];
 	};
 
 	# external hash (e.g. CGI variables)
 	$self->{op}->{'%'} = sub {
-		return $self->{xh}->{$_[0]} || '';
+		return $self->{xh}->{$_[0]};
 	};
 
-
-
-
+	# joiner
 	$self->{op}->{'?'} = sub {
 		return join('', map { $self->exec($_); } @_);
 	};
 
+	# assignation
 	$self->{op}->{'='} = sub {
 		$self->{op}->{$self->exec($_[0])} =
 			[ '"', $self->exec($_[1]) ];
@@ -248,22 +251,20 @@ sub init {
 		return '';
 	};
 
-	$self->{op}->{var} = sub { $self->{xh}->{$self->exec($_[0])}; };
-
 	$self->{op}->{eq} = sub {
-		($self->exec($_[0]) || '') eq
-			($self->exec($_[1]) || '') ? 1 : 0;
+		$self->exec($_[0]) eq
+			$self->exec($_[1]) ? 1 : 0;
 	};
 	$self->{op}->{ne} = sub {
-		($self->exec($_[0]) || '') ne
-			($self->exec($_[1]) || '') ? 1 : 0;
+		$self->exec($_[0]) ne
+			$self->exec($_[1]) ? 1 : 0;
 	};
 
 	$self->{op}->{and} = sub {
-		($self->exec($_[0]) && $self->exec($_[1])) || '';
+		$self->exec($_[0]) && $self->exec($_[1]);
 	};
 	$self->{op}->{or} = sub {
-		$self->exec($_[0]) || $self->exec($_[1]) || '';
+		$self->exec($_[0]) || $self->exec($_[1]);
 	};
 	$self->{op}->{not} = sub {
 		$self->exec($_[0]) ? 0 : 1;

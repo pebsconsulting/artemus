@@ -50,8 +50,6 @@ my $p = [ '?',
 
 print $a->exec($p), "\n";
 
-use Data::Dumper;
-
 my $c;
 $c = $a->compile("Leading <{%arch}> Trailing");
 print $a->exec($c), "\n";
@@ -68,6 +66,8 @@ print $a->exec($c), "\n";
 $c = $a->compile("Leading <{if {eq 1 2} {'Equal'} {'Different'}}> Trailing");
 print $a->exec($c), "\n";
 $c = $a->compile("Leading <{if {eq 1 1} {'Equal'} {'Different'}}> Trailing");
+print $a->exec($c), "\n";
+$c = $a->compile("Leading <{url 'LOGIN' 'Login page'}> Trailing");
 print $a->exec($c), "\n";
 
 exit 0;
