@@ -303,6 +303,16 @@ sub init {
 		return ($self->exec($_[0]) || 0) / ($self->exec($_[1]) || 1);
 	};
 
+	$self->{op}->{gt} = sub {
+		return ($self->exec($_[0]) || 0) > ($self->exec($_[1]) || 0);
+	};
+	$self->{op}->{lt} = sub {
+		return ($self->exec($_[0]) || 0) < ($self->exec($_[1]) || 0);
+	};
+	$self->{op}->{random} = sub {
+		return $self->exec($_[rand(scalar(@_))]);
+	};
+
 	$self->{op}->{env} = sub {
 		return $ENV{$self->exec($_[0])};
 	};

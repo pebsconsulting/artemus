@@ -69,5 +69,7 @@ $c = $a->compile("Leading <{if {eq 1 1} {'Equal'} {'Different'}}> Trailing");
 print $a->exec($c), "\n";
 $c = $a->compile("Leading <{url 'LOGIN' 'Login page'}> Trailing");
 print $a->exec($c), "\n";
+$c = $a->compile("Leading <{random 1 2 3 4 5 6}> Trailing");
+print $a->exec($c), "\n";
 
 exit 0;
