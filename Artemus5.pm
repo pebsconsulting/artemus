@@ -150,21 +150,28 @@ sub code {
 	my $op		= shift;
 
 	if (!exists($self->{op}->{$op})) {
-		my $c = undef;
+		my $src = undef;
 
-		# try to resolve it by loading
-		# and compiling it from the path
-		foreach my $p (@{$self->{path}}) {
-			if (open(F, $p . '/' . $op)) {
-				$c = join('', <F>);
-				close F;
+		# does a loader_func() exist?
+		if (ref($self->{loader_func}) eq 'CODE') {
+			$src = $self->{loader_func}->{$op};
+		}
 
-				last;
+		if (!defined($src)) {
+			# try to resolve it by loading
+			# and compiling it from the path
+			foreach my $p (@{$self->{path}}) {
+				if (open(F, $p . '/' . $op)) {
+					$src = join('', <F>);
+					close F;
+
+					last;
+				}
 			}
 		}
 
-		if (defined($c)) {
-			$self->{op}->{$op} = $self->compile($c);
+		if (defined($src)) {
+			$self->{op}->{$op} = $self->compile($src);
 		}
 	}
 
@@ -175,7 +182,7 @@ sub code {
 sub exec {
 	my $self	= shift;
 	my $prg		= shift;
-	my $ret		= '';
+	my $ret;
 
 	# stream of Artemus5 code
 	my @stream = @{$prg};
