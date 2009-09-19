@@ -78,7 +78,7 @@ sub compile_c {
 			# external hash value
 			push(@ret, [ '%', $1 ]);
 		}
-		elsif ($$seq =~ s/^(\$\d+)\s*//) {
+		elsif ($$seq =~ s/^\$(\d+)\s*//) {
 			# argument
 			push(@ret, [ '$', $1 ]);
 		}
@@ -314,7 +314,54 @@ sub init {
 	};
 
 	$self->{op}->{env} = sub {
+		# no arguments? return keys as an arrayref
+		if (scalar(@_) == 0) {
+			return [ keys(%ENV) ];
+		}
+
 		return $ENV{$self->exec($_[0])};
+	};
+
+	$self->{op}->{foreach} = sub {
+		my $list	= shift;
+		my $code	= shift || [ '$', 0 ];
+		my $sep		= shift || [ '"', '' ];
+		my $header	= shift || [ '"', '' ];
+
+		my @ret = ();
+		my $ph = '';
+
+		# create a stack for the elements
+		push(@{$self->{stack}}, []);
+
+		foreach my $e (@{$self->exec($list)}) {
+			# store the element in the stack
+			$self->{stack}->[-1] =
+				ref($e) ? $e : [ $e ];
+
+			# execute the header code
+			my $o = $self->exec($header);
+
+			# if it's different from previous header,
+			# strip from output; otherwise, remember
+			# for next time
+			if ($ph eq $o) {
+				$o = '';
+			}
+			else {
+				$ph = $o;
+			}
+
+			# execute the body code
+			$o .= $self->exec($code);
+
+			push(@ret, $o);
+		}
+
+		# destroy last stack
+		pop(@{$self->{stack}});
+
+		return join($self->exec($sep), @ret);
 	};
 
 	$self->{xh}->{arch} = 'Unix';
