@@ -219,6 +219,13 @@ sub exec {
 }
 
 
+sub exec0 {
+	my $self	= shift;
+
+	return $self->exec(@_) || 0;
+}
+
+
 sub init {
 	my $self	= shift;
 
@@ -291,23 +298,23 @@ sub init {
 	};
 
 	$self->{op}->{add} = sub {
-		return ($self->exec($_[0]) || 0) + ($self->exec($_[1]) || 0);
+		return $self->exec0($_[0]) + $self->exec0($_[1]);
 	};
 	$self->{op}->{sub} = sub {
-		return ($self->exec($_[0]) || 0) - ($self->exec($_[1]) || 0);
+		return $self->exec0($_[0]) - $self->exec0($_[1]);
 	};
 	$self->{op}->{mul} = sub {
-		return ($self->exec($_[0]) || 0) * ($self->exec($_[1]) || 0);
+		return $self->exec0($_[0]) * $self->exec0($_[1]);
 	};
 	$self->{op}->{div} = sub {
-		return ($self->exec($_[0]) || 0) / ($self->exec($_[1]) || 1);
+		return $self->exec0($_[0]) / $self->exec0($_[1]);
 	};
 
 	$self->{op}->{gt} = sub {
-		return ($self->exec($_[0]) || 0) > ($self->exec($_[1]) || 0);
+		return $self->exec0($_[0]) > $self->exec0($_[1]);
 	};
 	$self->{op}->{lt} = sub {
-		return ($self->exec($_[0]) || 0) < ($self->exec($_[1]) || 0);
+		return $self->exec0($_[0]) < $self->exec0($_[1]);
 	};
 	$self->{op}->{random} = sub {
 		return $self->exec($_[rand(scalar(@_))]);
