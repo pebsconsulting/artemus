@@ -40,6 +40,10 @@ sub compile_c {
 	$$seq =~ s/^\s*\{?\s*//;
 
 	while ($$seq) {
+		# delete comments
+		while ($$seq =~ s/^\s*#[^\n]+\n\s*//) {
+		}
+
 		if ($$seq =~ s/^"(([^"\\]*(\\.[^"\\]*)*))"\s*//) {
 			# double quoted string
 			my $str = $1;
@@ -94,7 +98,7 @@ sub compile_c {
 			}
 		}
 		else {
-			die "Syntax error near $$seq";
+			die "Syntax error near '$$seq'";
 		}
 	}
 
