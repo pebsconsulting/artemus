@@ -142,7 +142,7 @@ sub compile {
 			push(@ret, $self->compile_c(\$p));
 			shift(@stream);
 		}
-		else {
+		elsif ($p) {
 			push(@ret, [ '"', $p ]);
 		}
 	}
