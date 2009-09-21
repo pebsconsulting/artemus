@@ -134,7 +134,7 @@ sub compile {
 		my $p = shift(@stream);
 
 		if ($p eq '<{') {
-			$p = shift(@stream);
+			$p = '{' . shift(@stream) . '}';
 			push(@ret, $self->compile_c(\$p));
 			shift(@stream);
 		}
