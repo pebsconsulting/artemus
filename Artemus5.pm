@@ -88,22 +88,20 @@ sub compile_c {
 			# nothing yet? operator call
 			if (scalar(@ret) == 0) {
 				push(@ret, $1);
-
-				# the rest will be args for this one
-				next;
 			}
-
-			push(@ret, [ $1 ]);
+			else {
+				push(@ret, [ $1 ]);
+			}
 		}
 		else {
 			die "Syntax error near $$seq";
 		}
+	}
 
-		# if arrived here with only one instruction,
-		# we're over
-		if (scalar(@ret) == 1) {
-			return $ret[0];
-		}
+	# is the first thing in the sequence an array
+	# (instruction) and not a string (opcode)? return it
+	if (ref($ret[0]) eq 'ARRAY') {
+		return $ret[0];
 	}
 
 	return [ @ret ];
@@ -158,8 +156,8 @@ sub code {
 		}
 
 		if (!defined($src)) {
-			# try to resolve it by loading
-			# and compiling it from the path
+			# try to resolve by loading
+			# a source file from the path
 			foreach my $p (@{$self->{path}}) {
 				if (open(F, $p . '/' . $op)) {
 					$src = join('', <F>);
@@ -170,6 +168,7 @@ sub code {
 			}
 		}
 
+		# compile if available
 		if (defined($src)) {
 			$self->{op}->{$op} = $self->compile($src);
 		}
