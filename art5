@@ -81,5 +81,7 @@ $c = $a->compile("Leading <{foreach env \$0 ', '}> Trailing");
 print $a->exec($c), "\n";
 $c = $a->compile("Leading <{foreach env {? \$0 '=' {env \$0}} ', '}> Trailing");
 print $a->exec($c), "\n";
+$c = $a->compile("Leading <{1 2 3}> Trailing");
+print $a->exec($c), "\n";
 
 exit 0;
