@@ -4,11 +4,15 @@ use Artemus5;
 
 my $dump = 0;
 my $v, $s;
+my @path = ();
 
 # raw argument parsing
 while ($v = shift(@ARGV)) {
 	if ($v eq '-d') {
 		$dump  = 1;
+	}
+	elsif ($v eq '-I') {
+		push(@path, shift(@ARGV));
 	}
 	else {
 		# script name
@@ -16,17 +20,17 @@ while ($v = shift(@ARGV)) {
 }
 
 if (!defined($s)) {
-	$s = join(<>);
+	$s = join('', <>);
 }
 
-my $a = Artemus5->new();
+my $a = Artemus5->new( path => \@path);
 
 my $c = $a->compile($s);
 
 if ($dump) {
 	use Data::Dumper;
 
-	print Dump($dump), "\n";
+	print Dumper($c), "\n";
 }
 else {
 	print $a->exec($c);
