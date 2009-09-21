@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use Artemus5;
+
+my $dump = 0;
+my $v, $s;
+
+# raw argument parsing
+while ($v = shift(@ARGV)) {
+	if ($v eq '-d') {
+		$dump  = 1;
+	}
+	else {
+		# script name
+	}
+}
+
+if (!defined($s)) {
+	$s = join(<>);
+}
+
+my $a = Artemus5->new();
+
+my $c = $a->compile($s);
+
+if ($dump) {
+	use Data::Dumper;
+
+	print Dump($dump), "\n";
+}
+else {
+	print $a->exec($c);
+}
+
+exit 0;
