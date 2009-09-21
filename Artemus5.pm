@@ -99,9 +99,15 @@ sub compile_c {
 	}
 
 	# is the first thing in the sequence an array
-	# (instruction) and not a string (opcode)? return it
+	# (instruction) and not a string (opcode)?
 	if (ref($ret[0]) eq 'ARRAY') {
-		return $ret[0];
+		# only one instruction? return as is
+		if (scalar(@ret) == 1) {
+			return $ret[0];
+		}
+
+		# otherwise, prepend a '?' (joiner)
+		unshift(@ret, '?');
 	}
 
 	return [ @ret ];
