@@ -74,7 +74,7 @@ sub compile_c {
 			# end of sequence
 			last;
 		}
-		elsif ($$seq =~ s/^%([^\s\{]+)\s*//) {
+		elsif ($$seq =~ s/^%([^\s\{\}]+)\s*//) {
 			# external hash value
 			push(@ret, [ '%', $1 ]);
 		}
@@ -82,8 +82,8 @@ sub compile_c {
 			# argument
 			push(@ret, [ '$', $1 ]);
 		}
-		elsif ($$seq =~ s/^([^\s\{]+)\s*//) {
-			# code sequence without arguments
+		elsif ($$seq =~ s/^([^\s\{\}]+)\s*//) {
+			# opcode
 
 			# nothing yet? operator call
 			if (scalar(@ret) == 0) {
