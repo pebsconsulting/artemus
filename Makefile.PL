@@ -5,6 +5,6 @@ WriteMakefile(
     'NAME'		=> 'Artemus',
     'dist'		=> { COMPRESS => gzip, SUFFIX => '.gz'},
     'VERSION_FROM'	=> 'Artemus4.pm',
-    'EXE_FILES' 	=> [ 'artemus' ],
+    'EXE_FILES' 	=> [ 'artemus', 'art5' ],
     'INSTALLSCRIPT'	=> '/usr/local/bin',
 );
