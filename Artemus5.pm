@@ -193,6 +193,11 @@ sub exec {
 	my $prg		= shift;
 	my $ret;
 
+	# aborted? do nothing more
+	if ($self->{abort}) {
+		return '';
+	}
+
 	# stream of Artemus5 code
 	my @stream = @{$prg};
 
