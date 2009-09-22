@@ -385,6 +385,30 @@ sub init {
 		return join($self->exec($sep), @ret);
 	};
 
+	$self->{op}->{case} = sub {
+		my $value	= $self->exec(shift);
+		my $oth;
+
+		# if args are odd, the last one is
+		# the 'otherwise' case
+		if (scalar(@_) % 2) {
+			$oth = pop(@_);
+		}
+
+		# now treat the rest of arguments as
+		# pairs of case / result
+		while (@_) {
+			my $case =	$self->exec(shift);
+			my $res = 	shift;
+
+			if ($value eq $case) {
+				return $self->exec($res);
+			}
+		}
+
+		return defined($oth) ? $self->exec($oth) : '';
+	};
+
 	$self->{xh}->{arch} = 'Unix';
 
 	return $self;
