@@ -298,7 +298,7 @@ sub init {
 		$self->exec($_[0]) ? 0 : 1;
 	};
 
-	$self->{op}->{if} = sub {
+	$self->{op}->{iff} = sub {
 		my $ret = '';
 
 		if ($self->exec($_[0])) {
@@ -309,6 +309,11 @@ sub init {
 		}
 
 		$ret;
+	};
+
+	$self->{op}->{if} = sub {
+		$self->{op}->{iff}->(@_);
+		return '';
 	};
 
 	$self->{op}->{add} = sub {
