@@ -409,6 +409,13 @@ sub init {
 		return defined($oth) ? $self->exec($oth) : '';
 	};
 
+	$self->{op}->{seq} = sub {
+		my $from	= $self->exec0(shift);
+		my $to		= $self->exec0(shift);
+
+		return [ $from .. $to ];
+	};
+
 	$self->{xh}->{arch} = 'Unix';
 
 	return $self;
