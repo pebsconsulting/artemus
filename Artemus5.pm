@@ -416,6 +416,33 @@ sub init {
 		return [ $from .. $to ];
 	};
 
+	$self->{op}->{sort} = sub {
+		my $list	= $self->exec(shift);
+		my $code	= shift || [ '$', 0 ];
+
+		# create a stack for the elements
+		push(@{$self->{stack}}, []);
+
+		my $ret = [ sort {
+			$self->{stack}->[-1] = ref($a) ? $a : [ $a ];
+			my $va = $self->exec($code);
+
+			$self->{stack}->[-1] = ref($b) ? $b : [ $b ];
+			my $vb = $self->exec($code);
+
+			$va cmp $vb;
+		} @{$list} ];
+
+		# destroy last stack
+		pop(@{$self->{stack}});
+
+		return $ret;
+	};
+
+	$self->{op}->{reverse} = sub {
+		return [ reverse @{$self->exec(shift)} ];
+	};
+
 	$self->{xh}->{arch} = 'Unix';
 
 	return $self;
