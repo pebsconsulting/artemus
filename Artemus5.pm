@@ -443,6 +443,8 @@ sub init {
 		return [ reverse @{$self->exec(shift)} ];
 	};
 
+	$self->{op}->{size} = sub { return scalar @{$self->exec($_[0])} };
+
 	$self->{xh}->{arch} = 'Unix';
 
 	return $self;
