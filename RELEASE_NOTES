@@ -4,8 +4,24 @@ Artemus Release Notes
 4.1.3
 -----
 
+ * The `foreach' constructor now includes an optional
+   4th argument, the _header_, that will be appended
+   to the output in case it's different from the
+   previous iteration. This code block is expected to
+   contain dollar-prefixed arguments.
  * New template function `item', to return an item
    from a colon-separated list given its subscript.
+ * Fix `case' comparisons when the variable contains
+   carriage returns.
+ * Fix loader_func() to correctly process empty
+   templates.
+ * Unless a very grave bug or vulnerabity is found,
+   this will be the last 4.x release; next release
+   will jump to the 5.x branch. Please take note that
+   this new branch is intentionally incompatible
+   with current one. Anyway, the Artemus4.pm module
+   and associated tools are planned to be distributed
+   with the 5.x series for a very long time.
 
 4.1.2
 -----
