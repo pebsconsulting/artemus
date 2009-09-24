@@ -44,9 +44,10 @@ sub parse {
 		while ($$seq =~ s/^\s*#[^\n]+\n\s*//) {
 		}
 
-		if ($$seq =~ s/^"(([^"\\]*(\\.[^"\\]*)*))"\s*//) {
+		if ($$seq =~ s/^(@?)"(([^"\\]*(\\.[^"\\]*)*))"\s*//) {
 			# double quoted string
-			my $str = $1;
+			my $op =	$1 || '"';
+			my $str =	$2;
 
 			# replace usual escaped characters
 			$str =~ s/\\n/\n/g;
@@ -55,16 +56,17 @@ sub parse {
 			$str =~ s/\\"/\"/g;
 			$str =~ s/\\\\/\\/g;
 
-			push(@ret, [ '"', $str ]);
+			push(@ret, [ $op, $str ]);
 		}
-		elsif ($$seq =~ s/^'(([^'\\]*(\\.[^'\\]*)*))'\s*//) {
+		elsif ($$seq =~ s/^(@?)'(([^'\\]*(\\.[^'\\]*)*))'\s*//) {
 			# single quoted string
-			my $str = $1;
+			my $op =	$1 || '"';
+			my $str =	$2;
 
 			$str =~ s/\\'/\'/g;
 			$str =~ s/\\\\/\\/g;
 
-			push(@ret, [ '"', $str ]);
+			push(@ret, [ $op, $str ]);
 		}
 		elsif ($$seq =~ s/^(\d+(\.\d+)?)\s*//) {
 			# number
@@ -254,6 +256,11 @@ sub init {
 	# literal
 	$self->{op}->{'"'} = sub {
 		return $_[0];
+	};
+
+	# translateable literal
+	$self->{op}->{'@'} = sub {
+		return $self->{t}->{$_[0]} || $_[0];
 	};
 
 	# argument
