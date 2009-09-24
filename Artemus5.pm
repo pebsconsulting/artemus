@@ -31,7 +31,7 @@ use warnings;
 
 $Artemus5::VERSION = '5.0.0-dev';
 
-sub compile_c {
+sub parse {
 	my $self	= shift;
 	my $seq		= shift;
 	my @ret		= ();
@@ -72,7 +72,7 @@ sub compile_c {
 		}
 		elsif ($$seq =~ /^\{\s*/) {
 			# another code sequence
-			push(@ret, $self->compile_c($seq));
+			push(@ret, $self->parse($seq));
 		}
 		elsif ($$seq =~ s/^\}\s*//) {
 			# end of sequence
@@ -139,7 +139,7 @@ sub compile {
 
 		if ($p eq '<{') {
 			$p = '{' . shift(@stream) . '}';
-			push(@ret, $self->compile_c(\$p));
+			push(@ret, $self->parse(\$p));
 			shift(@stream);
 		}
 		elsif ($p) {
