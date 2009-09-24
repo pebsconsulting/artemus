@@ -162,6 +162,10 @@ sub code {
 	if (!exists($self->{op}->{$op})) {
 		my $src = undef;
 
+		# filter opcode to only allow
+		# characters valid in file names
+		$op =~ s/[^\w\d_-]//g;
+
 		# does a loader_func() exist?
 		if (ref($self->{loader_func}) eq 'CODE') {
 			$src = $self->{loader_func}->{$op};
