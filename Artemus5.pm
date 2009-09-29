@@ -168,7 +168,7 @@ sub code {
 
 		# does a loader_func() exist?
 		if (ref($self->{loader_func}) eq 'CODE') {
-			$src = $self->{loader_func}->{$op};
+			$src = $self->{loader_func}->($op);
 		}
 
 		if (!defined($src)) {
