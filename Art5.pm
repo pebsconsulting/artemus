@@ -28,6 +28,7 @@ package Art5;
 
 use strict;
 use warnings;
+use Carp;
 
 $Art5::VERSION = '5.0.0-dev';
 
@@ -100,7 +101,7 @@ sub parse {
 			}
 		}
 		else {
-			die "Syntax error near '$$seq'";
+			croak "Artemus5 syntax error near '$$seq'";
 		}
 	}
 
@@ -233,7 +234,7 @@ sub exec {
 		pop(@{$self->{stack}});
 	}
 	else {
-		die "Opcode not found: $op";
+		croak "Artemus5 opcode not found: $op";
 	}
 
 	if (!defined($ret)) {
