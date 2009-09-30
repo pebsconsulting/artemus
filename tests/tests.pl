@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-use Artemus5;
+use Art5;
 
-my $a = Artemus5->new();
+my $a = Art5->new();
 
 #my $src = join('', <>);
 

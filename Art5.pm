@@ -24,12 +24,12 @@
 
 use locale;
 
-package Artemus5;
+package Art5;
 
 use strict;
 use warnings;
 
-$Artemus5::VERSION = '5.0.0-dev';
+$Art5::VERSION = '5.0.0-dev';
 
 sub parse {
 	my $self	= shift;
@@ -256,7 +256,7 @@ sub init {
 
 	$self->{stack} = [ [] ];
 
-	$self->{op}->{VERSION} = [ '"', $Artemus5::VERSION ];
+	$self->{op}->{VERSION} = [ '"', $Art5::VERSION ];
 
 	$self->{op}->{VERSION_STR} = [
 		'?', 'Artemus ', [ 'VERSION' ]

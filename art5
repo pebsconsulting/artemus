@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Artemus5;
+use Art5;
 
 my $dump = 0;
 my $v, $s;
@@ -23,7 +23,7 @@ if (!defined($s)) {
 	$s = join('', <>);
 }
 
-my $a = Artemus5->new( path => \@path);
+my $a = Art5->new( path => \@path);
 
 my $c = $a->compile($s);
 
