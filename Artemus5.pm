@@ -199,8 +199,8 @@ sub exec {
 	my $prg		= shift;
 	my $ret;
 
-	# aborted? do nothing more
-	if ($self->{abort}) {
+	# aborted or empty? do nothing more
+	if (!ref($prg) || $self->{abort}) {
 		return '';
 	}
 
