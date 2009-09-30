@@ -104,6 +104,11 @@ sub parse {
 		}
 	}
 
+	# no program? return a NOP */
+	if (!@ret) {
+		return [ '"', '' ];
+	}
+
 	# is the first thing in the sequence an array
 	# (instruction) and not a string (opcode)?
 	if (ref($ret[0]) eq 'ARRAY') {
