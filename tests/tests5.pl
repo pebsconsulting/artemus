@@ -9,6 +9,7 @@ $tests_ok = 0;
 
 $art5->{op}->{ary1} = sub { [ 'a', 'b', 'c' ]; };
 $art5->{op}->{ary2} = sub { [ [1, 'a'], [2, 'b'], [3, 'b'], [4, 'c'] ]; };
+$art5->{op}->{ary3} = sub { [ [3, 'b'], [1, 'a'], [2, 'k'], [9, 'z'], [7, 'q' ]]; };
 $art5->{op}->{link} = sub { "<a href = '" . $art5->exec(shift) . "'>" . $art5->exec(shift) . "</a>"; };
 
 sub try {
@@ -67,6 +68,14 @@ try('1<{link}>2', "1<a href = ''></a>2");
 try('1<{link "http://url"}>2', "1<a href = 'http://url'></a>2");
 try('1<{link "http://url" "label"}>2', "1<a href = 'http://url'>label</a>2");
 try('1<{= "RESULT" 1000}>2<{RESULT}>3', '1210003');
+try('1<{size ary1}>2', '132');
+try('1<{size ary2}>2', '142');
+try('1<{foreach {seq 1 10}}>2', '1123456789102');
+try('1<{foreach {reverse {seq 1 10}}}>2', '1109876543212');
+try('1<{foreach {sort ary3 $1}}>2', '1132792');
+try('1<{foreach {sort ary3 {add 100 $0}}}>2', '1123792');
+try('1<{case %arch "Windows" "Is Windows" "Unix" "Is Unix"}>2', '1Is Unix2');
+try('1<{case %arch "Windows" "Is Windows" "MSDOS" "Is MSDOS" "Is Unix"}>2', '1Is Unix2');
 
 print "\nTest result: ", $tests_ok, '/', $tests, ' (', ($tests_ok / $tests) * 100, "%)\n";
 
