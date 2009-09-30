@@ -41,10 +41,10 @@ sub parse {
 
 	while ($$seq) {
 		# delete comments
-		while ($$seq =~ s/^\s*#[^\n]+\n\s*//) {
+		if ($$seq =~ s/^#.*$//gm) {
+			$$seq =~ s/^\s+//;
 		}
-
-		if ($$seq =~ s/^(@?)"(([^"\\]*(\\.[^"\\]*)*))"\s*//) {
+		elsif ($$seq =~ s/^(@?)"(([^"\\]*(\\.[^"\\]*)*))"\s*//) {
 			# double quoted string
 			my $op =	$1 || '"';
 			my $str =	$2;
