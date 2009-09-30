@@ -37,6 +37,7 @@ try('1<{#}>2', '12');
 try('1<{#this is a comment}>2', '12');
 try('1<{#this is a comment "hello"}>2', '12');
 try("1<{#this is a comment\n'hello'}>2", '1hello2');
+try("1<{'hi'#this is a comment\n'hello'}>2", '1hihello2');
 try('1<{"hello"}>2', '1hello2');
 try("1<{'hello'}>2", '1hello2');
 try('1<{"hello\n"}>2', "1hello\n2");
@@ -77,7 +78,7 @@ try('1<{foreach {sort ary3 {add 100 $0}}}>2', '1123792');
 try('1<{case %arch "Windows" "Is Windows" "Unix" "Is Unix"}>2', '1Is Unix2');
 try('1<{case %arch "Windows" "Is Windows" "MSDOS" "Is MSDOS" "Is Unix"}>2', '1Is Unix2');
 
-print "\nTest result: ", $tests_ok, '/', $tests, ' (', ($tests_ok / $tests) * 100, "%)\n";
+print "\nTesting success: ", $tests_ok, '/', $tests, ' (', ($tests_ok / $tests) * 100, "%)\n";
 
 exit 0;
 
