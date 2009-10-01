@@ -16,8 +16,6 @@ Pending Enhancements
 
  * 1000: Add a new clear_cache() function to delete cache entries older
    than a specified number of days.
- * 1006: Add optional blocks to foreach() to be returned whenever
-   some of the parameters change.
 
 Closed
 ------
@@ -42,5 +40,7 @@ Closed
    (Footers deleted by now; Tue, 03 Feb 2009 10:25:08 +0100).
  * 1011: Test for 'defined' and not for 'true' in the value returned
    from the loader_func (Fri, 31 Jul 2009 11:27:35 +0200).
+ * 1006: Add optional blocks to foreach() to be returned whenever
+   some of the parameters change (Thu, 01 Oct 2009 10:51:48 +0200).
 
 Email bugs to angel@triptico.com
