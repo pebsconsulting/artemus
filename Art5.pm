@@ -47,8 +47,8 @@ sub parse {
 		}
 		elsif ($$seq =~ s/^(@?)"(([^"\\]*(\\.[^"\\]*)*))"\s*//) {
 			# double quoted string
-			my $op =	$1 || '"';
-			my $str =	$2;
+			my $op	= $1 || '"';
+			my $str	= $2;
 
 			# replace usual escaped characters
 			$str =~ s/\\n/\n/g;
@@ -61,8 +61,8 @@ sub parse {
 		}
 		elsif ($$seq =~ s/^(@?)'(([^'\\]*(\\.[^'\\]*)*))'\s*//) {
 			# single quoted string
-			my $op =	$1 || '"';
-			my $str =	$2;
+			my $op	= $1 || '"';
+			my $str	= $2;
 
 			$str =~ s/\\'/\'/g;
 			$str =~ s/\\\\/\\/g;
