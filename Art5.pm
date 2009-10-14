@@ -285,7 +285,16 @@ sub init {
 
 	# joiner
 	$self->{op}->{'?'} = sub {
+		if (scalar(@_) == 1) {
+			return $self->exec($_[0]);
+		}
+
 		return join('', map { $self->exec($_); } @_);
+	};
+
+	# array
+	$self->{op}->{'&'} = sub {
+		return [ map { $self->exec($_); } @_ ];
 	};
 
 	# assignation
