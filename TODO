@@ -4,7 +4,12 @@ Artemus TODO / Bug List
 Release Critical Bugs
 ---------------------
 
- * 1007: Find a way to manage lists from Art5 code.
+ * 1007: Find a way to manage lists from Art5 source code (maybe
+   implementing a split function).
+ * 1012: When a template includes only an Art5 call that returns
+   a list (for example, Gruta's `cfg_main_menu_topics' that include
+   just a call to `topics'), the result should not be concatenated,
+   but returned as is.
 
 Open Bugs
 ---------
