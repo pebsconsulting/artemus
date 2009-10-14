@@ -378,13 +378,10 @@ sub init {
 		my @ret = ();
 		my $ph = '';
 
-		# create a stack for the elements
-		push(@{$self->{stack}}, []);
-
 		foreach my $e (@{$self->exec($list)}) {
-			# store the element in the stack
-			$self->{stack}->[-1] =
-				ref($e) ? $e : [ $e ];
+			# create a stack for the elements
+			# and store the element in the stack
+			push(@{$self->{stack}}, ref($e) ? $e : [ $e ]);
 
 			# execute the header code
 			my $o = $self->exec($header);
@@ -403,10 +400,10 @@ sub init {
 			$o .= $self->exec($code);
 
 			push(@ret, $o);
-		}
 
-		# destroy last stack
-		pop(@{$self->{stack}});
+			# destroy last stack
+			pop(@{$self->{stack}});
+		}
 
 		return join($self->exec($sep), @ret);
 	};
