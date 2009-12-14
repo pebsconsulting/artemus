@@ -4,8 +4,6 @@ Artemus TODO / Bug List
 Release Critical Bugs
 ---------------------
 
- * 1007: Find a way to manage lists from Art5 source code (maybe
-   implementing a split function).
  * 1012: When a template includes only an Art5 call that returns
    a list (for example, Gruta's `cfg_main_menu_topics' that include
    just a call to `topics'), the result should not be concatenated,
@@ -47,5 +45,8 @@ Closed
    from the loader_func (Fri, 31 Jul 2009 11:27:35 +0200).
  * 1006: Add optional blocks to foreach() to be returned whenever
    some of the parameters change (Thu, 01 Oct 2009 10:51:48 +0200).
+ * 1007: Find a way to manage lists from Art5 source code (maybe
+   implementing a split function)
+   (No, implemented with the '&' keyword; Mon, 14 Dec 2009 16:20:42 +0100).
 
 Email bugs to angel@triptico.com
