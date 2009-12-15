@@ -8,6 +8,9 @@ Release Critical Bugs
    a list (for example, Gruta's `cfg_main_menu_topics' that include
    just a call to `topics'), the result should not be concatenated,
    but returned as is.
+ * 1013: Find a solution to translateable strings; an automatic
+   extractor (ala xgettext) and a way to define the translation
+   tables.
 
 Open Bugs
 ---------
@@ -17,8 +20,7 @@ None!
 Pending Enhancements
 --------------------
 
- * 1000: Add a new clear_cache() function to delete cache entries older
-   than a specified number of days.
+None!
 
 Closed
 ------
@@ -48,5 +50,8 @@ Closed
  * 1007: Find a way to manage lists from Art5 source code (maybe
    implementing a split function)
    (No, implemented with the '&' keyword; Mon, 14 Dec 2009 16:20:42 +0100).
+ * 1000: Add a new clear_cache() function to delete cache entries older
+   than a specified number of days (This was a version <= 4 problem, 
+   version 5 do not have a cache by now); Tue, 15 Dec 2009 11:50:03 +0100).
 
 Email bugs to angel@triptico.com
