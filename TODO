@@ -11,6 +11,7 @@ Release Critical Bugs
  * 1013: Find a solution to translateable strings; an automatic
    extractor (ala xgettext) and a way to define the translation
    tables.
+ * 1014: Document Art5.
 
 Open Bugs
 ---------
