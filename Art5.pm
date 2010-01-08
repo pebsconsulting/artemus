@@ -499,6 +499,10 @@ sub new {
 
 	$self->{path} ||= [];
 
+	if ($self->{cache}) {
+		mkdir $self->{cache};
+	}
+
 	return $self->init();
 }
 
