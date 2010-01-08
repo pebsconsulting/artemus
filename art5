@@ -23,7 +23,7 @@ if (!defined($s)) {
 	$s = join('', <>);
 }
 
-my $a = Art5->new( path => \@path);
+my $a = Art5->new( path => \@path, cache => '/tmp/art5/');
 
 my $c = $a->compile($s);
 

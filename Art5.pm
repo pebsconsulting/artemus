@@ -193,6 +193,14 @@ sub code {
 		# compile if available
 		if (defined($src)) {
 			$self->{op}->{$op} = $self->compile($src);
+
+			# if there is a cache directory, save the compiled code
+			if ($self->{cache} and open(F, '>' . $self->{cache} . $op)) {
+				use Data::Dumper;
+
+				print F Dumper($self->{op}->{$op});
+				close F;
+			}
 		}
 	}
 
