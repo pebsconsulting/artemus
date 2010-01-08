@@ -181,7 +181,19 @@ sub code {
 			# try to resolve by loading
 			# a source file from the path
 			foreach my $p (@{$self->{path}}) {
-				if (open(F, $p . '/' . $op)) {
+				my $fp = $p . '/' . $op;
+
+				# does a precompiled script already exist?
+				if ($self->{cache} && -f $fp &&
+					-M ($self->{cache} . $op) < -M $fp) {
+					# it does and it's fresh; import wildly
+					$self->{op}->{$op} =
+						eval "require '" . $self->{cache} . $op . "'";
+					last;
+				}
+
+				# load the source
+				if (open(F, $fp)) {
 					$src = join('', <F>);
 					close F;
 
