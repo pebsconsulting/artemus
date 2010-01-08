@@ -12,6 +12,9 @@ Release Critical Bugs
    extractor (ala xgettext) and a way to define the translation
    tables.
  * 1014: Document Art5.
+ * 1015: A cache has been implemented, but it does not work for templates
+   read using the 'loader_func' (as it cannot find the filenames to check
+   dates to compare), so it's not useful for Gruta.
 
 Open Bugs
 ---------
