@@ -184,12 +184,14 @@ sub code {
 				my $fp = $p . '/' . $op;
 
 				# does a precompiled script already exist?
-				if ($self->{cache} && -f $fp &&
-					-M ($self->{cache} . $op) < -M $fp) {
-					# it does and it's fresh; import wildly
-					$self->{op}->{$op} =
-						eval "require '" . $self->{cache} . $op . "'";
-					last;
+				if ($self->{cache} && -f $fp) {
+					my $cp = $self->{cache} . $op;
+
+					if (-f $cp && -M $cp < -M $fp) {
+						# it does and it's fresh; import wildly
+						$self->{op}->{$op} = eval "require '$cp'";
+						last;
+					}
 				}
 
 				# load the source
