@@ -491,6 +491,11 @@ sub init {
 	$self->{op}->{size} = sub { return scalar @{$self->exec($_[0])} };
 
 	$self->{op}->{split} = sub {
+		if (scalar(@_) == 3) {
+			return [ map { [ split($self->exec($_[1]), $_) ] }
+					split($self->exec($_[0]), $self->exec($_[2]))
+				];
+		}
 		return [ split($self->exec($_[0]), $self->exec($_[1])) ];
 	};
 
