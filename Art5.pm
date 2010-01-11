@@ -490,6 +490,10 @@ sub init {
 
 	$self->{op}->{size} = sub { return scalar @{$self->exec($_[0])} };
 
+	$self->{op}->{split} = sub {
+		return [ split($self->exec($_[0]), $self->exec($_[1])) ];
+	};
+
 	$self->{xh}->{arch} = 'Unix';
 
 	return $self;
