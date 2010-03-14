@@ -14,6 +14,9 @@ while ($v = shift(@ARGV)) {
 	elsif ($v eq '-I') {
 		push(@path, shift(@ARGV));
 	}
+	elsif ($v eq '-l') {
+		update_lang();
+	}
 	else {
 		# script name
 	}
@@ -37,3 +40,50 @@ else {
 }
 
 exit 0;
+
+sub update_lang
+# updates all language files
+{
+	my @lang = glob("lang_*");
+
+	if (scalar(@lang) == 0) {
+		print "Error: no lang_* files.\n";
+		exit 1;
+	}
+
+	# read now all templates in the current directory
+	# searching for translateable strings
+	my %h = ();
+
+	foreach my $t (glob("*")) {
+		# skip language files themselves
+		if ($t =~ /lang_.*$/) {
+			next;
+		}
+
+		# read template
+		if (open F, $t) {
+			my $l;
+
+			while ($l = <F>) {
+				my @s = ($l =~ /@\"([^\"]+)"/g);
+
+				foreach my $s (@s) {
+					$h{$s}++;
+				}
+			}
+
+			close F;
+		}
+	}
+
+	# now all keys in the templates must be
+	# merged into each language file
+	# ...
+
+	foreach my $k (keys(%h)) {
+		print $k, "\n";
+	}
+
+	exit 0;
+}
