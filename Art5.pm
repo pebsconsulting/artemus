@@ -327,6 +327,18 @@ sub init {
 		return '';
 	};
 
+	# list of translation pairs
+	$self->{op}->{'T'} = sub {
+		while (scalar(@_) > 1) {
+			my $k = $self->exec(shift);
+			my $v = $self->exec(shift);
+
+			$self->{t}->{$k} = $v;
+		}
+
+		return '';
+	};
+
 	$self->{op}->{eq} = sub {
 		$self->exec($_[0]) eq
 			$self->exec($_[1]) ? 1 : 0;

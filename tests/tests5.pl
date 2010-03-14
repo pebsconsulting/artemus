@@ -78,6 +78,7 @@ try('1<{foreach {sort ary3 {add 100 $0}}}>2', '1123792');
 try('1<{case %arch "Windows" "Is Windows" "Unix" "Is Unix"}>2', '1Is Unix2');
 try('1<{case %arch "Windows" "Is Windows" "MSDOS" "Is MSDOS" "Is Unix"}>2', '1Is Unix2');
 try("1<{foreach {& 1 2 3 4}}>2", "112342");
+try('1<{T @"this" "esto" }><{@"this"}>2', "1esto2");
 
 print "\nTesting success: ", $tests_ok, '/', $tests, ' (', ($tests_ok / $tests) * 100, "%)\n";
 
