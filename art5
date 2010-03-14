@@ -77,12 +77,29 @@ sub update_lang
 		}
 	}
 
+	my $a = Art5->new( path => ['.']);
+
 	# now all keys in the templates must be
 	# merged into each language file
 	# ...
 
-	foreach my $k (keys(%h)) {
-		print $k, "\n";
+	foreach my $l (@lang) {
+		print "Rebulding $l...\n";
+
+		# load and execute this template file
+		my $c = $a->code($l);
+		$a->exec($c);
+
+		open F, ">$l";
+
+		print F "<{T\n";
+		foreach my $k (sort keys(%h)) {
+			print F "\"$k\" \n";
+			print F "\"", ($a->{t}->{$k} || ''), "\"\n\n";
+		}
+		print F "}>\n";
+
+		close F;
 	}
 
 	exit 0;
