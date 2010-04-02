@@ -5,6 +5,7 @@ use Art5;
 my $dump = 0;
 my $v, $s;
 my @path = ();
+my $cache = undef;
 
 # raw argument parsing
 while ($v = shift(@ARGV)) {
@@ -13,6 +14,9 @@ while ($v = shift(@ARGV)) {
 	}
 	elsif ($v eq '-I') {
 		push(@path, shift(@ARGV));
+	}
+	elsif ($v eq '-c') {
+		$cache = shift(@ARGV);
 	}
 	elsif ($v eq '-l') {
 		update_lang();
@@ -26,7 +30,7 @@ if (!defined($s)) {
 	$s = join('', <>);
 }
 
-my $a = Art5->new( path => \@path, cache => '/tmp/art5/');
+my $a = Art5->new( path => \@path, cache => $cache);
 
 my $c = $a->compile($s);
 
