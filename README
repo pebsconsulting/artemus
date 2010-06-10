@@ -16,6 +16,8 @@ untouched) and concatenating everything as output. Its main purpose is
 to filter HTML files, but it can be used for any scripting need related
 to text filtering and substitution.
 
+The distribution includes a Perl module and a command line utility.
+
 Available documentation
 -----------------------
 
