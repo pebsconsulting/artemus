@@ -6,7 +6,6 @@ artemus - Text substitution tool and much more
 
 =head1 SYNOPSIS
 
- # substitutes text
  artemus -i|--input={input file} -o|--output={output file}
 	[-c|--conf={config file}]
 	[-p|--paragraph={paragraph_separator}]
