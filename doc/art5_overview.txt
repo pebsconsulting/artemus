@@ -1,6 +1,223 @@
-The Artemus 5.x Templating Language Overview
-============================================
+Artemus 5 Templating Language Overview
+======================================
 
+Artemus is a template toolkit. It filters text files, parsing, compiling
+and executing code surrounded by special marks (leaving the rest
+untouched) and concatenating everything as output. Its main purpose is
+to filter HTML files, but it can be used for any scripting need related
+to text filtering and substitution.
+
+Basic Syntax
+------------
+
+The Artemus 5 parser expects its code to be between the <{ and }> markers,
+passing the rest of its input as is.
+
+This will be output with no modification:
+
+ This is a text.
+ It includes no Art5 markup,
+ so it will pass through unmodified.
+
+Artemus 5 tokens must be separated by freely distributed blanks (spaces,
+tabs or newlines). If a single token is found, it's accepted to be a
+template to be called. Templates can be found on disk as regular files
+(where they will be recursively compiled), in memory as builting operators
+or functions (that will be discussed later), or as variables defined inside
+the Art5 program flow.
+
+Direct template file inclusion:
+
+ This is a text.
+ If the current directory is in the path and
+ a README file exists there, it will be directly included.
+ 
+ README file:
+ <{README}>
+
+Builting functions:
+
+ This is another example.
+ The sum of 2 plus 3 is <{add 2 3}>,
+ that will output "The sum of 2 plus 3 is 5".
+
+Assignation and variable usage:
+
+ This is another example.
+ The TEST variable is assigned. <{= 'TEST' 'This is a test' }>
+ (Note that the above code do not generate any output).
+ And now it's printed: <{TEST}>
+
+Any text from a # symbol to the end of the line is assumed to be a comment
+and is ignored.
+
+ <{
+ # This won't appear in the output and will be ignored
+ }>
+
+A block of code, or a template invocation with arguments, must be
+enclosed in curly brackets. The <{ and }> markers also work as code
+block enclosers.
+
+Look how a `mul' (multiply) operation must be set in a code stream:
+
+ V and A are variables.
+ <{"Voltage: " V "Current: " A "Power: " {mul V A}}>
+
+In a code block, the first argument must always be an opcode, being it a
+builtin operator or a template name. But, if a literal is found, the
+default opcode `?' (concatenate) is assumed. So, the following example
+is exactly the same as the previous one:
+
+ <{? "Voltage: " V "Current: " A "Power: " {mul V A}}>
+
+Variables and data types
+------------------------
+
+Assignation to variables can be done by using the `=' operator:
+
+ <{= 'email' 'angel@triptico.com' # assign }>
+ Artemus author's email is <{email}>.
+
+From that moment on, the `email' variable can be used as a template.
+
+Strings
+~~~~~~~
+
+Strings can be specified in two ways: by enclosing them in double quotes,
+where backslash-prefixed codes are accepted (like \n, as in C or Perl),
+or by enclosing in single quotes, where they are parsed verbatim.
+
+ <{ "This is\na test" # Output is two lines }>
+ <{ 'This is\na test' # Output is one line, \n is printed }>
+
+Translateable strings
+~~~~~~~~~~~~~~~~~~~~~
+
+A translateable string is one that will be internally translated just
+before output. They are like double quoted strings, but prefixed by
+the `@' symbol.
+
+ <{ @"Monday" }>
+
+The special `T' operator can be used to define sets of translateable
+strings. For example, this code snippets translate weekday names from
+english to spanish:
+
+ <{T
+ "Monday"    "lunes"
+ "Tuesday"   "martes"
+ "Wednesday" "miercoles"
+ "Thursday"  "jueves"
+ "Friday"    "viernes"
+ "Saturday"  "sabado"
+ "Sunday"    "domingo"
+ }>
+
+So the <{ @"Monday" }> code above will output `lunes'.
+
+The `art5' command line tool includes an option to generate translate
+code files from a set of templates on disk. Any file matching `lang_*'
+will be refreshed to include all translateable strings ready to be
+edited. To start with new language file, just create an empty one.
+
+Arrays
+~~~~~~
+
+Arrays can be defined by using the `&' opcode.
+
+ <{= 'weekdays'
+     {&  "Monday" "Tuesday" "Wednesday" "Thursday"
+         "Friday" "Saturday" "Sunday" }
+  }>
+
+Arrays can be later used in `foreach' loops and such.
+
+Arguments
+~~~~~~~~~
+
+Any included template can be called with arguments. For example:
+
+ <{ link 'http://triptico.com/software/artemus.html' 'Artemus Home Page' }>
+
+The `link' template will access its arguments as numbers prefixed by the `$'
+sign, as in the example:
+
+ <{ # generate an link
+ <a href = "$0">$1</a>
+ }>
+
+External hash elements
+~~~~~~~~~~~~~~~~~~~~~~
+
+When Artemus 5 is used as a library inside an application, an external hash
+can be provided at startup. The values for this hash can be accessed by
+prefixing them with the `%' sign. For example, in the Gruta Content
+Management System, the external hash is filled with the CGI arguments.
+
+ The topic is <{%topic}>.
+
+In the `art5' command line tool, though, the external hash only has a
+key/value pair, `arch', containing the system architecture (most probably
+the "Unix" string).
+
+ The current architecture on this system is <{%arch}>.
+
+Conditional and looping constructs
+----------------------------------
+
+if
+~~
+
+The `if' opcode can be used for conditional output. It has two mandatory
+arguments, the condition and the output if true:
+
+ <{if accepted "Operation was accepted" # accepted should return 1 or 0 }>
+
+It also accepts an optional third argument, to be output if the condition
+is false:
+
+ Operation <{if accepted "was accepted" "was NOT accepted"}>.
+
+As discussed above, if any of the three code blocks contain more than one
+opcode or one with arguments, they must be enclosed by curly brackets:
+
+ Error msg: <{if {eq msg "OK"} "All OK" "Something bad happened"}>
+
+ <{if {eq %user "anonymous"}
+ 		"No user logged" {"User " %user " logged in"}
+ }>
+
+foreach
+~~~~~~~
+
+case
+~~~~
+
+Builtins
+--------
+
+String comparisons
+~~~~~~~~~~~~~~~~~~
+
+Numerical comparisons
+~~~~~~~~~~~~~~~~~~~~~
+
+Boolean operators
+~~~~~~~~~~~~~~~~~
+
+Array manipulation
+~~~~~~~~~~~~~~~~~~
+
+sort, reverse, size, split
+
+Math operators
+~~~~~~~~~~~~~~
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+env, random
 
 
 ----
