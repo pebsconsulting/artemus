@@ -1,6 +1,18 @@
 Artemus Release Notes
 =====================
 
+5.0.0
+-----
+
+ * New milestone release. The Artemus language has been
+   completely rewritten to be a LISP-like, compiled
+   machine. No backward compatibility is provided (other
+   than including the old 4.x module in the distribution).
+   The new 5.x language is faster, more flexible, less
+   cumbersome (for example, there's no need for escaping
+   inner blocks that should execute only conditionally)
+   and include support for translateable strings.
+
 4.1.3
 -----
 
