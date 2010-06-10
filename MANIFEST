@@ -10,5 +10,5 @@ artemus_cmd.pod
 TODO
 RELEASE_NOTES
 README
-tests/
-doc/
+tests/tests5.pl
+doc/art5_overview.txt
