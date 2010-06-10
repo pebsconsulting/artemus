@@ -590,9 +590,9 @@ accept two numbers and returns the average:
  };
 
 The external hash can similarly accessed by tweaking the C<xh>
-component:
+component. In this example, the running program process id will be
+accesible as %pid:
 
- # Current process id will be accesible as %pid
  $art5->{xh}->{pid} = $!;
 
 =head1 FUNCTIONS AND METHODS
