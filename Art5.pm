@@ -543,3 +543,115 @@ sub new {
 
 1;
 __END__
+=pod
+
+=head1 NAME
+
+Art5 - Template Toolkit
+
+=head1 SYNOPSIS
+
+ use Art5;
+ 
+ # creates a new object
+ my $art5 = Art5->new(path => \@path_to_templates);
+ 
+ # compiles and executes a string of Art5 code
+ my $r = $art5->process($source_code);
+
+=head1 DESCRIPTION
+
+Artemus is a template toolkit. It filters text files, parsing, compiling
+and executing code surrounded by special marks (leaving the rest
+untouched) and concatenating everything as output. Its main purpose is
+to filter HTML files, but it can be used for any scripting need related
+to text filtering and substitution.
+
+The main purpose of the Art5 API is to add your own functions to the
+Art5 machine to make them part of the programming language. For more
+information on the Art5 Templating Language, please see the included
+L<art5_overview> document.
+
+This can be done by adding code to the C<op> component of the Art5
+object. For example, this is a way to add a C<localtime> function to
+Art5:
+
+ $art5->{op}->{localtime} = sub { return localtime(); };
+
+Art5 functions can also accept arguments. They arrive as code streams
+that must be executed before use. For example, this is a function that
+accept two numbers and returns the average:
+
+ $art5->{op}->{avg} = sub {
+          my $v1 = shift;
+          my $v2 = shift;
+ 
+          return ($art5->exec($v1) + $art5->exec($v2)) / 2;
+ };
+
+The external hash can similarly accessed by tweaking the C<xh>
+component:
+
+ # Current process id will be accesible as %pid
+ $art5->{xh}->{pid} = $!;
+
+=head1 FUNCTIONS AND METHODS
+
+=cut
+
+=head2 new
+
+ $art5 = Art5->new(
+    [ path        => \@directories, ]
+    [ cache       => $directory, ]
+    [ loader_func => \&function, ]
+ );
+
+Creates a new Art5 object. The object creation accepts the following
+arguments:
+
+=head3 path
+
+A reference to a list of directories where templates are to be found.
+
+=head3 cache
+
+A directory path where compiled templates are to be cached. These compiled
+templates are raw Data::Dumper output of the compiled stream, and are
+loaded back with simple C<eval()>, so take B<extreme care>.
+
+=head3 loader_func
+
+A pointer to a function to be called whenever a new template is queried
+by the underlying system. This function should return the content of a
+template or undef if not found. This mechanism is used to have an external
+storage for templates (as in a SQL Database, for example). Take note that
+templates retrived this way cannot be cached (this defect will eventually
+be solved).
+
+This function is called before any search in the L<path>.
+
+=head2 process
+
+ my $ret_val = $art->process($art5_code);
+
+Compiles a string of Art5 code, executes it and returns the exit
+value.
+
+=head2 compile
+
+ my $opcode_stream = $art5->compile($art5_code);
+
+Reads a string of Art5 code and returns a compiled stream.
+
+=head2 exec
+
+ my $ret_val = $art5->exec($opcode_stream);
+
+Executes a compiled stream (returned by C<compile()>) and returns
+the exit value.
+
+=head1 AUTHOR
+
+Angel Ortega angel@triptico.com
+
