@@ -4,19 +4,18 @@ Artemus TODO / Bug List
 Release Critical Bugs
 ---------------------
 
- * 1012: When a template includes only an Art5 call that returns
-   a list (for example, Gruta's `cfg_main_menu_topics' that include
-   just a call to `topics'), the result should not be concatenated,
-   but returned as is.
  * 1014: Document Art5.
- * 1015: A cache has been implemented, but it does not work for templates
-   read using the 'loader_func' (as it cannot find the filenames to check
-   dates to compare), so it's not useful for Gruta.
 
 Open Bugs
 ---------
 
-None!
+ * 1012: When a template includes only an Art5 call that returns
+   a list (for example, Gruta's `cfg_main_menu_topics' that include
+   just a call to `topics'), the result should not be concatenated,
+   but returned as is.
+ * 1015: A cache has been implemented, but it does not work for templates
+   read using `loader_func' (as it cannot find the filenames to check
+   dates to compare), so it's not useful for Gruta.
 
 Pending Enhancements
 --------------------
