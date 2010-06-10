@@ -4,7 +4,7 @@ Artemus TODO / Bug List
 Release Critical Bugs
 ---------------------
 
- * 1014: Document Art5.
+ * 1016: Document the Art5 API.
 
 Open Bugs
 ---------
@@ -57,5 +57,6 @@ Closed
    extractor (ala xgettext) and a way to define the translation
    tables (included as part of the `art5' utility;
    Sun, 14 Mar 2010 17:34:28 +0100).
+ * 1014: Document the Art5 language (Thu, 10 Jun 2010 17:02:48 +0200).
 
 Email bugs to angel@triptico.com
