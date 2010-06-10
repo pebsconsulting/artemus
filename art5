@@ -21,6 +21,9 @@ while ($v = shift(@ARGV)) {
 	elsif ($v eq '-l') {
 		update_lang();
 	}
+	elsif ($v eq '-h') {
+		usage();
+	}
 	else {
 		# script name
 	}
@@ -44,6 +47,8 @@ else {
 }
 
 exit 0;
+
+
 
 sub update_lang
 # updates all language files
@@ -105,6 +110,35 @@ sub update_lang
 
 		close F;
 	}
+
+	exit 0;
+}
+
+
+sub usage {
+	print <<EOF;
+
+Artemus 5 Command Line Interpreter
+Copyright (C) 2000/2010 Angel Ortega <angel\@triptico.com>
+
+Usage:
+
+art5 [options]
+
+Options
+-------
+
+ -d       Do not execute the compiled code, but dump it (using
+          Data::Dumper).
+ -I {dir} Add {dir} to the template search path.
+ -c {dir} Use {dir} as a folder to store caching information.
+ -l       Reads all templates in the current directory, extracts all
+          translateable strings and updates all templates matching
+          'lang_*' with them. To start with a new language, just
+          create an empty language file.
+ -h       Show this help.
+
+EOF
 
 	exit 0;
 }

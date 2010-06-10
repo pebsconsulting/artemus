@@ -9,4 +9,6 @@ art5
 artemus_cmd.pod
 TODO
 RELEASE_NOTES
+README
 tests/
+doc/

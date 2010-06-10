@@ -1,0 +1,30 @@
+Artemus README
+==============
+
+ Artemus - A template toolkit
+ Copyright (C) 2000/2010 Angel Ortega <angel@triptico.com>
+ Home Page: http://triptico.com/software/artemus.html
+
+This software is GPL. NO WARRANTY. See file 'COPYING' for details.
+
+Intro
+-----
+
+Artemus is a template toolkit. It filters text files, parsing, compiling
+and executing code surrounded by special marks (leaving the rest
+untouched) and concatenating everything as output. Its main purpose is
+to filter HTML files, but it can be used for any scripting need related
+to text filtering and substitution.
+
+Available documentation
+-----------------------
+
+The following documents are included in this package:
+
+ * art5_overview: Artemus 5.x Templating Language Overview.
+ * Art5: (Perl Module) 5.x API Documentation.
+ * Artemus4: (Perl Module) 4.x API and Specification Documentation.
+ * artemus_cmd: 4.x command line tool.
+
+----
+Angel Ortega <angel@triptico.com>
