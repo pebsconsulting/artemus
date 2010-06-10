@@ -337,7 +337,7 @@ Miscellaneous
 
 The `env' opcode returns the value of an environment variable; if no
 argument is given, the full set of existing environment variables will
-be returned as an array of two element arrays.
+be returned as an array.
 
 The `random' opcode accepts an arbitrary number of arguments and returns
 one of them, at random.

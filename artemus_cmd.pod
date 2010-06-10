@@ -19,18 +19,17 @@ being B<value> the destination text, that can have parameters. The macro is
 included in the source file between the B<{-> and B<}> marks. The (possible)
 parameters are delimited by the B<|> symbol.
 
-=for html <->
-
 Examples:
 
 In F<artemus.conf> file:
 
+ 
  # some simple definitions
  Perl=<a href="http://www.perl.com">Perl</a>
  LWN=<a href="http://www.lwn.net">Linux Weekly News</a>
  separator=<br><hr><br>
  head=<html><body bgcolor=ffffff>
-
+ 
  # definitions with parameters
  # generic link
  link=<a href="http://$1">$0</a>
