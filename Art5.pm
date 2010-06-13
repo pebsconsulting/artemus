@@ -589,6 +589,11 @@ accept two numbers and returns the average:
           return ($art5->exec($v1) + $art5->exec($v2)) / 2;
  };
 
+Art5 functions always have to return something. If you have nothing to
+return, use an empty string. If an array must be returned (for example,
+to be feed to C<foreach>, return a reference to it (not the array
+itself).
+
 The external hash can similarly accessed by tweaking the C<xh>
 component. In this example, the running program process id will be
 accesible as %pid:

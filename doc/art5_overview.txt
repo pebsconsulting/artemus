@@ -48,6 +48,9 @@ Assignation and variable usage:
  (Note that the above code do not generate any output).
  And now it's printed: <{TEST}>
 
+Please take note that, on assignation, the name of the variable to be
+assigned *must* be enclosed by quotes, as if it was a string literal.
+
 Any text from a # symbol to the end of the line is assumed to be a comment
 and is ignored.
 
