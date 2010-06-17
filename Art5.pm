@@ -30,7 +30,7 @@ use strict;
 use warnings;
 use Carp;
 
-$Art5::VERSION = '5.0.0';
+$Art5::VERSION = '5.0.1-dev';
 
 sub parse {
 	my $self	= shift;
@@ -282,7 +282,7 @@ sub init {
 	$self->{op}->{VERSION} = [ '"', $Art5::VERSION ];
 
 	$self->{op}->{VERSION_STR} = [
-		'?', 'Artemus ', [ 'VERSION' ]
+		'?', [ '"', 'Artemus ' ], [ 'VERSION' ]
 	];
 
 	# literal
