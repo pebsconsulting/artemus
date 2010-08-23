@@ -1,6 +1,14 @@
 Artemus Release Notes
 =====================
 
+5.0.1
+-----
+
+ * The %% keyword returns the full extended hash.
+ * A new function template `dump', to dump an expression
+   using Data::Dumper.
+ * Fixed a bug in processing ARTEMUS_STR.
+
 5.0.0
 -----
 
