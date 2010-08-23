@@ -513,6 +513,12 @@ sub init {
 		return [ split($self->exec($_[0]), $self->exec($_[1])) ];
 	};
 
+	$self->{op}->{dump} = sub {
+		use Data::Dumper;
+
+		return Dumper($self->exec($_[0]));
+	};
+
 	$self->{xh}->{arch} = 'Unix';
 
 	return $self;
