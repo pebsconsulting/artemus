@@ -302,7 +302,9 @@ sub init {
 
 	# external hash (e.g. CGI variables)
 	$self->{op}->{'%'} = sub {
-		return $self->{xh}->{$_[0]};
+		my $var = shift;
+
+		return $var eq '%' ? $self->{xh} : $self->{xh}->{$var};
 	};
 
 	# joiner
