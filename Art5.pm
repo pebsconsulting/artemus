@@ -150,7 +150,7 @@ sub compile {
 			push(@ret, $self->parse(\$p));
 			shift(@stream);
 		}
-		elsif ($p) {
+		elsif (defined $p) {
 			push(@ret, [ '"', $p ]);
 		}
 	}
