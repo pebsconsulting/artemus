@@ -30,7 +30,7 @@ use strict;
 use warnings;
 use Carp;
 
-$Art5::VERSION = '5.0.1';
+$Art5::VERSION = '5.0.2-dev';
 
 sub parse {
 	my $self	= shift;
@@ -223,47 +223,44 @@ sub code {
 
 
 sub exec {
-	my $self	= shift;
-	my $prg		= shift;
-	my $ret;
+    my $self	= shift;
+    my $prg		= shift;
+    my $ret;
 
-	# aborted or empty? do nothing more
-	if (!ref($prg) || $self->{abort}) {
-		return '';
-	}
-
-	# stream of Artemus5 code
-	my @stream = @{$prg};
-
-	# pick opcode
-	my $op = shift(@stream);
-
-	# pick code
-	my $c = $self->code($op);
-
-	if (ref($c) eq 'CODE') {
-		$ret = $c->(@stream);
-	}
-	elsif (ref($c) eq 'ARRAY') {
-		# push the arguments to the stack
-		push(@{$self->{stack}},
-			[ map { $self->exec($_); }
-				@stream ]);
-
-		$ret = $self->exec($c);
-
-		# drop stack
-		pop(@{$self->{stack}});
-	}
-	else {
-		croak "Artemus5 opcode not found: $op";
-	}
-
-	if (!defined($ret)) {
-		$ret = '';
-	}
-
-	return $ret;
+    if (ref($prg) && !$self->{abort}) {
+        # stream of Artemus5 code
+        my @stream = @{$prg};
+    
+        # pick opcode
+        my $op = shift(@stream);
+    
+        # pick code
+        my $c = $self->code($op);
+    
+        if (ref($c) eq 'CODE') {
+            $ret = $c->(@stream);
+        }
+        elsif (ref($c) eq 'ARRAY') {
+            # push the arguments to the stack
+            push(@{$self->{stack}},
+                [ map { $self->exec($_); }
+                    @stream ]);
+    
+            $ret = $self->exec($c);
+    
+            # drop stack
+            pop(@{$self->{stack}});
+        }
+        else {
+            croak "Artemus5 opcode not found: $op";
+        }
+    }
+   
+    if (!defined($ret)) {
+        $ret = '';
+    }
+    
+    return $ret;
 }
 
 
