@@ -33,96 +33,96 @@ use Carp;
 $Art5::VERSION = '5.0.2-dev';
 
 sub parse {
-	my $self	= shift;
-	my $seq		= shift;
-	my @ret		= ();
+    my $self	= shift;
+    my $seq		= shift;
+    my @ret		= ();
 
-	# delete leading blanks and a possible brace
-	$$seq =~ s/^\s*\{?\s*//;
+    # delete leading blanks and a possible brace
+    $$seq =~ s/^\s*\{?\s*//;
 
-	while ($$seq) {
-		# delete comments
-		if ($$seq =~ s/^#.*$//gm) {
-			$$seq =~ s/^\s+//;
-		}
-		elsif ($$seq =~ s/^(@?)"(([^"\\]*(\\.[^"\\]*)*))"\s*//) {
-			# double quoted string
-			my $op	= $1 || '"';
-			my $str	= $2;
+    while ($$seq) {
+        # delete comments
+        if ($$seq =~ s/^#.*$//gm) {
+            $$seq =~ s/^\s+//;
+        }
+        elsif ($$seq =~ s/^(@?)"(([^"\\]*(\\.[^"\\]*)*))"\s*//) {
+            # double quoted string
+            my $op	= $1 || '"';
+            my $str	= $2;
 
-			# replace usual escaped characters
-			$str =~ s/\\n/\n/g;
-			$str =~ s/\\r/\r/g;
-			$str =~ s/\\t/\t/g;
-			$str =~ s/\\"/\"/g;
-			$str =~ s/\\\\/\\/g;
+            # replace usual escaped characters
+            $str =~ s/\\n/\n/g;
+            $str =~ s/\\r/\r/g;
+            $str =~ s/\\t/\t/g;
+            $str =~ s/\\"/\"/g;
+            $str =~ s/\\\\/\\/g;
 
-			push(@ret, [ $op, $str ]);
-		}
-		elsif ($$seq =~ s/^(@?)'(([^'\\]*(\\.[^'\\]*)*))'\s*//) {
-			# single quoted string
-			my $op	= $1 || '"';
-			my $str	= $2;
+            push(@ret, [ $op, $str ]);
+        }
+        elsif ($$seq =~ s/^(@?)'(([^'\\]*(\\.[^'\\]*)*))'\s*//) {
+            # single quoted string
+            my $op	= $1 || '"';
+            my $str	= $2;
 
-			$str =~ s/\\'/\'/g;
-			$str =~ s/\\\\/\\/g;
+            $str =~ s/\\'/\'/g;
+            $str =~ s/\\\\/\\/g;
 
-			push(@ret, [ $op, $str ]);
-		}
-		elsif ($$seq =~ s/^(\d+(\.\d+)?)\s*//) {
-			# number
-			push(@ret, [ '"', $1 ]);
-		}
-		elsif ($$seq =~ /^\{\s*/) {
-			# another code sequence
-			push(@ret, $self->parse($seq));
-		}
-		elsif ($$seq =~ s/^\}\s*//) {
-			# end of sequence
-			last;
-		}
-		elsif ($$seq =~ s/^%([^\s\{\}]+)\s*//) {
-			# external hash value
-			push(@ret, [ '%', $1 ]);
-		}
-		elsif ($$seq =~ s/^\$(\d+)\s*//) {
-			# argument
-			push(@ret, [ '$', $1 ]);
-		}
-		elsif ($$seq =~ s/^([^\s\{\}]+)\s*//) {
-			# opcode
+            push(@ret, [ $op, $str ]);
+        }
+        elsif ($$seq =~ s/^(\d+(\.\d+)?)\s*//) {
+            # number
+            push(@ret, [ '"', $1 ]);
+        }
+        elsif ($$seq =~ /^\{\s*/) {
+            # another code sequence
+            push(@ret, $self->parse($seq));
+        }
+        elsif ($$seq =~ s/^\}\s*//) {
+            # end of sequence
+            last;
+        }
+        elsif ($$seq =~ s/^%([^\s\{\}]+)\s*//) {
+            # external hash value
+            push(@ret, [ '%', $1 ]);
+        }
+        elsif ($$seq =~ s/^\$(\d+)\s*//) {
+            # argument
+            push(@ret, [ '$', $1 ]);
+        }
+        elsif ($$seq =~ s/^([^\s\{\}]+)\s*//) {
+            # opcode
 
-			# nothing yet? operator call
-			if (scalar(@ret) == 0) {
-				push(@ret, $1);
-			}
-			else {
-				push(@ret, [ $1 ]);
-			}
-		}
-		else {
-			croak "Artemus5 syntax error near '$$seq'";
-		}
-	}
+            # nothing yet? operator call
+            if (scalar(@ret) == 0) {
+                push(@ret, $1);
+            }
+            else {
+                push(@ret, [ $1 ]);
+            }
+        }
+        else {
+            croak "Artemus5 syntax error near '$$seq'";
+        }
+    }
 
-	# no program? return a NOP */
-	if (!@ret) {
-		return [ '"', '' ];
-	}
+    # no program? return a NOP */
+    if (!@ret) {
+        return [ '"', '' ];
+    }
 
-	# is the first thing in the sequence an array
-	# (instruction) and not a string (opcode)?
-	if (ref($ret[0]) eq 'ARRAY') {
-		# only one instruction? return as is
-		if (scalar(@ret) == 1) {
-			return $ret[0];
-		}
+    # is the first thing in the sequence an array
+    # (instruction) and not a string (opcode)?
+    if (ref($ret[0]) eq 'ARRAY') {
+        # only one instruction? return as is
+        if (scalar(@ret) == 1) {
+            return $ret[0];
+        }
 
-		# otherwise, prepend a '?' (joiner)
-		unshift(@ret, '?');
-	}
+        # otherwise, prepend a '?' (joiner)
+        unshift(@ret, '?');
+    }
 
-	return [ @ret ];
+    return [ @ret ];
 }
 
 
@@ -162,63 +162,63 @@ sub compile {
 
 
 sub code {
-	my $self	= shift;
-	my $op		= shift;
+    my $self	= shift;
+    my $op		= shift;
 
-	if (!exists($self->{op}->{$op})) {
-		my $src = undef;
+    if (!exists($self->{op}->{$op})) {
+        my $src = undef;
 
-		# filter opcode to only allow
-		# characters valid in file names
-		$op =~ s/[^\w\d_-]//g;
+        # filter opcode to only allow
+        # characters valid in file names
+        $op =~ s/[^\w\d_-]//g;
 
-		# does a loader_func() exist?
-		if (ref($self->{loader_func}) eq 'CODE') {
-			$src = $self->{loader_func}->($op);
-		}
+        # does a loader_func() exist?
+        if (ref($self->{loader_func}) eq 'CODE') {
+            $src = $self->{loader_func}->($op);
+        }
 
-		if (!defined($src)) {
-			# try to resolve by loading
-			# a source file from the path
-			foreach my $p (@{$self->{path}}) {
-				my $fp = $p . '/' . $op;
+        if (!defined($src)) {
+            # try to resolve by loading
+            # a source file from the path
+            foreach my $p (@{$self->{path}}) {
+                my $fp = $p . '/' . $op;
 
-				# does a precompiled script already exist?
-				if ($self->{cache} && -f $fp) {
-					my $cp = $self->{cache} . $op;
+                # does a precompiled script already exist?
+                if ($self->{cache} && -f $fp) {
+                    my $cp = $self->{cache} . $op;
 
-					if (-f $cp && -M $cp < -M $fp) {
-						# it does and it's fresh; import wildly
-						$self->{op}->{$op} = eval "require '$cp'";
-						last;
-					}
-				}
+                    if (-f $cp && -M $cp < -M $fp) {
+                        # it does and it's fresh; import wildly
+                        $self->{op}->{$op} = eval "require '$cp'";
+                        last;
+                    }
+                }
 
-				# load the source
-				if (open(F, $fp)) {
-					$src = join('', <F>);
-					close F;
+                # load the source
+                if (open(F, $fp)) {
+                    $src = join('', <F>);
+                    close F;
 
-					last;
-				}
-			}
-		}
+                    last;
+                }
+            }
+        }
 
-		# compile if available
-		if (defined($src)) {
-			$self->{op}->{$op} = $self->compile($src);
+        # compile if available
+        if (defined($src)) {
+            $self->{op}->{$op} = $self->compile($src);
 
-			# if there is a cache directory, save the compiled code
-			if ($self->{cache} and open(F, '>' . $self->{cache} . $op)) {
-				use Data::Dumper;
+            # if there is a cache directory, save the compiled code
+            if ($self->{cache} and open(F, '>' . $self->{cache} . $op)) {
+                use Data::Dumper;
 
-				print F Dumper($self->{op}->{$op});
-				close F;
-			}
-		}
-	}
+                print F Dumper($self->{op}->{$op});
+                close F;
+            }
+        }
+    }
 
-	return $self->{op}->{$op};
+    return $self->{op}->{$op};
 }
 
 
@@ -265,9 +265,9 @@ sub exec {
 
 
 sub exec0 {
-	my $self	= shift;
+    my $self	= shift;
 
-	return $self->exec(@_) || 0;
+    return $self->exec(@_) || 0;
 }
 
 
