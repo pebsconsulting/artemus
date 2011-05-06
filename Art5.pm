@@ -127,37 +127,37 @@ sub parse {
 
 
 sub compile {
-	my $self	= shift;
-	my $str		= shift;
+    my $self	= shift;
+    my $str		= shift;
 
-	# was this code already compiled?
-	if (exists($self->{pc}->{$str})) {
-		return $self->{pc}->{$str};
-	}
+    # was this code already compiled?
+    if (!exists($self->{pc}->{$str})) {
+        # joiner opcode
+        my @ret = ( '?' );
+    
+        # split by the Artemus5 marks
+        my @stream = split(/(<\{|\}>)/, $str);
+    
+        # alternate between literal strings and Artemus5 code
+        while (@stream) {
+            my $p = shift(@stream);
+    
+            if ($p eq '<{') {
+                $p = '{' . shift(@stream) . '}';
+                push(@ret, $self->parse(\$p));
+                shift(@stream);
+            }
+            elsif (defined $p) {
+                push(@ret, [ '"', $p ]);
+            }
+        }
+    
+        my $ret = [ @ret ];
 
-	# joiner opcode
-	my @ret = ( '?' );
-
-	# split by the Artemus5 marks
-	my @stream = split(/(<\{|\}>)/, $str);
-
-	# alternate between literal strings and Artemus5 code
-	while (@stream) {
-		my $p = shift(@stream);
-
-		if ($p eq '<{') {
-			$p = '{' . shift(@stream) . '}';
-			push(@ret, $self->parse(\$p));
-			shift(@stream);
-		}
-		elsif (defined $p) {
-			push(@ret, [ '"', $p ]);
-		}
-	}
-
-	my $ret = [ @ret ];
-
-	return $self->{pc}->{$str} = $ret;
+        $self->{pc}->{$str} = $ret;
+    }
+    
+    return $self->{pc}->{$str};
 }
 
 
