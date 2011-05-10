@@ -227,35 +227,38 @@ sub exec {
     my $prg		= shift;
     my $ret;
 
-    # if it has additonal arguments,
-    # wrap the call in a stack with them
-    if (scalar(@_)) {
-        push(@{$self->{stack}}, [ @_ ]);
-
-        $ret = $self->exec($prg);
-
-        pop(@{$self->{stack}});
-    }
-    elsif (ref($prg) && !$self->{abort}) {
-        # stream of Artemus5 code
-        my @stream = @{$prg};
+    if (ref($prg) && !$self->{abort}) {
+        # if it has additonal arguments,
+        # wrap the call in a stack with them
+        if (scalar(@_)) {
+            push(@{$self->{stack}}, [ @_ ]);
     
-        # pick opcode
-        my $op = shift(@stream);
+            $ret = $self->exec($prg);
     
-        # pick code
-        my $c = $self->code($op);
-    
-        if (ref($c) eq 'CODE') {
-            $ret = $c->(@stream);
-        }
-        elsif (ref($c) eq 'ARRAY') {
-            $ret = $self->exec($c,
-                map { $self->exec($_) } @stream
-            );
+            pop(@{$self->{stack}});
         }
         else {
-            croak "Artemus5 opcode not found: $op";
+            # stream of Artemus5 code
+            my @stream = @{$prg};
+        
+            # pick opcode
+            my $op = shift(@stream);
+        
+            # pick code
+            my $c = $self->code($op);
+        
+            if (ref($c) eq 'CODE') {
+                $ret = $c->(@stream);
+            }
+            elsif (ref($c) eq 'ARRAY') {
+                $ret = $self->exec(
+                    $c,
+                    map { $self->exec($_) } @stream
+                );
+            }
+            else {
+                croak "Artemus5 opcode not found: $op";
+            }
         }
     }
    
