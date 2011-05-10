@@ -1,6 +1,14 @@
 Artemus Release Notes
 =====================
 
+5.0.2
+-----
+
+ - New features:
+   * Both the exec() andf the process() methods accept
+     arguments in its calls that can be referenced with
+     dollar-prefixed arguments as usual.
+
 5.0.1
 -----
 
