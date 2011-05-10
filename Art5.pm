@@ -250,15 +250,9 @@ sub exec {
             $ret = $c->(@stream);
         }
         elsif (ref($c) eq 'ARRAY') {
-            # push the arguments to the stack
-            push(@{$self->{stack}},
-                [ map { $self->exec($_); }
-                    @stream ]);
-    
-            $ret = $self->exec($c);
-    
-            # drop stack
-            pop(@{$self->{stack}});
+            $ret = $self->exec($c,
+                map { $self->exec($_) } @stream
+            );
         }
         else {
             croak "Artemus5 opcode not found: $op";
