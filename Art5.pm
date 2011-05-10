@@ -105,9 +105,9 @@ sub parse {
         }
     }
 
-    # no program? return a NOP */
+    # no program? build a NOP */
     if (!@ret) {
-        return [ '"', '' ];
+        @ret = ('"', '');
     }
 
     # is the first thing in the sequence an array
