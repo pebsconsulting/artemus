@@ -16,7 +16,7 @@ sub try {
 	my $code	= shift;
 	my $expected	= shift;
 
-	my $result = $art5->process($code);
+	my $result = $art5->process($code, @_);
 
 	if ($result eq $expected) {
 		print "OK test: ", $code, "\n";
@@ -79,6 +79,7 @@ try('1<{case %arch "Windows" "Is Windows" "Unix" "Is Unix"}>2', '1Is Unix2');
 try('1<{case %arch "Windows" "Is Windows" "MSDOS" "Is MSDOS" "Is Unix"}>2', '1Is Unix2');
 try("1<{foreach {& 1 2 3 4}}>2", "112342");
 try('1<{T @"this" "esto" }><{@"this"}>2', "1esto2");
+try('<{$0}>+<{$1}>=<{$2}>', '1+2=3', 1, 2, 3);
 
 print "\nTesting success: ", $tests_ok, '/', $tests, ' (', ($tests_ok / $tests) * 100, "%)\n";
 

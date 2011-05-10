@@ -228,6 +228,12 @@ sub exec {
     my $ret;
 
     if (ref($prg) && !$self->{abort}) {
+        # has additional arguments?
+        # push them to the stack
+        if (scalar(@_)) {
+            push(@{$self->{stack}}, [ @_ ]);
+        }
+
         # stream of Artemus5 code
         my @stream = @{$prg};
     
@@ -253,6 +259,12 @@ sub exec {
         }
         else {
             croak "Artemus5 opcode not found: $op";
+        }
+
+        # additional arguments?
+        # pop them from the stack
+        if (scalar(@_)) {
+            pop(@{$self->{stack}});
         }
     }
    
