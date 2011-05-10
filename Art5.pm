@@ -115,11 +115,12 @@ sub parse {
     if (ref($ret[0]) eq 'ARRAY') {
         # only one instruction? return as is
         if (scalar(@ret) == 1) {
-            return $ret[0];
+            @ret = @{$ret[0]};
         }
-
-        # otherwise, prepend a '?' (joiner)
-        unshift(@ret, '?');
+        else {
+            # otherwise, prepend a '?' (joiner)
+            unshift(@ret, '?');
+        }
     }
 
     return [ @ret ];
