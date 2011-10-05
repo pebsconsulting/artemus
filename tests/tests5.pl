@@ -12,7 +12,7 @@ $art5->{op}->{ary2} = sub { [ [1, 'a'], [2, 'b'], [3, 'b'], [4, 'c'] ]; };
 $art5->{op}->{ary3} = sub { [ [3, 'b'], [1, 'a'], [2, 'k'], [9, 'z'], [7, 'q' ]]; };
 $art5->{op}->{link} = sub { "<a href = '" . $art5->exec(shift) . "'>" . $art5->exec(shift) . "</a>"; };
 
-$art5->{op}->{AUTOLOAD} = sub { "Bad opcode '" . $_[0] . "'"};
+$art5->{op}->{AUTOLOAD} = sub { "Bad opcode '" . $art5->exec($_[0]) . "'"};
 
 sub try {
 	my $code	= shift;

@@ -259,7 +259,7 @@ sub exec {
             }
             else {
                 if ($self->code('AUTOLOAD')) {
-                    $ret = $self->exec(['AUTOLOAD', $op]);
+                    $ret = $self->exec(['AUTOLOAD', [ '"', $op]]);
                 }
                 else {
                     croak "Artemus5 opcode not found: $op";
