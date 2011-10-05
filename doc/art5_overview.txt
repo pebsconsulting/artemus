@@ -335,6 +335,15 @@ Math operators
 The `add', `sub', `mul' and `div' exist as their corresponding math
 operators.
 
+Error control
+~~~~~~~~~~~~~
+
+An undefined operator or template name generates a fatal error unless
+an `AUTOLOAD' template is defined. If it is, it's called on errors
+with the offending template name sent as the only argument. This allow
+automatic loading from external sources, code generation on the fly
+or simply returning the error in the output stream.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
