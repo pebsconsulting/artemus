@@ -4,8 +4,6 @@ Artemus TODO / Bug List
 Release Critical Bugs
 ---------------------
 
- * 1017: Fix arguments in direct template assignation.
-
 Open Bugs
 ---------
 
@@ -59,5 +57,7 @@ Closed
    Sun, 14 Mar 2010 17:34:28 +0100).
  * 1014: Document the Art5 language (Thu, 10 Jun 2010 17:02:48 +0200).
  * 1016: Document the Art5 API (Thu, 10 Jun 2010 19:45:36 +0200).
+ * 1017: Fix arguments in direct template assignation
+   (Added new `def' operator for this; Wed, 05 Oct 2011 15:48:43 +0200).
 
 Email bugs to angel@triptico.com

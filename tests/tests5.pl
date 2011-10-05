@@ -83,7 +83,7 @@ try("1<{foreach {& 1 2 3 4}}>2", "112342");
 try('1<{T @"this" "esto" }><{@"this"}>2', "1esto2");
 try('<{$0}>+<{$1}>=<{$2}>', '1+2=3', 1, 2, 3);
 try('<{nonexistent}>', "Bad opcode 'nonexistent'");
-try('<{{= "hi" {? "hello, "}} {hi "dr. chandra"}}>', "hello, dr. chandra");
+try('<{{def "hi" {? "hello, " $0}} {hi "dr. chandra"}}>', "hello, dr. chandra", "error");
 
 print "\nTesting success: ", $tests_ok, '/', $tests, ' (', ($tests_ok / $tests) * 100, "%)\n";
 

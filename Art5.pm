@@ -338,6 +338,13 @@ sub init {
 		return '';
 	};
 
+    # template definition
+    $self->{op}->{def} = sub {
+        $self->{op}->{$self->exec($_[0])} = $_[1];
+
+        return '';
+    };
+
 	# list of translation pairs
 	$self->{op}->{'T'} = sub {
 		while (scalar(@_) > 1) {
