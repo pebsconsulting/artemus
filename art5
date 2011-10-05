@@ -3,7 +3,8 @@
 use Art5;
 
 my $dump = 0;
-my $v, $s;
+my $v;
+my $s;
 my @path = ();
 my $cache = undef;
 

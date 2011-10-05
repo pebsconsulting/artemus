@@ -258,7 +258,12 @@ sub exec {
                 );
             }
             else {
-                croak "Artemus5 opcode not found: $op";
+                if ($self->code('AUTOLOAD')) {
+                    $ret = $self->exec(['AUTOLOAD', $op]);
+                }
+                else {
+                    croak "Artemus5 opcode not found: $op";
+                }
             }
         }
     }

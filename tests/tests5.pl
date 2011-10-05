@@ -12,6 +12,8 @@ $art5->{op}->{ary2} = sub { [ [1, 'a'], [2, 'b'], [3, 'b'], [4, 'c'] ]; };
 $art5->{op}->{ary3} = sub { [ [3, 'b'], [1, 'a'], [2, 'k'], [9, 'z'], [7, 'q' ]]; };
 $art5->{op}->{link} = sub { "<a href = '" . $art5->exec(shift) . "'>" . $art5->exec(shift) . "</a>"; };
 
+$art5->{op}->{AUTOLOAD} = sub { "Bad opcode '" . $_[0] . "'"};
+
 sub try {
 	my $code	= shift;
 	my $expected	= shift;
@@ -80,6 +82,7 @@ try('1<{case %arch "Windows" "Is Windows" "MSDOS" "Is MSDOS" "Is Unix"}>2', '1Is
 try("1<{foreach {& 1 2 3 4}}>2", "112342");
 try('1<{T @"this" "esto" }><{@"this"}>2', "1esto2");
 try('<{$0}>+<{$1}>=<{$2}>', '1+2=3', 1, 2, 3);
+try('<{nonexistent}>', "Bad opcode 'nonexistent'");
 
 print "\nTesting success: ", $tests_ok, '/', $tests, ' (', ($tests_ok / $tests) * 100, "%)\n";
 
