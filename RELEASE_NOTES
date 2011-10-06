@@ -5,9 +5,12 @@ Artemus Release Notes
 -----
 
  - New features:
+   * The new operand `def' allows inline template definitions.
    * Both the exec() and the process() methods accept
      arguments in their calls that can be referenced with
      dollar-prefixed arguments as usual.
+   * An `AUTOLOAD' template can be defined to be called
+     everytime a template is not found (instead of crashing).
 
 5.0.1
 -----

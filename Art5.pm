@@ -258,7 +258,12 @@ sub exec {
                 );
             }
             else {
-                croak "Artemus5 opcode not found: $op";
+                if ($self->code('AUTOLOAD')) {
+                    $ret = $self->exec(['AUTOLOAD', [ '"', $op]]);
+                }
+                else {
+                    croak "Artemus5 opcode not found: $op";
+                }
             }
         }
     }
@@ -332,6 +337,13 @@ sub init {
 
 		return '';
 	};
+
+    # template definition
+    $self->{op}->{def} = sub {
+        $self->{op}->{$self->exec($_[0])} = $_[1];
+
+        return '';
+    };
 
 	# list of translation pairs
 	$self->{op}->{'T'} = sub {

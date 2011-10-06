@@ -74,8 +74,8 @@ is exactly the same as the previous one:
 
  <{? "Voltage: " V "Current: " A "Power: " {mul V A}}>
 
-Variables and data types
-------------------------
+Variables, definitions and data types
+-------------------------------------
 
 Assignation to variables can be done by using the `=' operator:
 
@@ -83,6 +83,27 @@ Assignation to variables can be done by using the `=' operator:
  Artemus author's email is <{email}>.
 
 From that moment on, the `email' variable can be used as a template.
+
+It's also possible to define new templates inline by using the `def'
+operator. This code defines a `link' template that is then used:
+
+ <{
+    # Create the 'link' template
+    {def 'link' {
+            ? "<a href = '" $0 "'>" $1 "</a>"
+        }
+    }
+ }>
+ <{link "http://triptico.com" "Angel Ortega's Site"}>
+
+Please take note that, both on asignation and template definition,
+the name of the variable or template must be enclosed with quotes.
+
+Also take note that variables and templates are essentially the same,
+and the only difference is in the way dollar-prefixed arguments are
+treated when the assignation or definition is done: in the first case,
+arguments are expanded in that specific moment, but in the second one
+the expansion is postponed until the execution.
 
 Strings
 ~~~~~~~
@@ -334,6 +355,15 @@ Math operators
 
 The `add', `sub', `mul' and `div' exist as their corresponding math
 operators.
+
+Error control
+~~~~~~~~~~~~~
+
+An undefined operator or template name generates a fatal error unless
+an `AUTOLOAD' template is defined. If it is, it's called on errors
+with the offending template name sent as the only argument. This allow
+automatic loading from external sources, code generation on the fly
+or simply returning the error in the output stream.
 
 Miscellaneous
 ~~~~~~~~~~~~~
