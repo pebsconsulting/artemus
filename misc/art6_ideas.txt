@@ -581,3 +581,41 @@ out('</ul>')
     out
 } 'borodb' recv
 
+set('n', 0)
+
+while (lt(n, 100),
+    out('value: ')
+    out(n)
+    set('n', add(n, 1))
+)
+
+if (ne(HTTP_COOKIE, ''),
+    send('db',
+        'cmd',      'user_by_sid',
+        'sid',      sid
+    )
+
+    recv('db',
+        set_logged_user(user)
+    )
+)
+
+set(etag, cat('"', out_crc16, '"'))
+
+if (eq(HTTP_IF_NONE_MATCH, out_crc16),
+    http_status(304)
+    set('body', ''),
+
+    http_headers(
+        'ETag',             etag,
+        'Cache-Control',    'max-age=300'
+    )
+)
+
+
+foreach (http_headers,
+    out($0, ': ', $1, "\n")
+)
+out("\n")
+
+if (use_gzip,
