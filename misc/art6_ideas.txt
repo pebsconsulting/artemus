@@ -1,0 +1,583 @@
+'navigator'
+''
+{
+'or'
+%num
+cfg_index_num
+}
+
+
+[ {or %offset 0} {or %num cfg_index_num} '' 'navigator' $ &#
+
+[ { [ 0 'offset' % 'or' $ &# } { [ 'cfg_index_num' $ 'num' % 'or' $ &# }
+    '' 'navigator' $ &#
+
+MARK
+MARK, CALL n
+MARK, CALL n, CALL m
+MARK, CALL n, CALL m, LITERAL
+MARK, CALL n, CALL m, LITERAL, LITERAL
+MARK, CALL n, CALL m, LITERAL, ADDRESS
+
+{'navigator'
+    { " '' }
+    { 'or' { % 'num' & 'cfg_index_num' }}
+    { 'or' { % 'num' " 0}}
+}
+
+& 'navigator' 3 & 'or' 2 
+
+'<div class = navigator>' ?
+'0' 'offset' % or
+'cfg_index_num' & 'num' % or
+'' '3' 'navigator' &#
+'</div>' ?
+
+navigator
+---------
+
+{
+    '<span class = prev>' ?
+
+    'Newer posts' @
+
+    $1 $2 sub
+    'offset'
+    $0
+    'topic'
+    't' % 'INDEX' or
+    5 'url' &#
+
+    2 'link' &#
+
+    '</span>' ?
+}
+{
+    $2
+} if
+
+{
+    '<span class = next>' ?
+
+    'Older posts' @
+
+    $1 $2 add
+    'offset'
+    $0
+    'topic'
+    't' % 'INDEX' or
+    5 'url' &#
+
+    2 'link' &#
+
+    '</span>' ?
+}
+{
+    $1 $2 add
+    $1
+    $0 'cfg_index_topics' $ or
+    3 'stories_by_date' &#
+    size
+} if
+
+{
+    '<a href = "' ?
+    $0 ?
+    '">' ?
+    $1 ?
+}
+'link' def
+
+304 1 'set_http_status' &#
+
+'sid' $ "sid=" . 1 'set_cookie' &#
+
+{set_cookie {. "sid=" sid}}
+
+{foreach
+    {stories_by_date %topic 0 0}
+    {
+    }
+}
+
+{ 0 0 'topic' % 3 'stories_by_date' &# } foreach
+
+{stories_by_date {or $0 cfg_index_topics} $1 {add $2 $1}
+    {
+        '<url><loc>' ?
+        {aurl 'STORY' 'topic' $0 'id' $1} ?
+        '</loc></url>' ?
+    }
+}
+
+{topics {
+    '<url><loc>'
+    {aurl 'TOPIC' 'topic' $0}
+    '</loc></url>'
+    }
+}
+
+{
+    '<url><loc>' ?
+    $0 'topic' 'TOPIC' 3 'aurl' &# ?
+    '</loc></url>' ?
+} 1 'topics' &#
+
+[
+{
+    [
+    '</loc></url>'
+    [ $1 'id' $0 'topic' 'TOPIC' 'aurl' &
+    '<url><loc>'
+    ?
+} 'stories_by_date' &
+
+out(
+    '<url><loc>',
+    aurl('TOPIC', 'topic', $0),
+    '</loc></url>'
+)
+
+if($2,
+    out(
+        '<span class = prev>',
+        link(
+            url(
+                or(%t, 'INDEX'),
+                'topic',
+                $0,
+                'offset',
+                sub($2, $1)
+            ),
+            @("Newer posts")
+        ),
+        '</span>'
+    )
+)
+
+if(
+    size(stories_by_date(or($0, cfg_index_topics), $1, add($2, $1))),
+    out(
+        '<span class = next',
+        link(
+            url(
+                or(%t, 'INDEX'),
+                'topic',
+                $0,
+                'offset'
+                add($2, $1)
+            ),
+            @("Older posts")
+        ),
+        '</span>'
+    )
+)
+
+if
+size
+stories_by_date
+or
+$0
+&
+cfg_index_topics
+[
+$1
+add
+$2
+$1
+[
+out
+'<span class = next>'
+link
+url
+or
+%
+'t'
+'INDEX'
+'topic'
+$0
+'offset'
+add
+$2
+$1
+[
+@
+"Older posts"
+[
+'<span>'
+[
+
+{
+[
+    '</span>'
+    [
+        "Older posts" @
+        [
+            $1 $2 add 'offset' $0 'topic' 'INDEX' 't' % or
+        'url' &
+    'link' &
+    '<span class = next>'
+out
+}
+[
+    $1 $2 add
+    $1
+    [
+    'cfg_index_topics' & $0 or
+'stories_by_date' &
+size
+if
+
+stories_by_date(
+    &out(
+        '<url><loc>',
+        aurl('STORY', 'topic', $0, 'id', $1),
+        '</loc></url>'
+    )
+);
+
+    &out(
+        '<url><loc>',
+        aurl('STORY', 'id', $0),
+        '</loc></url>'
+    )
+
+
+SITEMAP:
+
+<{
+    content_type("application/rss+xml")
+
+    transfer_encoding("chunked")
+
+    out(
+        '<?xml version="1.0" encoding="UTF-8?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+
+        '<url><loc>',
+        aurl,
+        '</loc></url>',
+
+        stories_by_date(
+            &out(
+                '<url><loc>',
+                aurl('STORY', 'id', $0),
+                '</loc></url>'
+            )
+        ),
+
+        topics(
+            &out(
+                '<url><loc>',
+                aurl('TOPIC', 'id', $0),
+                '</loc></url>'
+            )
+        ),
+
+        '</urlset>'
+    )
+}>
+
+
+    let('count', 0)
+
+    channel(
+        borodin,
+        &out(
+            '<url><loc>',
+            aurl('STORY', 'id', $0),
+            '</loc></url>'
+        ),
+        'cmd',      'stories_by_date'
+    )
+
+channel
+borodin
+[
+}
+out
+    '<url><loc>',
+    aurl
+        'STORY'
+        'id'
+        $0
+    [
+    '</loc></url>'
+[
+{
+'cmd'
+'stories_by_date'
+[
+
+[ 'stories_by_date' 'cmd'
+    { [ '</loc></url>' [ $0 'id' 'STORY' 'aurl' & '<url><loc>' out }
+[ 'borodin' &
+channel
+
+channel_send(borofd, 'cmd', 'topics')
+
+channel_recv(borofd,
+    &out(
+        '<url><loc>',
+        aurl('STORY', 'id', $0),
+        '</loc></url>'
+    )
+)
+
+[ 'topics' 'cmd' 'borofd' & channel_send
+
+{ [ '</loc></url>' [ $0 'id' 'STORY' 'aurl' &] '<url><loc>' out }
+'borofd' & channel_recv
+
+SEARCH_IMAGE
+------------
+
+<{
+    assert_admin()
+
+    out(
+        header,
+        column1,
+        column2,
+        '<div class = main>'
+        main_top,
+        '<h1>',
+        @("Search image by name"),
+        '</h1>',
+        search_image_form,
+        add(1, 2)
+    )
+
+    out
+        'header' &
+        'column1' &
+        'column2' &
+        '<div class = main>'
+        'main_top' &
+        '<h1>'
+        'Search image by name' @
+        '</h1>'
+        'search_image_form' &
+        2 1 add
+    [
+
+    search_image(
+        &out(
+            '<p><b>',
+            $0,
+            '</b><br><img src = "http://',
+            cfg_host_name,
+            '/img/',
+            $0,
+            '" alt = "',
+            $0,
+            '" title = "',
+            $0,
+            '"></p>'
+        ),
+        %query
+    )
+
+    out(
+        search_hits,
+        main_bottom,
+        'div',
+        footer
+    );
+}>
+
+    channel_send(
+        borodb,
+        'cmd',          'search_image',
+        'query',        %query
+    )
+
+    [ 'query' % 'query' 'search_image' 'cmd' 'borodb' & channel_send
+
+    channel_recv(
+        borodb,
+        &out(
+            '<p><b>',
+            $0,
+            '</b><br><img src = "http://',
+            cfg_host_name,
+            '/img/',
+            $0,
+            '" alt = "',
+            $0,
+            '" title = "',
+            $0,
+            '"></p>'
+        )
+    )
+
+    [ { [ '</b><br><img src = "http://' $0 '<p><b>' out } 'borodb' & channel_recv
+
+    if (eq(HTTP_REQUEST_METHOD, 'GET'),
+        out(coco)
+        foreach(array, out($0))
+    )
+
+    { [ 'coco' & out { [ $0 out } 'array' & foreach}
+        'HTTP_REQUEST_METHOD' & 'GET' eq if
+
+    set('link',
+        &out(
+            '<a href = "',
+            $0,
+            '">',
+            $1,
+            '</a>'
+        )
+    )
+
+    { [ '</a>' $1 '">' $0 '<a href = "' out } 'link' set
+
+    def('link',
+        out($0)
+        out($1)
+        out("---")
+    )
+
+    { [ $0 out [ $1 out [ "---" out } 'link' =
+
+    set('link',
+        out($0)
+        out($1)
+        out("---")
+    )
+
+    [ $0 out [ $1 out [ "---" out 'link' =
+
+    set('v', 10)
+
+    10 'v' =
+
+    local('v', 10)
+
+init
+----
+
+<{ open('borodb', 'localhost', '1234') cgi_init() }>
+
+header
+------
+
+<{init}><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+       "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+
+...
+
+
+INDEX
+-----
+
+#!/usr/bin/env art6
+<{
+    header
+    column1
+    column2
+}>
+
+<div class = 'main'>
+
+    <{
+        main_top
+
+        if (story_exists('info', 'index'),
+            story_body('info', 'index'),
+            index()
+        )
+
+        main_bottom
+    }>
+
+</div>
+
+<{footer}>
+
+story_exists
+------------
+
+<{
+
+    chan_send('borodb',
+        'cmd',              'story_exists',
+        'topic',            $0,
+        'id'                $1
+    )
+
+    chan_recv('borodb',
+        return($1)
+    )
+
+}>
+
+story_body
+----------
+
+<{
+    send('borodb',
+        'cmd',          'story_body',
+        'topic',        $0,
+        'id',           $1
+    )
+
+    recv('borodb', return($1))
+}>
+
+def('story_body',
+    send('borodb',
+        'cmd',          'story_body',
+        'topic',        $0,
+        'id',           $1
+    )
+
+    recv('borodb', return($1))
+)
+
+send('borodb',
+    'cmd',      'topics',
+    'key',      'id',
+    'key',      'title'
+)
+
+out('<ul>')
+
+recv('borodb',
+    out(
+        '<li>',
+        link(
+            url(
+                'TOPIC', 'topic', id
+            ),
+            title
+        ),
+        '</li>'
+    )
+)
+
+def('link',
+    cat('<a href = "', $0, '">', $1, '</a>')
+)
+
+<a href = "<{$0}>"><{$1}></a>
+
+out('</ul>')
+
+{
+    [
+        '</li>'
+        [
+            'title' $
+            [
+                'id' $
+                'topic'
+                'TOPIC'
+            'url' &
+        'link' &
+        '<li>'
+    out
+} 'borodb' recv
+
