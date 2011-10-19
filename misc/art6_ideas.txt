@@ -619,3 +619,35 @@ foreach (http_headers,
 out("\n")
 
 if (use_gzip,
+
+C API
+-----
+
+    struct a6_m a6m;
+
+    char *prg = "{[@0?[@1?['---\0?}'link\0=";
+
+    a6_prog(a6m, prg);
+
+    a6_run(a6m, 150);
+
+    char *prg2 = "['Triptico\0'http://triptico.com\0\0'link\0&?";
+
+    /* even variables are programs */
+    char *prg3 = "{'angel\0}'user\0='user&?";
+
+    char *prg4 = "{['</a>\0$1'">\0$0'<a href = "\0?}'link\0=";
+
+    [ 'Triptico 'http://triptico.com [ '</a> $1 '"> $0 '<a href = "
+
+    ?('result is: ', /(10, 2), '!!!')
+    def('link', ~('<a href = "', $0, '">', $1, '"</a>'))
+    def('url', ~('http://', $0))
+    link(url('triptico.com'), 'Triptico')
+
+    ['!!!\0['2\0'10\0/'Result is: \0?
+
+    ['Triptico\0['triptico.com\0'url\0&'link\0&
+
+    {['<a href =\0$0'">\0$1'"</a>\0~}'link\0=
+    {[$0'http://\0~}'url\0=
