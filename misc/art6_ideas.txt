@@ -663,17 +663,24 @@ ARCfour
         =(j, &(+(j, .(S, i)), 0xff))
         /* t = S[i]; S[i] = S[j]; S[j] = t; */
         =(t, .(S, i)) =(.(S, i), .(S, j)) =(.(S, j), t)
-        /* t = (S[i] + S(j)) & 0xff; */
-        =(t, &(+(.(S, i), .(S, j)) & 0xff))
+        /* t = (S[i] + S[j]) & 0xff; */
+        =(t, &(+(.(S, i), .(S, j)), 0xff))
         /* K = S[t]; */
         =(K, .(S, t))
     }
 )
-    ['i\000[['i\000'1\000+'0xff\000&=Z
+
+=(i, and(add(i, 1), 0xff))
+i = and(add(i, 1), 0xff)
+
+    ['i\000[['i\000$'1\000+'0xff\000&=Z
     ['K\000['S\000't\000$.=
 
     ['arcfour_byte\000{['i\000[['i\000'1\000+'0xff\000&=Z'S\000't\000$.}=Z
 
-=c(^(get_char(f), arcfour_byte()))
+=(c,^(get_char(f), arcfour_byte()))
 
     ['c\000[['f\000$'get_char\000$&['arcfour_byte\000$&^=Z
+
+=(.(S, j), t)
+=(S, j, t)
