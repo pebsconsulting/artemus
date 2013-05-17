@@ -356,6 +356,28 @@ Math operators
 The `add', `sub', `mul' and `div' exist as their corresponding math
 operators.
 
+Regular expressions
+~~~~~~~~~~~~~~~~~~~
+
+The `regex' opcode filters the text in its first argument through
+the regular expression in the second one and returns all the matched
+text:
+
+ <{regex "My phone number is 7731411, you know" "[0-9]+"}>
+
+returns
+
+ 7731411
+
+If a third argument is sent, it's accepted as a substition string
+for the matched substring:
+
+ <{regex "My phone number is 7731411, you know" "[0-9]+" "SECRET"}>
+
+returns
+
+ My phone number is SECRET, you know
+
 Error control
 ~~~~~~~~~~~~~
 

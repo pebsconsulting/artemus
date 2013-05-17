@@ -2,7 +2,7 @@
 #
 #   Artemus - Template Toolkit version 5
 #
-#   Copyright (C) 2000/2011 Angel Ortega <angel@triptico.com>
+#   Copyright (C) 2000/2013 Angel Ortega <angel@triptico.com>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License
@@ -30,7 +30,7 @@ use strict;
 use warnings;
 use Carp;
 
-$Art5::VERSION = '5.0.2-dev';
+$Art5::VERSION = '5.1.0-dev';
 
 sub parse {
     my $self	= shift;
@@ -534,6 +534,26 @@ sub init {
 
 		return Dumper($self->exec($_[0]));
 	};
+
+    $self->{op}->{regex} = sub {
+        my $str = $self->exec(shift);
+        my $rx  = $self->exec(shift);
+        my $ret = '';
+
+        if (scalar(@_)) {
+            # there is a 3rd argument: it's a substitution
+            my $sub = $self->exec(shift);
+            $str =~ s/$rx/$sub/g;
+
+            $ret = $str;
+        }
+        else {
+            $str =~ /($rx)/;
+            $ret = $1;
+        }
+
+        return $ret;
+    };
 
 	$self->{xh}->{arch} = 'Unix';
 

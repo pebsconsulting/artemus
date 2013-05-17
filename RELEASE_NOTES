@@ -1,11 +1,13 @@
 Artemus Release Notes
 =====================
 
-5.0.2
+5.1.0
 -----
 
  - New features:
    * The new operand `def' allows inline template definitions.
+   * The new operand `regex' allows extracting or substituting
+     text using regular expressions.
    * Both the exec() and the process() methods accept
      arguments in their calls that can be referenced with
      dollar-prefixed arguments as usual.
