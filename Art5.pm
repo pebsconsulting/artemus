@@ -30,7 +30,7 @@ use strict;
 use warnings;
 use Carp;
 
-$Art5::VERSION = '5.1.0';
+$Art5::VERSION = '5.1.1-dev';
 
 sub parse {
     my $self	= shift;
@@ -249,7 +249,25 @@ sub exec {
             my $c = $self->code($op);
         
             if (ref($c) eq 'CODE') {
-                $ret = $c->(@stream);
+                if ($self->{profile}) {
+                    use Time::HiRes;
+                    my ($s, $ms, $st, $et);
+
+                    ($s, $ms) = (Time::HiRes::gettimeofday());
+                    $st = $s + ($ms / 1000000);
+
+                    $ret = $c->(@stream);
+
+                    ($s, $ms) = (Time::HiRes::gettimeofday());
+                    $et = $s + ($ms / 1000000);
+
+                    push(@{$self->{timed_calls}},
+                        sprintf("%s %.6fs", $op, $et - $st)
+                    );
+                }
+                else {
+                    $ret = $c->(@stream);
+                }
             }
             elsif (ref($c) eq 'ARRAY') {
                 $ret = $self->exec(
@@ -581,6 +599,8 @@ sub new {
 	if ($self->{cache}) {
 		mkdir $self->{cache};
 	}
+
+    $self->{timed_calls} = [];
 
 	return $self->init();
 }

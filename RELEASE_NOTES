@@ -1,6 +1,15 @@
 Artemus Release Notes
 =====================
 
+5.1.1
+-----
+
+ - New features:
+   * Function template profiling; if `profile' is set (-p
+     in the command-line utility), the `timed_calls' array
+     is filled with information about how much time each
+     invoked opcode has taken.
+
 5.1.0
 -----
 

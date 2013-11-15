@@ -7,6 +7,7 @@ my $v;
 my $s;
 my @path = ();
 my $cache = undef;
+my $profile = 0;
 
 # raw argument parsing
 while ($v = shift(@ARGV)) {
@@ -25,6 +26,9 @@ while ($v = shift(@ARGV)) {
 	elsif ($v eq '-h') {
 		usage();
 	}
+    elsif ($v eq '-p') {
+        $profile = 1;
+    }
 	else {
 		# script name
 	}
@@ -34,7 +38,7 @@ if (!defined($s)) {
 	$s = join('', <>);
 }
 
-my $a = Art5->new( path => \@path, cache => $cache);
+my $a = Art5->new( path => \@path, cache => $cache, profile => $profile);
 
 my $c = $a->compile($s);
 
@@ -45,6 +49,11 @@ if ($dump) {
 }
 else {
 	print $a->exec($c);
+}
+
+if ($a->{profile}) {
+    print("Timed calls:\n");
+    print(join("\n", @{$a->{timed_calls}}), "\n");
 }
 
 exit 0;
