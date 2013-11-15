@@ -30,7 +30,7 @@ use strict;
 use warnings;
 use Carp;
 
-$Art5::VERSION = '5.1.0-dev';
+$Art5::VERSION = '5.1.0';
 
 sub parse {
     my $self	= shift;
