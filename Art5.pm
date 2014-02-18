@@ -33,9 +33,9 @@ use Carp;
 $Art5::VERSION = '5.1.1-dev';
 
 sub parse {
-    my $self	= shift;
-    my $seq		= shift;
-    my @ret		= ();
+    my $self    = shift;
+    my $seq     = shift;
+    my @ret     = ();
 
     # delete leading blanks and a possible brace
     $$seq =~ s/^\s*\{?\s*//;
@@ -47,8 +47,8 @@ sub parse {
         }
         elsif ($$seq =~ s/^(@?)"(([^"\\]*(\\.[^"\\]*)*))"\s*//) {
             # double quoted string
-            my $op	= $1 || '"';
-            my $str	= $2;
+            my $op  = $1 || '"';
+            my $str = $2;
 
             # replace usual escaped characters
             $str =~ s/\\n/\n/g;
@@ -61,8 +61,8 @@ sub parse {
         }
         elsif ($$seq =~ s/^(@?)'(([^'\\]*(\\.[^'\\]*)*))'\s*//) {
             # single quoted string
-            my $op	= $1 || '"';
-            my $str	= $2;
+            my $op  = $1 || '"';
+            my $str = $2;
 
             $str =~ s/\\'/\'/g;
             $str =~ s/\\\\/\\/g;
@@ -128,8 +128,8 @@ sub parse {
 
 
 sub compile {
-    my $self	= shift;
-    my $str		= shift;
+    my $self    = shift;
+    my $str     = shift;
 
     # was this code already compiled?
     if (!exists($self->{pc}->{$str})) {
@@ -163,8 +163,8 @@ sub compile {
 
 
 sub code {
-    my $self	= shift;
-    my $op		= shift;
+    my $self    = shift;
+    my $op      = shift;
 
     if (!exists($self->{op}->{$op})) {
         my $src = undef;
@@ -224,8 +224,8 @@ sub code {
 
 
 sub exec {
-    my $self	= shift;
-    my $prg		= shift;
+    my $self    = shift;
+    my $prg     = shift;
     my $ret;
 
     if (ref($prg) && !$self->{abort}) {
@@ -295,66 +295,66 @@ sub exec {
 
 
 sub exec0 {
-    my $self	= shift;
+    my $self    = shift;
 
     return $self->exec(@_) || 0;
 }
 
 
 sub init {
-	my $self	= shift;
+    my $self    = shift;
 
-	$self->{stack} = [ [] ];
+    $self->{stack} = [ [] ];
 
-	$self->{op}->{VERSION} = [ '"', $Art5::VERSION ];
+    $self->{op}->{VERSION} = [ '"', $Art5::VERSION ];
 
-	$self->{op}->{VERSION_STR} = [
-		'?', [ '"', 'Artemus ' ], [ 'VERSION' ]
-	];
+    $self->{op}->{VERSION_STR} = [
+        '?', [ '"', 'Artemus ' ], [ 'VERSION' ]
+    ];
 
-	# literal
-	$self->{op}->{'"'} = sub {
-		return $_[0];
-	};
+    # literal
+    $self->{op}->{'"'} = sub {
+        return $_[0];
+    };
 
-	# translateable literal
-	$self->{op}->{'@'} = sub {
-		return $self->{t}->{$_[0]} || $_[0];
-	};
+    # translateable literal
+    $self->{op}->{'@'} = sub {
+        return $self->{t}->{$_[0]} || $_[0];
+    };
 
-	# argument
-	$self->{op}->{'$'} = sub {
-		return $self->{stack}->[-1]->[$_[0]];
-	};
+    # argument
+    $self->{op}->{'$'} = sub {
+        return $self->{stack}->[-1]->[$_[0]];
+    };
 
-	# external hash (e.g. CGI variables)
-	$self->{op}->{'%'} = sub {
-		my $var = shift;
+    # external hash (e.g. CGI variables)
+    $self->{op}->{'%'} = sub {
+        my $var = shift;
 
-		return $var eq '%' ? $self->{xh} : $self->{xh}->{$var};
-	};
+        return $var eq '%' ? $self->{xh} : $self->{xh}->{$var};
+    };
 
-	# joiner
-	$self->{op}->{'?'} = sub {
-		if (scalar(@_) == 1) {
-			return $self->exec($_[0]);
-		}
+    # joiner
+    $self->{op}->{'?'} = sub {
+        if (scalar(@_) == 1) {
+            return $self->exec($_[0]);
+        }
 
-		return join('', map { $self->exec($_); } @_);
-	};
+        return join('', map { $self->exec($_); } @_);
+    };
 
-	# array
-	$self->{op}->{'&'} = sub {
-		return [ map { $self->exec($_); } @_ ];
-	};
+    # array
+    $self->{op}->{'&'} = sub {
+        return [ map { $self->exec($_); } @_ ];
+    };
 
-	# assignation
-	$self->{op}->{'='} = sub {
-		$self->{op}->{$self->exec($_[0])} =
-			[ '"', $self->exec($_[1]) ];
+    # assignation
+    $self->{op}->{'='} = sub {
+        $self->{op}->{$self->exec($_[0])} =
+            [ '"', $self->exec($_[1]) ];
 
-		return '';
-	};
+        return '';
+    };
 
     # template definition
     $self->{op}->{def} = sub {
@@ -363,195 +363,195 @@ sub init {
         return '';
     };
 
-	# list of translation pairs
-	$self->{op}->{'T'} = sub {
-		while (scalar(@_) > 1) {
-			my $k = $self->exec(shift);
-			my $v = $self->exec(shift);
+    # list of translation pairs
+    $self->{op}->{'T'} = sub {
+        while (scalar(@_) > 1) {
+            my $k = $self->exec(shift);
+            my $v = $self->exec(shift);
 
-			$self->{t}->{$k} = $v;
-		}
+            $self->{t}->{$k} = $v;
+        }
 
-		return '';
-	};
+        return '';
+    };
 
-	$self->{op}->{eq} = sub {
-		$self->exec($_[0]) eq
-			$self->exec($_[1]) ? 1 : 0;
-	};
-	$self->{op}->{ne} = sub {
-		$self->exec($_[0]) ne
-			$self->exec($_[1]) ? 1 : 0;
-	};
+    $self->{op}->{eq} = sub {
+        $self->exec($_[0]) eq
+            $self->exec($_[1]) ? 1 : 0;
+    };
+    $self->{op}->{ne} = sub {
+        $self->exec($_[0]) ne
+            $self->exec($_[1]) ? 1 : 0;
+    };
 
-	$self->{op}->{and} = sub {
-		$self->exec($_[0]) && $self->exec($_[1]);
-	};
-	$self->{op}->{or} = sub {
-		$self->exec($_[0]) || $self->exec($_[1]);
-	};
-	$self->{op}->{not} = sub {
-		$self->exec($_[0]) ? 0 : 1;
-	};
+    $self->{op}->{and} = sub {
+        $self->exec($_[0]) && $self->exec($_[1]);
+    };
+    $self->{op}->{or} = sub {
+        $self->exec($_[0]) || $self->exec($_[1]);
+    };
+    $self->{op}->{not} = sub {
+        $self->exec($_[0]) ? 0 : 1;
+    };
 
-	$self->{op}->{if} = sub {
-		my $ret = '';
+    $self->{op}->{if} = sub {
+        my $ret = '';
 
-		if ($self->exec($_[0])) {
-			$ret = $self->exec($_[1]);
-		}
-		elsif (scalar(@_) == 3) {
-			$ret = $self->exec($_[2]);
-		}
+        if ($self->exec($_[0])) {
+            $ret = $self->exec($_[1]);
+        }
+        elsif (scalar(@_) == 3) {
+            $ret = $self->exec($_[2]);
+        }
 
-		$ret;
-	};
+        $ret;
+    };
 
-	$self->{op}->{add} = sub {
-		return $self->exec0($_[0]) + $self->exec0($_[1]);
-	};
-	$self->{op}->{sub} = sub {
-		return $self->exec0($_[0]) - $self->exec0($_[1]);
-	};
-	$self->{op}->{mul} = sub {
-		return $self->exec0($_[0]) * $self->exec0($_[1]);
-	};
-	$self->{op}->{div} = sub {
-		return $self->exec0($_[0]) / $self->exec0($_[1]);
-	};
+    $self->{op}->{add} = sub {
+        return $self->exec0($_[0]) + $self->exec0($_[1]);
+    };
+    $self->{op}->{sub} = sub {
+        return $self->exec0($_[0]) - $self->exec0($_[1]);
+    };
+    $self->{op}->{mul} = sub {
+        return $self->exec0($_[0]) * $self->exec0($_[1]);
+    };
+    $self->{op}->{div} = sub {
+        return $self->exec0($_[0]) / $self->exec0($_[1]);
+    };
 
-	$self->{op}->{gt} = sub {
-		return $self->exec0($_[0]) > $self->exec0($_[1]);
-	};
-	$self->{op}->{lt} = sub {
-		return $self->exec0($_[0]) < $self->exec0($_[1]);
-	};
-	$self->{op}->{random} = sub {
-		return $self->exec($_[rand(scalar(@_))]);
-	};
+    $self->{op}->{gt} = sub {
+        return $self->exec0($_[0]) > $self->exec0($_[1]);
+    };
+    $self->{op}->{lt} = sub {
+        return $self->exec0($_[0]) < $self->exec0($_[1]);
+    };
+    $self->{op}->{random} = sub {
+        return $self->exec($_[rand(scalar(@_))]);
+    };
 
-	$self->{op}->{env} = sub {
-		# no arguments? return keys as an arrayref
-		if (scalar(@_) == 0) {
-			return [ keys(%ENV) ];
-		}
+    $self->{op}->{env} = sub {
+        # no arguments? return keys as an arrayref
+        if (scalar(@_) == 0) {
+            return [ keys(%ENV) ];
+        }
 
-		return $ENV{$self->exec($_[0])};
-	};
+        return $ENV{$self->exec($_[0])};
+    };
 
-	$self->{op}->{foreach} = sub {
-		my $list	= shift;
-		my $code	= shift || [ '$', 0 ];
-		my $sep		= shift || [ '"', '' ];
-		my $header	= shift || [ '"', '' ];
+    $self->{op}->{foreach} = sub {
+        my $list    = shift;
+        my $code    = shift || [ '$', 0 ];
+        my $sep     = shift || [ '"', '' ];
+        my $header  = shift || [ '"', '' ];
 
-		my @ret = ();
-		my $ph = '';
+        my @ret = ();
+        my $ph = '';
 
-		foreach my $e (@{$self->exec($list)}) {
-			# create a stack for the elements
-			# and store the element in the stack
-			push(@{$self->{stack}}, ref($e) ? $e : [ $e ]);
+        foreach my $e (@{$self->exec($list)}) {
+            # create a stack for the elements
+            # and store the element in the stack
+            push(@{$self->{stack}}, ref($e) ? $e : [ $e ]);
 
-			# execute the header code
-			my $o = $self->exec($header);
+            # execute the header code
+            my $o = $self->exec($header);
 
-			# if it's different from previous header,
-			# strip from output; otherwise, remember
-			# for next time
-			if ($ph eq $o) {
-				$o = '';
-			}
-			else {
-				$ph = $o;
-			}
+            # if it's different from previous header,
+            # strip from output; otherwise, remember
+            # for next time
+            if ($ph eq $o) {
+                $o = '';
+            }
+            else {
+                $ph = $o;
+            }
 
-			# execute the body code
-			$o .= $self->exec($code);
+            # execute the body code
+            $o .= $self->exec($code);
 
-			push(@ret, $o);
+            push(@ret, $o);
 
-			# destroy last stack
-			pop(@{$self->{stack}});
-		}
+            # destroy last stack
+            pop(@{$self->{stack}});
+        }
 
-		return join($self->exec($sep), @ret);
-	};
+        return join($self->exec($sep), @ret);
+    };
 
-	$self->{op}->{case} = sub {
-		my $value	= $self->exec(shift);
-		my $oth;
+    $self->{op}->{case} = sub {
+        my $value   = $self->exec(shift);
+        my $oth;
 
-		# if args are odd, the last one is
-		# the 'otherwise' case
-		if (scalar(@_) % 2) {
-			$oth = pop(@_);
-		}
+        # if args are odd, the last one is
+        # the 'otherwise' case
+        if (scalar(@_) % 2) {
+            $oth = pop(@_);
+        }
 
-		# now treat the rest of arguments as
-		# pairs of case / result
-		while (@_) {
-			my $case =	$self->exec(shift);
-			my $res = 	shift;
+        # now treat the rest of arguments as
+        # pairs of case / result
+        while (@_) {
+            my $case =  $self->exec(shift);
+            my $res =   shift;
 
-			if ($value eq $case) {
-				return $self->exec($res);
-			}
-		}
+            if ($value eq $case) {
+                return $self->exec($res);
+            }
+        }
 
-		return defined($oth) ? $self->exec($oth) : '';
-	};
+        return defined($oth) ? $self->exec($oth) : '';
+    };
 
-	$self->{op}->{seq} = sub {
-		my $from	= $self->exec0(shift);
-		my $to		= $self->exec0(shift);
+    $self->{op}->{seq} = sub {
+        my $from    = $self->exec0(shift);
+        my $to      = $self->exec0(shift);
 
-		return [ $from .. $to ];
-	};
+        return [ $from .. $to ];
+    };
 
-	$self->{op}->{sort} = sub {
-		my $list	= $self->exec(shift);
-		my $code	= shift || [ '$', 0 ];
+    $self->{op}->{sort} = sub {
+        my $list    = $self->exec(shift);
+        my $code    = shift || [ '$', 0 ];
 
-		# create a stack for the elements
-		push(@{$self->{stack}}, []);
+        # create a stack for the elements
+        push(@{$self->{stack}}, []);
 
-		my $ret = [ sort {
-			$self->{stack}->[-1] = ref($a) ? $a : [ $a ];
-			my $va = $self->exec($code);
+        my $ret = [ sort {
+            $self->{stack}->[-1] = ref($a) ? $a : [ $a ];
+            my $va = $self->exec($code);
 
-			$self->{stack}->[-1] = ref($b) ? $b : [ $b ];
-			my $vb = $self->exec($code);
+            $self->{stack}->[-1] = ref($b) ? $b : [ $b ];
+            my $vb = $self->exec($code);
 
-			$va cmp $vb;
-		} @{$list} ];
+            $va cmp $vb;
+        } @{$list} ];
 
-		# destroy last stack
-		pop(@{$self->{stack}});
+        # destroy last stack
+        pop(@{$self->{stack}});
 
-		return $ret;
-	};
+        return $ret;
+    };
 
-	$self->{op}->{reverse} = sub {
-		return [ reverse @{$self->exec(shift)} ];
-	};
+    $self->{op}->{reverse} = sub {
+        return [ reverse @{$self->exec(shift)} ];
+    };
 
-	$self->{op}->{size} = sub { return scalar @{$self->exec($_[0])} };
+    $self->{op}->{size} = sub { return scalar @{$self->exec($_[0])} };
 
-	$self->{op}->{split} = sub {
-		if (scalar(@_) == 3) {
-			return [ map { [ split($self->exec($_[1]), $_) ] }
-					split($self->exec($_[0]), $self->exec($_[2]))
-				];
-		}
-		return [ split($self->exec($_[0]), $self->exec($_[1])) ];
-	};
+    $self->{op}->{split} = sub {
+        if (scalar(@_) == 3) {
+            return [ map { [ split($self->exec($_[1]), $_) ] }
+                    split($self->exec($_[0]), $self->exec($_[2]))
+                ];
+        }
+        return [ split($self->exec($_[0]), $self->exec($_[1])) ];
+    };
 
-	$self->{op}->{dump} = sub {
-		use Data::Dumper;
+    $self->{op}->{dump} = sub {
+        use Data::Dumper;
 
-		return Dumper($self->exec($_[0]));
-	};
+        return Dumper($self->exec($_[0]));
+    };
 
     $self->{op}->{regex} = sub {
         my $str = $self->exec(shift);
@@ -573,36 +573,36 @@ sub init {
         return $ret;
     };
 
-	$self->{xh}->{arch} = 'Unix';
+    $self->{xh}->{arch} = 'Unix';
 
-	return $self;
+    return $self;
 }
 
 
 sub process {
-	my $self	= shift;
-	my $src		= shift;
+    my $self    = shift;
+    my $src     = shift;
 
-	my $c = $self->compile($src);
+    my $c = $self->compile($src);
 
-	return $self->exec($c, @_);
+    return $self->exec($c, @_);
 }
 
 
 sub new {
-	my $class	= shift;
+    my $class   = shift;
 
-	my $self = bless { @_ }, $class;
+    my $self = bless { @_ }, $class;
 
-	$self->{path} ||= [];
+    $self->{path} ||= [];
 
-	if ($self->{cache}) {
-		mkdir $self->{cache};
-	}
+    if ($self->{cache}) {
+        mkdir $self->{cache};
+    }
 
     $self->{timed_calls} = [];
 
-	return $self->init();
+    return $self->init();
 }
 
 1;
