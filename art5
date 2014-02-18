@@ -129,7 +129,7 @@ sub usage {
 	print <<EOF;
 
 Artemus 5 Command Line Interpreter
-Copyright (C) 2000/2011 Angel Ortega <angel\@triptico.com>
+Copyright (C) 2000/2014 Angel Ortega <angel\@triptico.com>
 
 Usage:
 
@@ -146,6 +146,7 @@ Options
           translateable strings and updates all templates matching
           'lang_*' with them. To start with a new language, just
           create an empty language file.
+ -p       Dump profiling information after executing the program.
  -h       Show this help.
 
 EOF
